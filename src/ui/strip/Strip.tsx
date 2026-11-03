@@ -4,7 +4,7 @@ import { computePace } from "../../core/pace";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { splitTemplate } from "../../i18n/resolve";
-import { useNow } from "../hooks";
+import { useAnimatedNumber, useNow } from "../hooks";
 import { Meter } from "../Meter";
 import { ProviderMark } from "../ProviderMark";
 
@@ -16,7 +16,9 @@ export function Strip({ report }: { report: ProviderReport }) {
   const headline = snapshot?.headline ?? null;
   const pace = headline ? computePace(headline, now) : null;
   const resetsAt = headline?.resetsAt ? new Date(headline.resetsAt) : null;
-  const percent = headline ? format.percent(headline.percent) : "--";
+  // A new reading counts to its value instead of jumping.
+  const counted = useAnimatedNumber(headline?.percent ?? 0, 0);
+  const percent = headline ? format.percent(Math.round(counted)) : "--";
 
   // "{percent} until {day}": the number is emphasised, the rest stays quiet.
   const parts = resetsAt ? splitTemplate(locale.messages.stripUntil) : [{ placeholder: "percent" }];
@@ -31,7 +33,11 @@ export function Strip({ report }: { report: ProviderReport }) {
       aria-label={t("usageTitle", { provider: snapshot?.providerName ?? "Claude" })}
       onClick={() => bridge.toggleFlyout()}
     >
-      <ProviderMark providerId={snapshot?.providerId ?? "claude"} size={18} />
+      <ProviderMark
+        providerId={snapshot?.providerId ?? "claude"}
+        size={18}
+        level={headline?.percent ?? null}
+      />
       <span className="strip__body">
         <span className="strip__text">
           {parts.map((part, index) => {

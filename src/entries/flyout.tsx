@@ -6,7 +6,7 @@ import { mount } from "./mount";
 
 function FlyoutWindow() {
   const report = useReport();
-  return <Root>{(chosen) => <Flyout report={report} chosenLocale={chosen} />}</Root>;
+  return <Root>{(settings) => <Flyout report={report} settings={settings} />}</Root>;
 }
 
 mount(<FlyoutWindow />);

@@ -1,9 +1,19 @@
 import type { ProviderReport } from "../core/snapshot";
 
+export type RefreshMode = "adaptive" | "2m" | "5m" | "15m";
+
+/** Mirrors `Settings` in `src-tauri/src/settings.rs`. */
 export interface Settings {
   /** BCP 47 code chosen by the user, or `null` to follow the system language. */
   locale: string | null;
+  showStrip: boolean;
+  notifications: boolean;
+  refresh: RefreshMode;
+  desktopCard: boolean;
 }
+
+/** Only the fields named in a patch change; the host keeps everything else. */
+export type SettingsPatch = Partial<Settings>;
 
 export type Theme = "light" | "dark";
 
@@ -20,6 +30,11 @@ export interface TrayTexts {
   quit: string;
 }
 
+export interface Toast {
+  title: string;
+  body: string;
+}
+
 export type Unsubscribe = () => void;
 
 /**
@@ -33,7 +48,9 @@ export interface Bridge {
 
   getSettings(): Promise<Settings>;
   onSettings(listener: (settings: Settings) => void): Promise<Unsubscribe>;
-  setLocale(locale: string | null): Promise<void>;
+  updateSettings(patch: SettingsPatch): Promise<Settings>;
+  getLaunchAtLogin(): Promise<boolean>;
+  setLaunchAtLogin(enabled: boolean): Promise<boolean>;
 
   /** Preferred UI languages of the operating system, most preferred first. */
   systemLocales(): Promise<readonly string[]>;
@@ -41,6 +58,10 @@ export interface Bridge {
   onTaskbarTheme(listener: (theme: Theme) => void): Promise<Unsubscribe>;
   /** Hands translated texts to the tray icon and its menu, which the host draws. */
   localizeTray(texts: TrayTexts): Promise<void>;
+  /** Shows a Windows notification. */
+  notify(toast: Toast): Promise<void>;
+  /** Fires each time the flyout is brought on screen, so it can play its entrance. */
+  onFlyoutShown(listener: () => void): Promise<Unsubscribe>;
 
   openUsagePage(): Promise<void>;
   /** Tells the host how tall the flyout content is, so the window can fit it. */
@@ -49,5 +70,7 @@ export interface Bridge {
   fitStrip(width: number): Promise<void>;
   toggleFlyout(): Promise<void>;
   hideFlyout(): Promise<void>;
+  /** Moves the desktop card while the pointer is held down on it. */
+  dragCard(): Promise<void>;
   quit(): Promise<void>;
 }

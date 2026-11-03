@@ -4,6 +4,7 @@ mod api;
 mod credentials;
 mod desktop;
 
+use std::path::PathBuf;
 use std::time::Duration;
 
 use reqwest::StatusCode;
@@ -29,6 +30,14 @@ impl ClaudeProvider {
 impl UsageProvider for ClaudeProvider {
     fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a> {
         Box::pin(fetch(http))
+    }
+
+    /// Claude Code appends to a transcript under `projects/` on every turn.
+    fn activity_paths(&self) -> Vec<PathBuf> {
+        credentials::claude_config_dir()
+            .map(|dir| dir.join("projects"))
+            .into_iter()
+            .collect()
     }
 }
 

@@ -4,6 +4,8 @@
 //! network, windows and the tray. The UI in `src/` only renders reports and
 //! asks for actions through the commands in [`commands`].
 
+mod activity;
+mod card;
 mod commands;
 mod events;
 mod flyout;
@@ -18,8 +20,10 @@ mod tray;
 
 use std::sync::Mutex;
 
-use tauri::{Manager, WindowEvent};
+use tauri::{Emitter, Manager, WindowEvent};
 
+use crate::activity::ActivityWatch;
+use crate::card::CardState;
 use crate::flyout::SharedFlyoutState;
 use crate::poller::PollerHandle;
 use crate::settings::{Settings, SettingsStore};
@@ -32,7 +36,9 @@ pub struct AppState {
     settings: Mutex<Settings>,
     store: SettingsStore,
     flyout: SharedFlyoutState,
+    card: CardState,
     tray: TrayMenu,
+    _activity: ActivityWatch,
 }
 
 pub fn run() {
@@ -47,6 +53,7 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
@@ -55,7 +62,9 @@ pub fn run() {
             commands::get_report,
             commands::refresh,
             commands::get_settings,
-            commands::set_locale,
+            commands::update_settings,
+            commands::get_launch_at_login,
+            commands::set_launch_at_login,
             commands::system_locales,
             commands::host_info,
             commands::open_usage_page,
@@ -70,29 +79,47 @@ pub fn run() {
             let store = SettingsStore::new(&app.path().app_config_dir()?);
             let settings = store.load();
             let tray = tray::build(app)?;
-            let poller = poller::start(app.handle().clone(), providers::default_provider());
+
+            let provider = providers::default_provider();
+            let activity_paths = provider.activity_paths();
+            let poller = poller::start(app.handle().clone(), provider, settings.refresh);
+            let activity = activity::watch(activity_paths, &poller);
+
+            #[cfg(windows)]
+            taskbar::set_enabled(settings.show_strip);
+            let (desktop_card, card_position) = (settings.desktop_card, settings.card_position);
             app.manage(AppState {
                 poller,
                 settings: Mutex::new(settings),
                 store,
                 flyout: SharedFlyoutState::default(),
+                card: CardState::default(),
                 tray,
+                _activity: activity,
             });
             #[cfg(windows)]
             taskbar::start(app.handle().clone());
+            card::set_visible(app.handle(), desktop_card, card_position);
             Ok(())
         })
-        .on_window_event(|window, event| match event {
-            // Like every Windows flyout, it closes when the user clicks elsewhere.
-            WindowEvent::Focused(false) if window.label() == flyout::LABEL => {
-                flyout::hide(window.app_handle());
+        .on_window_event(|window, event| {
+            let app = window.app_handle();
+            match (window.label(), event) {
+                // Like every Windows flyout, it closes when the user clicks elsewhere.
+                (flyout::LABEL, WindowEvent::Focused(false)) => flyout::hide(app),
+                // Tells the UI to play its entrance; hidden webviews throttle their own clocks.
+                (flyout::LABEL, WindowEvent::Focused(true)) => {
+                    let _ = app.emit_to(flyout::LABEL, events::FLYOUT_SHOWN, ());
+                }
+                (card::LABEL, WindowEvent::Moved(position)) => card::on_moved(app, *position),
+                (card::LABEL, WindowEvent::Focused(false)) => card::on_blur(app),
+                // Windows are created once and reused; closing one only hides it.
+                (_, WindowEvent::CloseRequested { api, .. }) => {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+                _ => {}
             }
-            // Windows are created once and reused; closing one only hides it.
-            WindowEvent::CloseRequested { api, .. } => {
-                api.prevent_close();
-                let _ = window.hide();
-            }
-            _ => {}
         })
         .run(tauri::generate_context!())
         .unwrap_or_else(|error| log::error!("Headroom stopped: {error}"));

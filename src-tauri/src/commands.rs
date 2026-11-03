@@ -6,13 +6,14 @@
 use std::sync::PoisonError;
 
 use tauri::{AppHandle, Emitter, Manager, State};
+use tauri_plugin_autostart::ManagerExt as _;
 use tauri_plugin_opener::OpenerExt;
 
 use crate::flyout::{self, Anchor};
-use crate::settings::Settings;
+use crate::settings::{Settings, SettingsPatch};
 use crate::snapshot::ProviderReport;
 use crate::system::{self, HostInfo};
-use crate::{AppState, events, tray};
+use crate::{AppState, card, events, tray};
 
 #[tauri::command]
 pub fn get_report(state: State<'_, AppState>) -> ProviderReport {
@@ -34,25 +35,60 @@ pub fn get_settings(state: State<'_, AppState>) -> Settings {
 }
 
 #[tauri::command]
-pub fn set_locale(
-    app: AppHandle,
-    state: State<'_, AppState>,
-    locale: Option<String>,
-) -> Result<(), String> {
-    let updated = {
+pub fn update_settings(app: AppHandle, patch: SettingsPatch) -> Result<Settings, String> {
+    apply_patch(&app, patch)
+}
+
+/// Applies a partial update, saves it, tells every window and puts it into effect.
+pub fn apply_patch(app: &AppHandle, mut patch: SettingsPatch) -> Result<Settings, String> {
+    if let Some(Some(code)) = &patch.locale
+        && !is_locale_tag(code)
+    {
+        patch.locale = None;
+    }
+    let state = app.state::<AppState>();
+    let (before, after) = {
         let mut settings = state
             .settings
             .lock()
             .unwrap_or_else(PoisonError::into_inner);
-        settings.locale = locale.filter(|code| is_locale_tag(code));
-        settings.clone()
+        let before = settings.clone();
+        settings.apply(patch);
+        (before, settings.clone())
     };
     state
         .store
-        .save(&updated)
+        .save(&after)
         .map_err(|error| error.to_string())?;
-    app.emit(events::SETTINGS_UPDATED, updated)
-        .map_err(|error| error.to_string())
+
+    if before.refresh != after.refresh {
+        state.poller.set_mode(after.refresh);
+    }
+    #[cfg(windows)]
+    crate::taskbar::set_enabled(after.show_strip);
+    if before.desktop_card != after.desktop_card {
+        card::set_visible(app, after.desktop_card, after.card_position);
+    }
+    app.emit(events::SETTINGS_UPDATED, &after)
+        .map_err(|error| error.to_string())?;
+    Ok(after)
+}
+
+#[tauri::command]
+pub fn get_launch_at_login(app: AppHandle) -> bool {
+    app.autolaunch().is_enabled().unwrap_or(false)
+}
+
+#[tauri::command]
+pub fn set_launch_at_login(app: AppHandle, enabled: bool) -> Result<bool, String> {
+    let autolaunch = app.autolaunch();
+    let result = if enabled {
+        autolaunch.enable()
+    } else {
+        autolaunch.disable()
+    };
+    result.map_err(|error| error.to_string())?;
+    Ok(autolaunch.is_enabled().unwrap_or(enabled))
 }
 
 #[tauri::command]

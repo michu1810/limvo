@@ -11,7 +11,81 @@
   background: var(--surface);
 }
 
+/* Views ---------------------------------------------------------------------
+ * Each view is remounted when it changes or when the flyout opens, which
+ * replays its arrival. Opening rises section by section; moving between
+ * views slides in the direction of travel.
+ */
+.view {
+  display: flex;
+  flex-direction: column;
+}
+
+.view[data-direction="enter"] > * {
+  animation: rise var(--duration-slow) var(--ease-out) both;
+}
+
+.view[data-direction="enter"] > :nth-child(2) {
+  animation-delay: 30ms;
+}
+
+.view[data-direction="enter"] > :nth-child(3) {
+  animation-delay: 60ms;
+}
+
+.view[data-direction="enter"] > :nth-child(4) {
+  animation-delay: 90ms;
+}
+
+.view[data-direction="enter"] > :nth-child(5) {
+  animation-delay: 120ms;
+}
+
+.view[data-direction="enter"] > :nth-child(n + 6) {
+  animation-delay: 150ms;
+}
+
+.view[data-direction="forward"] {
+  animation: slide-forward var(--duration-medium) var(--ease-out) both;
+}
+
+.view[data-direction="back"] {
+  animation: slide-back var(--duration-medium) var(--ease-out) both;
+}
+
+[dir="rtl"] .view[data-direction="forward"] {
+  animation-name: slide-back;
+}
+
+[dir="rtl"] .view[data-direction="back"] {
+  animation-name: slide-forward;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes slide-forward {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+
+@keyframes slide-back {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+}
+
+/* Header -------------------------------------------------------------------- */
+
 .flyout__header {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -20,18 +94,97 @@
 }
 
 .flyout__title {
+  flex: none;
   margin: 0;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.005em;
-}
-
-.flyout__updated {
-  margin-inline-start: auto;
-  font-size: 13px;
-  color: var(--text-secondary);
   white-space: nowrap;
 }
+
+/* The title keeps its line; the timestamp is the part that gives way. */
+.flyout__updated {
+  min-width: 0;
+  margin-inline-start: auto;
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: opacity var(--duration-medium) var(--ease-standard);
+}
+
+.flyout__updated[data-busy] {
+  opacity: 0.45;
+}
+
+/* A thin line under the header while a refresh is on its way. */
+.flyout__progress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -11px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity var(--duration-medium) var(--ease-standard);
+  pointer-events: none;
+}
+
+.flyout__progress::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: 30%;
+  border-radius: inherit;
+  background: linear-gradient(to right, transparent, var(--accent), transparent);
+  transform: translateX(-100%);
+}
+
+.flyout__progress[data-active] {
+  opacity: 1;
+}
+
+.flyout__progress[data-active]::before {
+  animation: sweep 1100ms var(--ease-standard) infinite;
+}
+
+@keyframes sweep {
+  to {
+    transform: translateX(340%);
+  }
+}
+
+.icon-button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-inline-start: -6px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-secondary);
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.icon-button:hover {
+  background: var(--fill-subtle-hover);
+  color: var(--text);
+}
+
+.icon-button:active {
+  background: var(--fill-subtle-pressed);
+}
+
+.icon-button--end {
+  margin-inline: -2px -8px;
+}
+
+/* Headline ------------------------------------------------------------------ */
 
 .eyebrow {
   margin: 0 0 6px;
@@ -93,6 +246,14 @@
   border-radius: var(--radius-control);
   font-size: 13px;
   font-weight: 600;
+  animation: pill-in var(--duration-slow) var(--ease-spring) 320ms both;
+}
+
+@keyframes pill-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
 }
 
 .pill[data-status="on_track"] {
@@ -116,12 +277,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Groups and rows ------------------------------------------------------------ */
+
 .group {
   margin-top: 28px;
 }
 
 .group__title {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   font-size: 14px;
   font-weight: 400;
   color: var(--text-secondary);
@@ -129,17 +292,26 @@
 
 .group__rows {
   display: grid;
-  gap: 14px;
-  margin: 0;
+  gap: 2px;
+  margin: 0 -10px;
   padding: 0;
   list-style: none;
 }
 
+/* Rows light up under the pointer, like Windows list items. */
 .limit {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 34% 44px;
   align-items: center;
   gap: 16px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: var(--radius-control);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.limit:hover {
+  background: var(--fill-subtle-hover);
 }
 
 .limit__label {
@@ -151,7 +323,14 @@
 .limit__value {
   text-align: end;
   font-variant-numeric: tabular-nums;
+  transition: color var(--duration-fast) var(--ease-standard);
 }
+
+.limit:hover .limit__value {
+  font-weight: 600;
+}
+
+/* State notice ----------------------------------------------------------------- */
 
 .notice {
   display: flex;
@@ -163,6 +342,7 @@
   background: var(--fill-subtle-hover);
   font-size: 13px;
   color: var(--text-secondary);
+  animation: rise var(--duration-medium) var(--ease-out) both;
 }
 
 .notice[data-state="auth_required"],
@@ -176,22 +356,28 @@
   margin: 0;
 }
 
+/* Footer actions --------------------------------------------------------------- */
+
 .flyout__footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 0;
   margin-top: 26px;
-  margin-inline: -12px;
+  /* Pull the outer buttons out so their labels, not their padding, line up with the content. */
+  margin-inline: -9px;
 }
 
 .action {
-  padding: 7px 12px;
+  padding: 7px 9px;
   border: 0;
   border-radius: var(--radius-control);
   background: transparent;
   font-size: 14px;
   white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
 }
 
 .action:hover:not(:disabled) {
@@ -226,20 +412,186 @@
   color: var(--text);
 }
 
-.icon-button {
+/* Settings ----------------------------------------------------------------------- */
+
+.settings {
   display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  margin-inline-start: -6px;
+  gap: 2px;
+  margin: -10px -12px 0;
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 12px;
   border: 0;
   border-radius: var(--radius-control);
   background: transparent;
+  text-align: start;
+  transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
-.icon-button:hover {
+button.setting:hover:not(:disabled) {
   background: var(--fill-subtle-hover);
 }
+
+button.setting:active:not(:disabled) {
+  background: var(--fill-subtle-pressed);
+}
+
+.setting--stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding-block: 10px;
+}
+
+.setting__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.setting__label {
+  font-size: 14px;
+}
+
+.setting__hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.setting .icon--chevron {
+  color: var(--text-secondary);
+}
+
+.settings__version {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+/* Switch: the knob grows under the pointer and slides with a soft settle, as in Windows 11. */
+.switch {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 20px;
+  border: 1px solid var(--text-secondary);
+  border-radius: 10px;
+  transition:
+    background-color var(--duration-medium) var(--ease-standard),
+    border-color var(--duration-medium) var(--ease-standard);
+}
+
+.switch__knob {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transform: translateY(-50%);
+  transition:
+    inset-inline-start var(--duration-medium) var(--ease-spring),
+    width var(--duration-fast) var(--ease-standard),
+    height var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-medium) var(--ease-standard);
+}
+
+.switch[data-on] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.switch[data-on] .switch__knob {
+  inset-inline-start: calc(100% - 4px - 10px);
+  background: #fff;
+}
+
+.setting:hover:not(:disabled) .switch__knob {
+  width: 12px;
+  height: 12px;
+}
+
+.setting:hover:not(:disabled) .switch[data-on] .switch__knob {
+  inset-inline-start: calc(100% - 4px - 12px);
+}
+
+.setting:disabled {
+  opacity: 0.5;
+}
+
+/* Segmented control: one thumb glides to the chosen option. */
+.segmented {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--segments), 1fr);
+  margin: 0;
+  padding: 2px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--fill-subtle-hover);
+}
+
+.segmented__thumb {
+  position: absolute;
+  inset-block: 2px;
+  inset-inline-start: 2px;
+  width: calc((100% - 4px) / var(--segments));
+  border-radius: 4px;
+  background: var(--surface);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.12),
+    0 0 0 1px var(--stroke);
+  transform: translateX(calc(100% * var(--active)));
+  transition: transform var(--duration-medium) var(--ease-out);
+}
+
+[dir="rtl"] .segmented__thumb {
+  transform: translateX(calc(-100% * var(--active)));
+}
+
+.segmented__option {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 28px;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.segmented__option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented__option:hover,
+.segmented__option:has(input:checked) {
+  color: var(--text);
+}
+
+.segmented__option:has(input:checked) {
+  font-weight: 600;
+}
+
+.segmented__option:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+/* Language list ---------------------------------------------------------------- */
 
 .languages {
   display: grid;
@@ -257,6 +609,7 @@
   min-height: 36px;
   padding: 0 12px;
   border-radius: var(--radius-control);
+  transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
 .languages__option:hover {
@@ -274,7 +627,7 @@
   pointer-events: none;
 }
 
-.languages__check {
+.languages__option .icon--check {
   color: var(--accent);
 }
 

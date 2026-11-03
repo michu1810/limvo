@@ -1,0 +1,57 @@
+/* The desktop card reuses the flyout pieces at a smaller scale. */
+.card {
+  padding: 14px 18px 16px;
+  cursor: grab;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card .flyout__header {
+  gap: 8px;
+  min-height: 20px;
+  margin-bottom: 12px;
+}
+
+.card .flyout__title {
+  font-size: 13px;
+}
+
+.card .flyout__updated {
+  font-size: 12px;
+}
+
+.card .eyebrow {
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.card .headline__value {
+  font-size: 36px;
+}
+
+.card .headline__reset strong {
+  font-size: 13px;
+}
+
+.card .headline__reset time {
+  font-size: 12px;
+}
+
+.card .headline .meter {
+  margin-block: 12px 12px;
+}
+
+.card[data-stale] .headline__value {
+  color: var(--text-secondary);
+}
+
+.card__empty {
+  margin: 8px 0;
+  color: var(--text-secondary);
+}
+
+:root[data-host="browser"] .card {
+  width: 300px;
+}

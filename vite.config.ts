@@ -1,13 +1,20 @@
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
 // The Tauri CLI sets TAURI_DEV_HOST when it drives the dev server.
 const host = process.env.TAURI_DEV_HOST;
+const { version } = JSON.parse(
+  readFileSync(resolve(import.meta.dirname, "package.json"), "utf8"),
+) as { version: string };
 
 export default defineConfig({
   plugins: [react()],
   clearScreen: false,
+  define: {
+    __APP_VERSION__: JSON.stringify(version),
+  },
   server: {
     port: 1420,
     strictPort: true,
@@ -20,6 +27,7 @@ export default defineConfig({
       input: {
         flyout: resolve(import.meta.dirname, "index.html"),
         strip: resolve(import.meta.dirname, "strip.html"),
+        card: resolve(import.meta.dirname, "card.html"),
       },
     },
   },

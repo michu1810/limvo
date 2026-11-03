@@ -65,7 +65,9 @@ pub fn show(app: &AppHandle, anchor: Option<Anchor>) {
     let _ = window.show();
     let _ = window.set_focus();
     // Looking at the flyout asks for a fresh reading; the poller skips it if the last one is recent.
-    app.state::<AppState>().poller.refresh_now();
+    if let Some(state) = app.try_state::<AppState>() {
+        state.poller.refresh_now();
+    }
 }
 
 pub fn hide(app: &AppHandle) {
@@ -133,8 +135,12 @@ fn default_anchor(window: &WebviewWindow) -> Option<Anchor> {
     })
 }
 
-fn with_state<T>(app: &AppHandle, f: impl FnOnce(&mut FlyoutState) -> T) -> T {
-    let state = app.state::<AppState>();
+/// Runs  on the flyout state. Before setup has registered it (early window
+/// events), there is nothing to remember yet and the default is returned.
+fn with_state<T: Default>(app: &AppHandle, f: impl FnOnce(&mut FlyoutState) -> T) -> T {
+    let Some(state) = app.try_state::<AppState>() else {
+        return T::default();
+    };
     let mut guard = state.flyout.lock().unwrap_or_else(PoisonError::into_inner);
     f(&mut guard)
 }

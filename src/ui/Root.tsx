@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
+import type { Settings } from "../bridge";
 import { I18nProvider } from "../i18n/I18nProvider";
-import { useActiveLocale } from "./hooks";
+import { useActiveLocale, useSettings } from "./hooks";
 
-/** Locale plumbing shared by every window. */
-export function Root({ children }: { children: (chosenLocale: string | null) => ReactNode }) {
-  const { locale, chosen } = useActiveLocale();
-  return <I18nProvider locale={locale}>{children(chosen)}</I18nProvider>;
+/** Settings and locale plumbing shared by every window. */
+export function Root({ children }: { children: (settings: Settings | null) => ReactNode }) {
+  const settings = useSettings();
+  const locale = useActiveLocale(settings);
+  return <I18nProvider locale={locale}>{children(settings)}</I18nProvider>;
 }

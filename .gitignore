@@ -9,3 +9,4 @@ public/brand/*
 !public/brand/README.md
 .vscode/*
 !.vscode/extensions.json
+.vs/

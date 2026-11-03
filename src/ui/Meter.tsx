@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Severity } from "../core/snapshot";
+import { useAnimatedNumber } from "./hooks";
 
 interface MeterProps {
   /** Share used, 0 to 100. */
@@ -9,12 +10,25 @@ interface MeterProps {
   size: "large" | "small" | "strip";
   severity?: Severity;
   label: string;
+  /** Changing this replays the fill from empty, as the flyout does when it opens. */
+  replay?: number;
 }
 
-export function Meter({ value, marker = null, size, severity = "normal", label }: MeterProps) {
+/** A light passes along the fill once whenever the value or the replay changes. */
+const glintKey = (value: number, replay: number) => `${replay}:${Math.round(value)}`;
+
+export function Meter({
+  value,
+  marker = null,
+  size,
+  severity = "normal",
+  label,
+  replay = 0,
+}: MeterProps) {
   const clamped = Math.min(100, Math.max(0, value));
+  const shown = useAnimatedNumber(clamped, replay, size === "small" ? 750 : 650);
   const style = {
-    "--meter-value": `${clamped}%`,
+    "--meter-value": `${shown}%`,
     "--meter-marker": marker === null ? undefined : `${Math.min(1, Math.max(0, marker)) * 100}%`,
   } as CSSProperties;
 
@@ -32,8 +46,8 @@ export function Meter({ value, marker = null, size, severity = "normal", label }
       aria-valuenow={Math.round(clamped)}
       style={style}
     >
-      <span className="meter__fill" />
-      {marker !== null && <span className="meter__marker" aria-hidden="true" />}
+      <span key={glintKey(clamped, replay)} className="meter__fill" />
+      {marker !== null && <span key={replay} className="meter__marker" aria-hidden="true" />}
     </div>
   );
 }

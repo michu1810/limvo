@@ -102,10 +102,14 @@ fn cli_tokens() -> Vec<Token> {
 }
 
 fn cli_credentials_path() -> Option<PathBuf> {
-    let dir = std::env::var_os("CLAUDE_CONFIG_DIR")
+    Some(claude_config_dir()?.join(".credentials.json"))
+}
+
+/// Claude Code's own folder: `CLAUDE_CONFIG_DIR` when set, otherwise `~/.claude`.
+pub fn claude_config_dir() -> Option<PathBuf> {
+    std::env::var_os("CLAUDE_CONFIG_DIR")
         .map(PathBuf::from)
-        .or_else(|| std::env::home_dir().map(|home| home.join(".claude")))?;
-    Some(dir.join(".credentials.json"))
+        .or_else(|| std::env::home_dir().map(|home| home.join(".claude")))
 }
 
 #[derive(Deserialize)]

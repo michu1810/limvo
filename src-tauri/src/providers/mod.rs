@@ -8,6 +8,7 @@
 pub mod claude;
 
 use std::future::Future;
+use std::path::PathBuf;
 use std::pin::Pin;
 use std::time::Duration;
 
@@ -20,6 +21,13 @@ pub type FetchFuture<'a> =
 pub trait UsageProvider: Send + Sync {
     /// Reads the current usage. Called by the poller, never concurrently.
     fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a>;
+
+    /// Folders the service's own tools write to while the user works with
+    /// them. Changes there make the adaptive schedule read sooner. Files are
+    /// watched, never opened.
+    fn activity_paths(&self) -> Vec<PathBuf> {
+        Vec::new()
+    }
 }
 
 #[derive(Debug, thiserror::Error)]

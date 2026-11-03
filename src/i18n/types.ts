@@ -50,6 +50,28 @@ export interface Messages {
   stateNoCredentials: string;
   stateError: string;
   retry: string;
+
+  settings: string;
+  launchAtLogin: string;
+  showStrip: string;
+  desktopCard: string;
+  notifications: string;
+  notificationsHint: string;
+  refreshFrequency: string;
+  refreshAdaptive: string;
+  refreshAdaptiveHint: string;
+  /** Placeholder `{interval}`, for example "5 min". */
+  refreshEvery: string;
+
+  /** Placeholders `{window}` and `{percent}`. */
+  notifyThresholdTitle: string;
+  /** Placeholder `{when}`, a weekday and time. Also used when a limit is reached. */
+  notifyThresholdBody: string;
+  /** Placeholder `{window}`. */
+  notifyReachedTitle: string;
+  /** Placeholder `{window}`. */
+  notifyResetTitle: string;
+  notifyResetBody: string;
 }
 
 export interface LocaleDefinition {

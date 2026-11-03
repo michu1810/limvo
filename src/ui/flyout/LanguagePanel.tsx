@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { bridge } from "../../bridge";
 import { useI18n } from "../../i18n/I18nProvider";
 import { LOCALES } from "../../i18n/locales";
+import { BackIcon, CheckIcon } from "../icons";
 
 /** Full-height list instead of a popup menu, so it always fits the small flyout. */
 export function LanguagePanel({ chosen, onClose }: { chosen: string | null; onClose: () => void }) {
@@ -11,7 +12,7 @@ export function LanguagePanel({ chosen, onClose }: { chosen: string | null; onCl
   useEffect(() => selected.current?.focus(), []);
 
   const pick = async (code: string | null) => {
-    await bridge.setLocale(code);
+    await bridge.updateSettings({ locale: code });
     onClose();
   };
 
@@ -51,35 +52,5 @@ export function LanguagePanel({ chosen, onClose }: { chosen: string | null; onCl
         })}
       </fieldset>
     </>
-  );
-}
-
-function BackIcon() {
-  return (
-    <svg className="flip-rtl" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-      <path
-        d="M10 3 5 8l5 5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg className="languages__check" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-      <path
-        d="m3.5 8.5 3 3 6-7"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

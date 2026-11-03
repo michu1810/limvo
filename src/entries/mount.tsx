@@ -29,5 +29,8 @@ export function mount(ui: ReactNode, { followTaskbarTheme = false }: MountOption
 
   const container = document.getElementById("root");
   if (!container) throw new Error("Missing #root element");
-  createRoot(container).render(<StrictMode>{ui}</StrictMode>);
+  const reactRoot = createRoot(container);
+  reactRoot.render(<StrictMode>{ui}</StrictMode>);
+  // A hot update that reaches the entry runs it again; the old root must go first.
+  import.meta.hot?.dispose(() => reactRoot.unmount());
 }

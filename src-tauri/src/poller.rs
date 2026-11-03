@@ -1,29 +1,46 @@
 //! Reads the provider on a schedule and publishes every new report.
 //!
 //! One task owns all network access, so there is never more than one request
-//! in flight. A manual refresh only wakes that task early.
+//! in flight. Everything else (a manual refresh, opening the flyout, activity
+//! in the provider's tools) only wakes that task early.
 
+use std::sync::atomic::{AtomicI64, AtomicU8, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use tauri::{AppHandle, Emitter};
 use tokio::sync::Notify;
 
 use crate::events;
 use crate::providers::{ProviderError, UsageProvider};
-use crate::snapshot::{ProviderReport, ReportState};
+use crate::settings::RefreshMode;
+use crate::snapshot::{ProviderReport, ReportState, UsageSnapshot};
 
-const HEALTHY_INTERVAL: Duration = Duration::from_mins(4);
+/// While the user is working: about once a minute.
+const ACTIVE_INTERVAL: Duration = Duration::from_mins(1);
+/// Adaptive mode when nothing is happening.
+const IDLE_INTERVAL: Duration = Duration::from_mins(5);
+/// How long after the last activity the user still counts as working.
+const ACTIVE_WINDOW: Duration = Duration::from_mins(5);
 const SIGNED_OUT_INTERVAL: Duration = Duration::from_mins(2);
 const FIRST_RETRY: Duration = Duration::from_secs(30);
 const MAX_RETRY: Duration = Duration::from_mins(15);
-/// Manual refreshes closer together than this reuse the last answer.
+/// Requests closer together than this reuse the last answer.
 const MIN_GAP: Duration = Duration::from_secs(10);
 
 #[derive(Debug, Clone)]
 pub struct PollerHandle {
     report: Arc<Mutex<ProviderReport>>,
     wake: Arc<Notify>,
+    schedule: Arc<Schedule>,
+}
+
+/// Lock-free state shared between the poller and whoever nudges it.
+#[derive(Debug)]
+struct Schedule {
+    mode: AtomicU8,
+    last_activity_ms: AtomicI64,
+    last_fetch_ms: AtomicI64,
 }
 
 impl PollerHandle {
@@ -37,12 +54,60 @@ impl PollerHandle {
     pub fn refresh_now(&self) {
         self.wake.notify_one();
     }
+
+    pub fn set_mode(&self, mode: RefreshMode) {
+        self.schedule
+            .mode
+            .store(mode_to_u8(mode), Ordering::Relaxed);
+        self.wake.notify_one();
+    }
+
+    /// The provider's tools just wrote something. Read soon, but never more
+    /// than once per [`ACTIVE_INTERVAL`], however busy the user is.
+    pub fn note_activity(&self) {
+        let now = now_ms();
+        self.schedule.last_activity_ms.store(now, Ordering::Relaxed);
+        if self.schedule.mode() != RefreshMode::Adaptive {
+            return;
+        }
+        let since_fetch = now - self.schedule.last_fetch_ms.load(Ordering::Relaxed);
+        if since_fetch >= millis(ACTIVE_INTERVAL) {
+            self.wake.notify_one();
+        }
+    }
 }
 
-pub fn start(app: AppHandle, provider: Box<dyn UsageProvider>) -> PollerHandle {
+impl Schedule {
+    fn mode(&self) -> RefreshMode {
+        mode_from_u8(self.mode.load(Ordering::Relaxed))
+    }
+
+    fn healthy_interval(&self, now_ms: i64) -> Duration {
+        match self.mode() {
+            RefreshMode::Adaptive => {
+                let idle_for = now_ms - self.last_activity_ms.load(Ordering::Relaxed);
+                if idle_for < millis(ACTIVE_WINDOW) {
+                    ACTIVE_INTERVAL
+                } else {
+                    IDLE_INTERVAL
+                }
+            }
+            RefreshMode::Every2Minutes => Duration::from_mins(2),
+            RefreshMode::Every5Minutes => Duration::from_mins(5),
+            RefreshMode::Every15Minutes => Duration::from_mins(15),
+        }
+    }
+}
+
+pub fn start(app: AppHandle, provider: Box<dyn UsageProvider>, mode: RefreshMode) -> PollerHandle {
     let handle = PollerHandle {
         report: Arc::new(Mutex::new(ProviderReport::loading())),
         wake: Arc::new(Notify::new()),
+        schedule: Arc::new(Schedule {
+            mode: AtomicU8::new(mode_to_u8(mode)),
+            last_activity_ms: AtomicI64::new(i64::MIN / 2),
+            last_fetch_ms: AtomicI64::new(i64::MIN / 2),
+        }),
     };
     let task = handle.clone();
     tauri::async_runtime::spawn(async move { run(app, provider, task).await });
@@ -58,25 +123,31 @@ async fn run(app: AppHandle, provider: Box<dyn UsageProvider>, handle: PollerHan
         }
     };
     let mut failures: u32 = 0;
-    let mut last_fetch: Option<Instant> = None;
+    let mut wait = Duration::ZERO;
 
     loop {
-        if last_fetch.is_none_or(|at| at.elapsed() >= MIN_GAP) {
-            last_fetch = Some(Instant::now());
+        let since_fetch = now_ms() - handle.schedule.last_fetch_ms.load(Ordering::Relaxed);
+        if since_fetch >= millis(MIN_GAP) {
+            handle
+                .schedule
+                .last_fetch_ms
+                .store(now_ms(), Ordering::Relaxed);
             let outcome = provider.fetch(&http).await;
             failures = if outcome.is_ok() {
                 0
             } else {
                 failures.saturating_add(1)
             };
-            let wait = next_delay(&outcome, failures);
+            wait = match &outcome {
+                Ok(_) => handle.schedule.healthy_interval(now_ms()),
+                Err(error) => retry_delay(error, failures),
+            };
             publish(&app, &handle, outcome);
-            wait_or_wake(&handle, wait).await;
         } else {
-            // A manual refresh arrived right after a fetch: show the same answer again.
+            // Woken right after a fetch: show the same answer again instead of asking twice.
             publish_current(&app, &handle);
-            wait_or_wake(&handle, HEALTHY_INTERVAL).await;
         }
+        wait_or_wake(&handle, wait).await;
     }
 }
 
@@ -87,11 +158,7 @@ async fn wait_or_wake(handle: &PollerHandle, wait: Duration) {
     }
 }
 
-fn publish(
-    app: &AppHandle,
-    handle: &PollerHandle,
-    outcome: Result<crate::snapshot::UsageSnapshot, ProviderError>,
-) {
+fn publish(app: &AppHandle, handle: &PollerHandle, outcome: Result<UsageSnapshot, ProviderError>) {
     {
         let mut report = handle.report.lock().unwrap_or_else(PoisonError::into_inner);
         *report = merge(&report, outcome);
@@ -108,7 +175,7 @@ fn publish_current(app: &AppHandle, handle: &PollerHandle) {
 /// Builds the next report. Failures keep the last good snapshot so the UI can show it as stale.
 fn merge(
     previous: &ProviderReport,
-    outcome: Result<crate::snapshot::UsageSnapshot, ProviderError>,
+    outcome: Result<UsageSnapshot, ProviderError>,
 ) -> ProviderReport {
     match outcome {
         Ok(snapshot) => ProviderReport {
@@ -135,18 +202,14 @@ fn merge(
     }
 }
 
-fn next_delay(
-    outcome: &Result<crate::snapshot::UsageSnapshot, ProviderError>,
-    failures: u32,
-) -> Duration {
-    match outcome {
-        Ok(_) => HEALTHY_INTERVAL,
+fn retry_delay(error: &ProviderError, failures: u32) -> Duration {
+    match error {
         // Signing in happens outside the app; check again soon, without hammering.
-        Err(ProviderError::NoCredentials | ProviderError::AuthRequired) => SIGNED_OUT_INTERVAL,
-        Err(ProviderError::RateLimited {
+        ProviderError::NoCredentials | ProviderError::AuthRequired => SIGNED_OUT_INTERVAL,
+        ProviderError::RateLimited {
             retry_after: Some(wait),
-        }) => (*wait).clamp(FIRST_RETRY, MAX_RETRY),
-        Err(_) => backoff(failures),
+        } => (*wait).clamp(FIRST_RETRY, MAX_RETRY),
+        _ => backoff(failures),
     }
 }
 
@@ -164,10 +227,35 @@ fn http_client() -> reqwest::Result<reqwest::Client> {
         .build()
 }
 
+fn mode_to_u8(mode: RefreshMode) -> u8 {
+    match mode {
+        RefreshMode::Adaptive => 0,
+        RefreshMode::Every2Minutes => 1,
+        RefreshMode::Every5Minutes => 2,
+        RefreshMode::Every15Minutes => 3,
+    }
+}
+
+fn mode_from_u8(value: u8) -> RefreshMode {
+    match value {
+        1 => RefreshMode::Every2Minutes,
+        2 => RefreshMode::Every5Minutes,
+        3 => RefreshMode::Every15Minutes,
+        _ => RefreshMode::Adaptive,
+    }
+}
+
+fn now_ms() -> i64 {
+    jiff::Timestamp::now().as_millisecond()
+}
+
+fn millis(duration: Duration) -> i64 {
+    i64::try_from(duration.as_millis()).unwrap_or(i64::MAX)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::snapshot::UsageSnapshot;
 
     fn snapshot() -> UsageSnapshot {
         UsageSnapshot {
@@ -178,6 +266,14 @@ mod tests {
             windows: Vec::new(),
             breakdown: Vec::new(),
             usage_page_url: None,
+        }
+    }
+
+    fn schedule(mode: RefreshMode, last_activity_ms: i64) -> Schedule {
+        Schedule {
+            mode: AtomicU8::new(mode_to_u8(mode)),
+            last_activity_ms: AtomicI64::new(last_activity_ms),
+            last_fetch_ms: AtomicI64::new(0),
         }
     }
 
@@ -196,6 +292,34 @@ mod tests {
     }
 
     #[test]
+    fn adaptive_mode_speeds_up_while_the_user_works() {
+        let now = 10_000_000;
+        let working = schedule(RefreshMode::Adaptive, now - 30_000);
+        let idle = schedule(RefreshMode::Adaptive, now - millis(ACTIVE_WINDOW) - 1);
+        assert_eq!(working.healthy_interval(now), ACTIVE_INTERVAL);
+        assert_eq!(idle.healthy_interval(now), IDLE_INTERVAL);
+    }
+
+    #[test]
+    fn fixed_modes_ignore_activity() {
+        let now = 10_000_000;
+        let fixed = schedule(RefreshMode::Every15Minutes, now);
+        assert_eq!(fixed.healthy_interval(now), Duration::from_mins(15));
+    }
+
+    #[test]
+    fn modes_survive_the_atomic_round_trip() {
+        for mode in [
+            RefreshMode::Adaptive,
+            RefreshMode::Every2Minutes,
+            RefreshMode::Every5Minutes,
+            RefreshMode::Every15Minutes,
+        ] {
+            assert_eq!(mode_from_u8(mode_to_u8(mode)), mode);
+        }
+    }
+
+    #[test]
     fn backs_off_exponentially_up_to_a_cap() {
         assert_eq!(backoff(1), Duration::from_secs(30));
         assert_eq!(backoff(3), Duration::from_secs(120));
@@ -204,9 +328,9 @@ mod tests {
 
     #[test]
     fn honours_retry_after_within_bounds() {
-        let limited = Err(ProviderError::RateLimited {
+        let limited = ProviderError::RateLimited {
             retry_after: Some(Duration::from_secs(3)),
-        });
-        assert_eq!(next_delay(&limited, 1), FIRST_RETRY);
+        };
+        assert_eq!(retry_delay(&limited, 1), FIRST_RETRY);
     }
 }

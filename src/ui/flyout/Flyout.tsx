@@ -1,30 +1,57 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { bridge } from "../../bridge";
+import { bridge, type Settings } from "../../bridge";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
-import { useNow } from "../hooks";
+import { useNow, useShowCount } from "../hooks";
+import { SettingsIcon } from "../icons";
 import { ProviderMark } from "../ProviderMark";
+import { useAlerts } from "../useAlerts";
 import { Breakdown, OtherLimits } from "./Details";
 import { Headline } from "./Headline";
 import { LanguagePanel } from "./LanguagePanel";
+import { SettingsPanel } from "./SettingsPanel";
 import { StateNotice } from "./StateNotice";
 
-type View = "usage" | "language";
+type View = "usage" | "settings" | "language";
+
+/** Depth of each view, so moving deeper slides forward and going back slides back. */
+const DEPTH: Record<View, number> = { usage: 0, settings: 1, language: 2 };
 
 export function Flyout({
   report,
-  chosenLocale,
+  settings,
 }: {
   report: ProviderReport;
-  chosenLocale: string | null;
+  settings: Settings | null;
 }) {
   const { t, format } = useI18n();
   const now = useNow();
+  const shown = useShowCount();
   const [view, setView] = useState<View>("usage");
+  const [direction, setDirection] = useState<"enter" | "forward" | "back">("enter");
+  const [languageFrom, setLanguageFrom] = useState<View>("usage");
   const [refreshing, setRefreshing] = useState(false);
   const root = useFitToContent();
-  useEscapeToHide(view, () => setView("usage"));
   useTrayTexts(report, now);
+  useAlerts(report, settings);
+
+  const go = (next: View) => {
+    setDirection(DEPTH[next] >= DEPTH[view] ? "forward" : "back");
+    setView(next);
+  };
+  const openLanguage = () => {
+    setLanguageFrom(view);
+    go("language");
+  };
+  const back = () => go(view === "language" ? languageFrom : "usage");
+  useEscape(() => (view === "usage" ? bridge.hideFlyout() : back()));
+
+  // Every time the flyout opens it starts on the readings and plays its arrival.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on each show only.
+  useEffect(() => {
+    setDirection("enter");
+    setView("usage");
+  }, [shown]);
 
   const snapshot = report.snapshot;
   const providerName = snapshot?.providerName ?? "Claude";
@@ -36,54 +63,73 @@ export function Flyout({
         ? t("updatedJustNow")
         : t("updated", { time: format.relativeTime(fetchedAt, now) });
 
-  const refresh = async () => {
+  // The button only asks; the busy state ends when the new report arrives.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new report ends the refresh.
+  useEffect(() => setRefreshing(false), [report]);
+  const refresh = () => {
     setRefreshing(true);
-    try {
-      await bridge.refresh();
-    } finally {
-      setRefreshing(false);
-    }
+    bridge.refresh();
   };
-
-  if (view === "language") {
-    return (
-      <main ref={root} className="flyout">
-        <LanguagePanel chosen={chosenLocale} onClose={() => setView("usage")} />
-      </main>
-    );
-  }
 
   return (
     <main ref={root} className="flyout" aria-busy={report.state === "loading" || refreshing}>
-      <header className="flyout__header">
-        <ProviderMark providerId={snapshot?.providerId ?? "claude"} size={20} />
-        <h1 className="flyout__title">{t("usageTitle", { provider: providerName })}</h1>
-        {updated && <span className="flyout__updated">{updated}</span>}
-      </header>
+      <div key={`${view}:${shown}`} className="view" data-direction={direction}>
+        {view === "settings" && (
+          <SettingsPanel settings={settings} onBack={back} onLanguage={openLanguage} />
+        )}
+        {view === "language" && <LanguagePanel chosen={settings?.locale ?? null} onClose={back} />}
+        {view === "usage" && (
+          <>
+            <header className="flyout__header">
+              <ProviderMark
+                providerId={snapshot?.providerId ?? "claude"}
+                size={20}
+                level={snapshot?.headline?.percent ?? null}
+              />
+              <h1 className="flyout__title">{t("usageTitle", { provider: providerName })}</h1>
+              {updated && (
+                <span className="flyout__updated" data-busy={refreshing || undefined}>
+                  {updated}
+                </span>
+              )}
+              <button
+                type="button"
+                className="icon-button icon-button--end"
+                aria-label={t("settings")}
+                title={t("settings")}
+                onClick={() => go("settings")}
+              >
+                <SettingsIcon />
+              </button>
+              <span className="flyout__progress" data-active={refreshing || undefined} />
+            </header>
 
-      <StateNotice report={report} now={now} onRetry={refresh} />
+            <StateNotice report={report} now={now} onRetry={refresh} />
 
-      {snapshot?.headline && <Headline window={snapshot.headline} now={now} />}
-      {snapshot && <Breakdown rows={snapshot.breakdown} />}
-      {snapshot && <OtherLimits windows={snapshot.windows} />}
+            {snapshot?.headline && <Headline window={snapshot.headline} now={now} replay={shown} />}
+            {snapshot && <Breakdown rows={snapshot.breakdown} replay={shown} />}
+            {snapshot && <OtherLimits windows={snapshot.windows} replay={shown} />}
 
-      <footer className="flyout__footer">
-        <button
-          type="button"
-          className="action"
-          disabled={!snapshot?.usagePageUrl}
-          onClick={() => bridge.openUsagePage()}
-        >
-          {t("openUsagePage")}
-        </button>
-        <button type="button" className="action" disabled={refreshing} onClick={refresh}>
-          {t("refresh")}
-        </button>
-        <LanguageButton onOpen={() => setView("language")} />
-        <button type="button" className="action" onClick={() => bridge.quit()}>
-          {t("quit")}
-        </button>
-      </footer>
+            <footer className="flyout__footer">
+              <button
+                type="button"
+                className="action"
+                disabled={!snapshot?.usagePageUrl}
+                onClick={() => bridge.openUsagePage()}
+              >
+                {t("openUsagePage")}
+              </button>
+              <button type="button" className="action" disabled={refreshing} onClick={refresh}>
+                {t("refresh")}
+              </button>
+              <LanguageButton onOpen={openLanguage} />
+              <button type="button" className="action" onClick={() => bridge.quit()}>
+                {t("quit")}
+              </button>
+            </footer>
+          </>
+        )}
+      </div>
     </main>
   );
 }
@@ -142,19 +188,18 @@ function useFitToContent() {
     });
     observer.observe(element);
     return () => observer.disconnect();
-  });
+  }, []);
   return root;
 }
 
-/** Escape closes the language panel first, then hides the flyout. */
-function useEscapeToHide(view: View, closePanel: () => void) {
+function useEscape(onEscape: () => void) {
+  const handler = useRef(onEscape);
+  handler.current = onEscape;
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      if (view === "language") closePanel();
-      else bridge.hideFlyout();
+      if (event.key === "Escape") handler.current();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [view, closePanel]);
+  }, []);
 }

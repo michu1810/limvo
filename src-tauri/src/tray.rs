@@ -33,7 +33,11 @@ pub fn build(app: &App) -> tauri::Result<TrayMenu> {
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(|app, event| match event.id.as_ref() {
-            REFRESH => app.state::<AppState>().poller.refresh_now(),
+            REFRESH => {
+                if let Some(state) = app.try_state::<AppState>() {
+                    state.poller.refresh_now();
+                }
+            }
             QUIT => app.exit(0),
             _ => {}
         })

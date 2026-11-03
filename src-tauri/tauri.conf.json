@@ -45,6 +45,24 @@
         "alwaysOnTop": true,
         "visible": false,
         "focus": false
+      },
+      {
+        "label": "card",
+        "url": "card.html",
+        "title": "Headroom card",
+        "width": 300,
+        "height": 176,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": true,
+        "skipTaskbar": true,
+        "alwaysOnTop": false,
+        "visible": false,
+        "focus": false,
+        "windowEffects": { "effects": ["acrylic"] }
       }
     ],
     "security": {
