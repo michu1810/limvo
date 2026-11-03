@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { BreakdownRow, UsageWindow } from "../../core/snapshot";
+import type { BreakdownRow, ExtraUsage, UsageWindow } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { useAnimatedNumber } from "../hooks";
 import { windowLabel } from "../labels";
@@ -22,17 +22,20 @@ export function Breakdown({ rows, replay }: { rows: readonly BreakdownRow[]; rep
 
 export function OtherLimits({
   windows,
+  extraUsage,
   replay,
 }: {
   windows: readonly UsageWindow[];
+  extraUsage: ExtraUsage | null;
   replay: number;
 }) {
   const i18n = useI18n();
   const { t, format } = i18n;
-  if (windows.length === 0) return null;
+  if (windows.length === 0 && !extraUsage) return null;
 
   return (
     <Group title={t("otherLimits")}>
+      {extraUsage && <ExtraUsageRow extra={extraUsage} replay={replay} />}
       {windows.map((window) => (
         <LimitRow
           key={window.id}
@@ -48,6 +51,45 @@ export function OtherLimits({
         />
       ))}
     </Group>
+  );
+}
+
+/** Paid credits: what was spent, against the monthly cap when there is one. */
+function ExtraUsageRow({ extra, replay }: { extra: ExtraUsage; replay: number }) {
+  const { t, locale } = useI18n();
+  const money = new Intl.NumberFormat(locale.code, {
+    style: "currency",
+    currency: extra.currency,
+    minimumFractionDigits: Math.min(extra.exponent, 2),
+    maximumFractionDigits: extra.exponent,
+  });
+  const amount = (minor: number) => money.format(minor / 10 ** extra.exponent);
+  const used = amount(extra.usedMinor);
+  const label = t("extraUsage");
+
+  return (
+    <li
+      className="limit limit--money"
+      title={
+        extra.limitMinor === null
+          ? undefined
+          : t("extraUsageOf", { used, limit: amount(extra.limitMinor) })
+      }
+    >
+      <span className="limit__label">{label}</span>
+      {extra.percent === null ? (
+        <span />
+      ) : (
+        <Meter
+          size="small"
+          value={extra.percent}
+          severity={extra.severity}
+          label={label}
+          replay={replay}
+        />
+      )}
+      <span className="limit__value">{used}</span>
+    </li>
   );
 }
 

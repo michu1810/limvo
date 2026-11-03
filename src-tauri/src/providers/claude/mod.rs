@@ -4,6 +4,7 @@ mod api;
 mod credentials;
 mod desktop;
 mod plan;
+mod spend;
 
 use std::path::PathBuf;
 use std::time::Duration;

@@ -12,7 +12,10 @@ export const SCENARIOS = {
   fresh: (now) =>
     ok(snapshot(now, { percent: 2, resetInHours: 167, updatedMinutesAgo: 0, codeShare: 100 })),
   tight: (now) => ok(snapshot(now, { percent: 46, resetInHours: 84, updatedMinutesAgo: 1 })),
-  hot: (now) => ok(snapshot(now, { percent: 78, resetInHours: 70, updatedMinutesAgo: 1 })),
+  hot: (now) =>
+    ok(
+      snapshot(now, { percent: 78, resetInHours: 70, updatedMinutesAgo: 1, extraSpentCents: 1240 }),
+    ),
   reached: (now) => ok(snapshot(now, { percent: 100, resetInHours: 5, updatedMinutesAgo: 2 })),
   offline: (now) => ({
     state: "offline",
@@ -37,6 +40,8 @@ interface Shape {
   updatedMinutesAgo: number;
   /** Share of Claude Code in the breakdown; the rest goes to Cowork and Chats. */
   codeShare?: number;
+  /** Extra usage spent, in cents of a 50 USD cap; omitted means extra usage is off. */
+  extraSpentCents?: number;
 }
 
 function snapshot(now: Date, shape: Shape): UsageSnapshot {
@@ -74,6 +79,17 @@ function snapshot(now: Date, shape: Shape): UsageSnapshot {
       { key: "cowork", label: "Cowork", percent: coworkShare },
       { key: "chat", label: "Chats", percent: codeShare === 100 ? 0 : 1 },
     ],
+    extraUsage:
+      shape.extraSpentCents === undefined
+        ? null
+        : {
+            usedMinor: shape.extraSpentCents,
+            limitMinor: 5000,
+            currency: "USD",
+            exponent: 2,
+            percent: shape.extraSpentCents / 50,
+            severity: shape.extraSpentCents >= 4000 ? "warning" : "normal",
+          },
     usagePageUrl: "https://claude.ai/settings/usage",
   };
 }

@@ -53,5 +53,9 @@ export const ja: LocaleDefinition = {
     notifyReachedTitle: "{window}: 上限に到達",
     notifyResetTitle: "{window}がリセットされました",
     notifyResetBody: "使用枠が全回復しました。",
+    extraUsage: "追加使用",
+    extraUsageOf: "{used} / {limit}",
+    forecastLimitAt: "このペースだと {when} に上限に達します",
+    weekChart: "今週の使用量と均等なペースの比較",
   },
 };

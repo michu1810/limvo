@@ -30,6 +30,14 @@
       { "key": "cowork", "label": "Cowork", "percent": 48.0 },
       { "key": "chat", "label": "Chats", "percent": 1.0 }
     ],
+    "extraUsage": {
+      "usedMinor": 1240,
+      "limitMinor": 5000,
+      "currency": "USD",
+      "exponent": 2,
+      "percent": 24.8,
+      "severity": "normal"
+    },
     "usagePageUrl": "https://claude.ai/settings/usage"
   },
   "detail": null

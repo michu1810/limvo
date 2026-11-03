@@ -6,6 +6,7 @@ import { useNow, useShowCount } from "../hooks";
 import { SettingsIcon } from "../icons";
 import { ProviderMark } from "../ProviderMark";
 import { useAlerts } from "../useAlerts";
+import { useWeekHistory } from "../useWeekHistory";
 import { Breakdown, OtherLimits } from "./Details";
 import { Headline } from "./Headline";
 import { LanguagePanel } from "./LanguagePanel";
@@ -34,6 +35,7 @@ export function Flyout({
   const root = useFitToContent();
   useTrayTexts(report, now);
   useAlerts(report, settings);
+  const history = useWeekHistory(report);
 
   const go = (next: View) => {
     setDirection(DEPTH[next] >= DEPTH[view] ? "forward" : "back");
@@ -107,10 +109,22 @@ export function Flyout({
             <StateNotice report={report} now={now} onRetry={refresh} />
 
             {snapshot?.headline && (
-              <Headline window={snapshot.headline} now={now} replay={shown} plan={snapshot.plan} />
+              <Headline
+                window={snapshot.headline}
+                now={now}
+                replay={shown}
+                plan={snapshot.plan}
+                history={history}
+              />
             )}
             {snapshot && <Breakdown rows={snapshot.breakdown} replay={shown} />}
-            {snapshot && <OtherLimits windows={snapshot.windows} replay={shown} />}
+            {snapshot && (
+              <OtherLimits
+                windows={snapshot.windows}
+                extraUsage={snapshot.extraUsage}
+                replay={shown}
+              />
+            )}
 
             <footer className="flyout__footer">
               <button

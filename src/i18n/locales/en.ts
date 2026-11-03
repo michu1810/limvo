@@ -52,5 +52,9 @@ export const en: LocaleDefinition = {
     notifyReachedTitle: "{window}: limit reached",
     notifyResetTitle: "{window} has reset",
     notifyResetBody: "Your full allowance is back.",
+    extraUsage: "Extra usage",
+    extraUsageOf: "{used} of {limit}",
+    forecastLimitAt: "At this pace the limit runs out {when}",
+    weekChart: "Usage this week against an even pace",
   },
 };

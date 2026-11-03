@@ -273,6 +273,7 @@ mod tests {
             headline: None,
             windows: Vec::new(),
             breakdown: Vec::new(),
+            extra_usage: None,
             usage_page_url: None,
         }
     }

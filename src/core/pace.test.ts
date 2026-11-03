@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computePace } from "./pace";
+import { computePace, limitReachedAt } from "./pace";
 
 const WEEK = 7 * 24 * 3600;
 const now = new Date("2026-11-08T17:00:00Z");
@@ -45,5 +45,40 @@ describe("computePace", () => {
       computePace({ percent: 10, resetsAt: hoursFromNow(5), periodSeconds: null }, now),
     ).toBeNull();
     expect(computePace({ percent: 10, resetsAt: "soon", periodSeconds: WEEK }, now)).toBeNull();
+  });
+});
+
+describe("limitReachedAt", () => {
+  it("finds when a hot week runs out", () => {
+    // 60% used halfway through the week: 100% after 5/6 of it, 28 hours before the reset.
+    const at = limitReachedAt(
+      { percent: 60, resetsAt: hoursFromNow(84), periodSeconds: WEEK },
+      now,
+    );
+    expect(at?.getTime()).toBe(now.getTime() + 56 * 3600_000);
+  });
+
+  it("says nothing when the week lasts until the reset", () => {
+    expect(
+      limitReachedAt({ percent: 51, resetsAt: hoursFromNow(40), periodSeconds: WEEK }, now),
+    ).toBeNull();
+  });
+
+  it("says nothing for an empty or an exhausted window", () => {
+    expect(
+      limitReachedAt({ percent: 0, resetsAt: hoursFromNow(40), periodSeconds: WEEK }, now),
+    ).toBeNull();
+    expect(
+      limitReachedAt({ percent: 100, resetsAt: hoursFromNow(40), periodSeconds: WEEK }, now),
+    ).toBeNull();
+  });
+
+  it("does not panic after an early burst", () => {
+    // 9% in the first hour would empty the week in 11 hours without the floor.
+    const at = limitReachedAt(
+      { percent: 9, resetsAt: hoursFromNow(167), periodSeconds: WEEK },
+      now,
+    );
+    expect(at).toBeNull();
   });
 });

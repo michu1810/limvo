@@ -52,5 +52,9 @@ export const uk: LocaleDefinition = {
     notifyReachedTitle: "{window}: ліміт вичерпано",
     notifyResetTitle: "{window}: ліміт скинуто",
     notifyResetBody: "Повний ліміт знову доступний.",
+    extraUsage: "Додаткове використання",
+    extraUsageOf: "{used} з {limit}",
+    forecastLimitAt: "У такому темпі ліміт закінчиться {when}",
+    weekChart: "Використання цього тижня порівняно з рівномірним темпом",
   },
 };

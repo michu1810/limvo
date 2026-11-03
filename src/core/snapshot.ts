@@ -40,6 +40,20 @@ export interface PlanBadge {
   label: string;
 }
 
+/** Paid credits beyond the plan, when the user turned them on. */
+export interface ExtraUsage {
+  /** Amount spent in minor units of `currency`: the value is `usedMinor / 10 ** exponent`. */
+  usedMinor: number;
+  /** The monthly cap in the same units, or `null` when uncapped. */
+  limitMinor: number | null;
+  /** ISO 4217 code. */
+  currency: string;
+  exponent: number;
+  /** Share of the cap spent, 0 to 100, when there is a cap. */
+  percent: number | null;
+  severity: Severity;
+}
+
 export interface UsageSnapshot {
   providerId: string;
   /** Name of the service, shown as "<name> usage". */
@@ -53,6 +67,7 @@ export interface UsageSnapshot {
   windows: UsageWindow[];
   /** How the headline window splits across products. */
   breakdown: BreakdownRow[];
+  extraUsage: ExtraUsage | null;
   usagePageUrl: string | null;
 }
 

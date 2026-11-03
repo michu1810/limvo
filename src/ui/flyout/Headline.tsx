@@ -1,9 +1,11 @@
-import { computePace } from "../../core/pace";
+import type { WindowHistory } from "../../core/history";
+import { computePace, limitReachedAt } from "../../core/pace";
 import type { PlanBadge, UsageWindow } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { headlineLabel, PACE_MESSAGE } from "../labels";
 import { Meter } from "../Meter";
 import { RollingPercent } from "../RollingNumber";
+import { WeekChart } from "./WeekChart";
 
 export function Headline({
   window,
@@ -11,7 +13,10 @@ export function Headline({
   replay = 0,
   compact = false,
   plan = null,
+  history,
 }: {
+  /** Earlier readings of this period, for the weekly chart. */
+  history?: WindowHistory | undefined;
   window: UsageWindow;
   /** The account's plan, shown as a badge beside the label. */
   plan?: PlanBadge | null;
@@ -24,6 +29,7 @@ export function Headline({
   const i18n = useI18n();
   const { t, format } = i18n;
   const pace = computePace(window, now);
+  const runsOutAt = limitReachedAt(window, now);
   const resetsAt = window.resetsAt ? new Date(window.resetsAt) : null;
   const remaining = resetsAt ? resetsAt.getTime() - now.getTime() : null;
   const label = headlineLabel(window, i18n);
@@ -75,6 +81,21 @@ export function Headline({
               })}
             </span>
           )}
+        </p>
+      )}
+
+      {!compact && pace && (
+        <WeekChart
+          window={window}
+          history={history}
+          now={now}
+          projected={pace.projected}
+          replay={replay}
+        />
+      )}
+      {!compact && runsOutAt && (
+        <p className="forecast" role="status">
+          {t("forecastLimitAt", { when: format.weekdayTime(runsOutAt) })}
         </p>
       )}
     </section>

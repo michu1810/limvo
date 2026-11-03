@@ -53,5 +53,9 @@ export const pl: LocaleDefinition = {
     notifyReachedTitle: "{window}: limit wyczerpany",
     notifyResetTitle: "{window}: limit odnowiony",
     notifyResetBody: "Masz znowu pełny limit.",
+    extraUsage: "Dodatkowe użycie",
+    extraUsageOf: "{used} z {limit}",
+    forecastLimitAt: "W tym tempie limit skończy się {when}",
+    weekChart: "Zużycie w tym tygodniu na tle równego tempa",
   },
 };

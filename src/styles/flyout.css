@@ -327,6 +327,102 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Week chart and forecast ------------------------------------------------------ */
+
+.chart {
+  position: relative;
+  height: 44px;
+  margin: 16px 0 0;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.chart__grid {
+  stroke: var(--track);
+  stroke-width: 1;
+}
+
+/* The even pace that ends the period exactly at the limit. */
+.chart__pace {
+  stroke: var(--text-tertiary);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+}
+
+.chart__area {
+  animation: chart-fade 700ms var(--ease-out) 300ms both;
+}
+
+.chart__line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  animation: chart-draw 1100ms var(--ease-out) both;
+}
+
+.chart__projection {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 1 4;
+  stroke-linecap: round;
+  opacity: 0.8;
+  animation: chart-fade 500ms var(--ease-out) 1000ms both;
+}
+
+.chart__dot {
+  position: absolute;
+  inset-inline-start: var(--dot-x);
+  top: var(--dot-y);
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pill-in var(--duration-slow) var(--ease-spring) 1000ms both;
+}
+
+/* The chart reads left to right in every language: time does not mirror. */
+[dir="rtl"] .chart {
+  direction: ltr;
+}
+
+[dir="rtl"] .chart__dot {
+  inset-inline-start: auto;
+  left: var(--dot-x);
+}
+
+@keyframes chart-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes chart-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.forecast {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--caution-text);
+  animation: rise var(--duration-medium) var(--ease-out) 900ms both;
+}
+
 /* Groups and rows ------------------------------------------------------------ */
 
 .group {
@@ -362,6 +458,11 @@
 
 .limit:hover {
   background: var(--fill-subtle-hover);
+}
+
+/* Money needs more room than a percentage. */
+.limit--money {
+  grid-template-columns: minmax(0, 1fr) 34% minmax(44px, auto);
 }
 
 .limit__label {

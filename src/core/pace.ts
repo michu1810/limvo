@@ -53,6 +53,33 @@ export function computePace(
   return { elapsed, projected, status: classify(window.percent, projected, thresholds) };
 }
 
+/**
+ * When the window would run out if usage carries on at its average rate so
+ * far, or `null` when it lasts until the reset (or has already run out).
+ * Uses the same elapsed floor as the projection, so one early burst does not
+ * predict an empty week.
+ */
+export function limitReachedAt(
+  window: Pick<UsageWindow, "percent" | "resetsAt" | "periodSeconds">,
+  now: Date,
+  thresholds: PaceThresholds = DEFAULT_THRESHOLDS,
+): Date | null {
+  if (window.resetsAt === null || window.periodSeconds === null || window.periodSeconds <= 0) {
+    return null;
+  }
+  const resetsAt = Date.parse(window.resetsAt);
+  if (Number.isNaN(resetsAt) || window.percent <= 0 || window.percent >= 100) return null;
+
+  const periodMs = window.periodSeconds * 1000;
+  const elapsedMs = Math.max(
+    periodMs - (resetsAt - now.getTime()),
+    thresholds.elapsedFloor * periodMs,
+  );
+  const perMs = window.percent / elapsedMs;
+  const at = now.getTime() + (100 - window.percent) / perMs;
+  return at < resetsAt ? new Date(at) : null;
+}
+
 function classify(percent: number, projected: number, thresholds: PaceThresholds): PaceStatus {
   if (percent >= 100) return "limit_reached";
   if (projected >= thresholds.hot) return "running_hot";

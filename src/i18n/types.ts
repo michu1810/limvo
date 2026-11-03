@@ -72,6 +72,14 @@ export interface Messages {
   /** Placeholder `{window}`. */
   notifyResetTitle: string;
   notifyResetBody: string;
+
+  extraUsage: string;
+  /** Placeholders `{used}` and `{limit}` are formatted amounts of money. */
+  extraUsageOf: string;
+  /** Placeholder `{when}`, a weekday and time before the reset. */
+  forecastLimitAt: string;
+  /** Accessible description of the weekly chart. */
+  weekChart: string;
 }
 
 export interface LocaleDefinition {

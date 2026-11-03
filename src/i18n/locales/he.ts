@@ -52,5 +52,9 @@ export const he: LocaleDefinition = {
     notifyReachedTitle: "{window}: המגבלה נוצלה",
     notifyResetTitle: "{window} התאפסה",
     notifyResetBody: "המכסה המלאה חזרה.",
+    extraUsage: "שימוש נוסף",
+    extraUsageOf: "{used} מתוך {limit}",
+    forecastLimitAt: "בקצב הזה המגבלה תיגמר {when}",
+    weekChart: "השימוש השבוע לעומת קצב אחיד",
   },
 };

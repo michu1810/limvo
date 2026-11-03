@@ -52,5 +52,9 @@ export const ptBR: LocaleDefinition = {
     notifyReachedTitle: "{window}: limite atingido",
     notifyResetTitle: "{window} reiniciado",
     notifyResetBody: "Sua cota completa está de volta.",
+    extraUsage: "Uso extra",
+    extraUsageOf: "{used} de {limit}",
+    forecastLimitAt: "Nesse ritmo o limite acaba {when}",
+    weekChart: "Uso da semana comparado a um ritmo constante",
   },
 };

@@ -53,5 +53,9 @@ export const de: LocaleDefinition = {
     notifyReachedTitle: "{window}: Limit erreicht",
     notifyResetTitle: "{window} wurde zurückgesetzt",
     notifyResetBody: "Dein volles Kontingent ist wieder da.",
+    extraUsage: "Zusätzliche Nutzung",
+    extraUsageOf: "{used} von {limit}",
+    forecastLimitAt: "Bei diesem Tempo ist das Limit {when} erreicht",
+    weekChart: "Nutzung dieser Woche im Vergleich zu gleichmäßigem Tempo",
   },
 };

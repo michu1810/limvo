@@ -56,6 +56,23 @@ pub struct PlanBadge {
     pub label: String,
 }
 
+/// Paid credits beyond the plan, when the user turned them on.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExtraUsage {
+    /// Amount spent, in minor units of `currency` (cents for `USD` with exponent 2).
+    pub used_minor: i64,
+    /// The monthly cap in the same units, or `None` when uncapped.
+    pub limit_minor: Option<i64>,
+    /// ISO 4217 code.
+    pub currency: String,
+    /// Number of minor-unit digits: the amount is `used_minor / 10^exponent`.
+    pub exponent: u32,
+    /// Share of the cap spent, 0 to 100, when there is a cap.
+    pub percent: Option<f64>,
+    pub severity: Severity,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UsageSnapshot {
@@ -67,6 +84,7 @@ pub struct UsageSnapshot {
     pub headline: Option<UsageWindow>,
     pub windows: Vec<UsageWindow>,
     pub breakdown: Vec<BreakdownRow>,
+    pub extra_usage: Option<ExtraUsage>,
     pub usage_page_url: Option<String>,
 }
 

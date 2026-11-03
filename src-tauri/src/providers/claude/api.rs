@@ -22,6 +22,8 @@ pub struct UsageResponse {
     seven_day: Option<Bucket>,
     limits: Vec<Limit>,
     seven_day_breakdown: Option<Breakdown>,
+    spend: Option<super::spend::Spend>,
+    extra_usage: Option<super::spend::LegacyExtraUsage>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -106,6 +108,9 @@ pub fn to_snapshot(response: UsageResponse, fetched_at: String) -> UsageSnapshot
         None => (session, scoped),
     };
 
+    let extra_usage =
+        super::spend::extra_usage(response.spend.as_ref(), response.extra_usage.as_ref());
+
     let breakdown = response
         .seven_day_breakdown
         .map(|breakdown| {
@@ -126,6 +131,7 @@ pub fn to_snapshot(response: UsageResponse, fetched_at: String) -> UsageSnapshot
         headline,
         windows,
         breakdown,
+        extra_usage,
         usage_page_url: Some(USAGE_PAGE_URL.to_owned()),
     }
 }

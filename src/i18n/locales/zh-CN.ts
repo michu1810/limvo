@@ -52,5 +52,9 @@ export const zhCN: LocaleDefinition = {
     notifyReachedTitle: "{window}：已达上限",
     notifyResetTitle: "{window}已重置",
     notifyResetBody: "额度已全部恢复。",
+    extraUsage: "额外用量",
+    extraUsageOf: "{used} / {limit}",
+    forecastLimitAt: "按此速度，限额将在{when}用完",
+    weekChart: "本周用量与均匀节奏对比",
   },
 };

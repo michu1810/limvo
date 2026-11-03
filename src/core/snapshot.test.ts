@@ -16,6 +16,7 @@ const snapshotKeys = {
   headline: true,
   windows: true,
   breakdown: true,
+  extraUsage: true,
   usagePageUrl: true,
 } satisfies Record<keyof UsageSnapshot, true>;
 const windowKeys = {
