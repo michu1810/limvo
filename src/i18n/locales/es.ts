@@ -62,5 +62,8 @@ export const es: LocaleDefinition = {
     shortcutTaken: "Otras apps ya usan los dos atajos",
     planColors: "Colores del plan",
     planColorsHint: "Tiñe el widget con el color de tu plan",
+    services: "Servicios",
+    taskbarPins: "Límites en la barra de tareas",
+    taskbarPinsHint: "Hasta {count} límites, en el orden en que los actives",
   },
 };

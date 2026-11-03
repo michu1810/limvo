@@ -16,8 +16,9 @@ const TASKBAR_THEME_EVENT = "taskbar-theme";
 const FLYOUT_SHOWN_EVENT = "flyout-shown";
 
 export const tauriBridge: Bridge = {
-  getReport: () => invoke<ProviderReport>("get_report"),
-  onReport: (listener) => listen<ProviderReport>(REPORT_EVENT, (event) => listener(event.payload)),
+  getReports: () => invoke<ProviderReport[]>("get_reports"),
+  onReports: (listener) =>
+    listen<ProviderReport[]>(REPORT_EVENT, (event) => listener(event.payload)),
   refresh: () => invoke("refresh"),
 
   getSettings: () => invoke<Settings>("get_settings"),
@@ -38,7 +39,7 @@ export const tauriBridge: Bridge = {
   },
   onFlyoutShown: (listener) => listen(FLYOUT_SHOWN_EVENT, () => listener()),
 
-  openUsagePage: () => invoke("open_usage_page"),
+  openUsagePage: (providerId) => invoke("open_usage_page", { providerId }),
   fitFlyout: (height) => invoke("fit_flyout", { height }),
   fitStrip: (width) => invoke("fit_strip", { width }),
   toggleFlyout: () => invoke("toggle_flyout"),

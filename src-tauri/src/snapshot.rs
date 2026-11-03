@@ -102,6 +102,9 @@ pub enum ReportState {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProviderReport {
+    /// Which provider this is about, known even before the first reading.
+    pub provider_id: String,
+    pub provider_name: String,
     pub state: ReportState,
     /// The last good reading, kept when a later refresh fails.
     pub snapshot: Option<UsageSnapshot>,
@@ -110,8 +113,10 @@ pub struct ProviderReport {
 }
 
 impl ProviderReport {
-    pub fn loading() -> Self {
+    pub fn loading(provider_id: &str, provider_name: &str) -> Self {
         Self {
+            provider_id: provider_id.to_owned(),
+            provider_name: provider_name.to_owned(),
             state: ReportState::Loading,
             snapshot: None,
             detail: None,

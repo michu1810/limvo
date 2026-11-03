@@ -62,5 +62,8 @@ export const de: LocaleDefinition = {
     shortcutTaken: "Beide Kürzel sind von anderen Apps belegt",
     planColors: "Planfarben",
     planColorsHint: "Färbt das Widget in der Farbe deines Plans",
+    services: "Dienste",
+    taskbarPins: "Limits in der Taskleiste",
+    taskbarPinsHint: "Bis zu {count} Limits, in der Reihenfolge des Einschaltens",
   },
 };

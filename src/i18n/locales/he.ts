@@ -61,5 +61,8 @@ export const he: LocaleDefinition = {
     shortcutTaken: "שני הקיצורים תפוסים על ידי אפליקציות אחרות",
     planColors: "צבעי התוכנית",
     planColorsHint: "צביעת הווידג׳ט בצבע התוכנית שלך",
+    services: "שירותים",
+    taskbarPins: "מגבלות בשורת המשימות",
+    taskbarPinsHint: "עד {count} מגבלות, לפי סדר ההפעלה",
   },
 };

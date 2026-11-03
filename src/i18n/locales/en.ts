@@ -61,5 +61,8 @@ export const en: LocaleDefinition = {
     shortcutTaken: "Both shortcuts are taken by other apps",
     planColors: "Plan colours",
     planColorsHint: "Tint the widget with the colour of your plan",
+    services: "Services",
+    taskbarPins: "Limits in the taskbar",
+    taskbarPinsHint: "Up to {count} limits, in the order you turn them on",
   },
 };

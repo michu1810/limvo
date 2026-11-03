@@ -1,12 +1,13 @@
-//! Reads the provider on a schedule and publishes every new report.
+//! Reads every provider on a schedule and publishes every new report.
 //!
 //! One task owns all network access, so there is never more than one request
-//! in flight. Everything else (a manual refresh, opening the flyout, activity
-//! in the provider's tools) only wakes that task early.
+//! in flight. Each provider keeps its own due time, back-off and last good
+//! reading. Everything else (a manual refresh, opening the flyout, activity
+//! in a provider's tools) only wakes that task early.
 
 use std::sync::atomic::{AtomicI64, AtomicU8, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use tauri::{AppHandle, Emitter};
 use tokio::sync::Notify;
@@ -25,12 +26,12 @@ const ACTIVE_WINDOW: Duration = Duration::from_mins(5);
 const SIGNED_OUT_INTERVAL: Duration = Duration::from_mins(2);
 const FIRST_RETRY: Duration = Duration::from_secs(30);
 const MAX_RETRY: Duration = Duration::from_mins(15);
-/// Requests closer together than this reuse the last answer.
+/// Requests to one provider closer together than this reuse the last answer.
 const MIN_GAP: Duration = Duration::from_secs(10);
 
 #[derive(Debug, Clone)]
 pub struct PollerHandle {
-    report: Arc<Mutex<ProviderReport>>,
+    reports: Arc<Mutex<Vec<ProviderReport>>>,
     wake: Arc<Notify>,
     schedule: Arc<Schedule>,
 }
@@ -44,11 +45,19 @@ struct Schedule {
 }
 
 impl PollerHandle {
-    pub fn report(&self) -> ProviderReport {
-        self.report
+    /// One report per provider, in the order the interface lists them.
+    pub fn reports(&self) -> Vec<ProviderReport> {
+        self.reports
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
             .clone()
+    }
+
+    /// The report of one provider, if it is known.
+    pub fn report(&self, provider_id: &str) -> Option<ProviderReport> {
+        self.reports()
+            .into_iter()
+            .find(|report| report.provider_id == provider_id)
     }
 
     pub fn refresh_now(&self) {
@@ -62,7 +71,7 @@ impl PollerHandle {
         self.wake.notify_one();
     }
 
-    /// The provider's tools just wrote something. Read soon, but never more
+    /// A provider's tools just wrote something. Read soon, but never more
     /// than once per [`ACTIVE_INTERVAL`], however busy the user is.
     pub fn note_activity(&self) {
         let now = now_ms();
@@ -99,9 +108,25 @@ impl Schedule {
     }
 }
 
-pub fn start(app: AppHandle, provider: Box<dyn UsageProvider>, mode: RefreshMode) -> PollerHandle {
+/// What the poller knows about one provider between readings.
+struct Slot {
+    provider: Box<dyn UsageProvider>,
+    due: Instant,
+    failures: u32,
+    last_fetch: Option<Instant>,
+}
+
+pub fn start(
+    app: AppHandle,
+    providers: Vec<Box<dyn UsageProvider>>,
+    mode: RefreshMode,
+) -> PollerHandle {
+    let reports = providers
+        .iter()
+        .map(|provider| ProviderReport::loading(provider.id(), provider.name()))
+        .collect();
     let handle = PollerHandle {
-        report: Arc::new(Mutex::new(ProviderReport::loading())),
+        reports: Arc::new(Mutex::new(reports)),
         wake: Arc::new(Notify::new()),
         schedule: Arc::new(Schedule {
             mode: AtomicU8::new(mode_to_u8(mode)),
@@ -110,11 +135,11 @@ pub fn start(app: AppHandle, provider: Box<dyn UsageProvider>, mode: RefreshMode
         }),
     };
     let task = handle.clone();
-    tauri::async_runtime::spawn(async move { run(app, provider, task).await });
+    tauri::async_runtime::spawn(async move { run(app, providers, task).await });
     handle
 }
 
-async fn run(app: AppHandle, provider: Box<dyn UsageProvider>, handle: PollerHandle) {
+async fn run(app: AppHandle, providers: Vec<Box<dyn UsageProvider>>, handle: PollerHandle) {
     let http = match http_client() {
         Ok(http) => http,
         Err(error) => {
@@ -122,60 +147,84 @@ async fn run(app: AppHandle, provider: Box<dyn UsageProvider>, handle: PollerHan
             return;
         }
     };
-    let mut failures: u32 = 0;
-    let mut wait = Duration::ZERO;
+    let start = Instant::now();
+    let mut slots: Vec<Slot> = providers
+        .into_iter()
+        .map(|provider| Slot {
+            provider,
+            due: start,
+            failures: 0,
+            last_fetch: None,
+        })
+        .collect();
 
     loop {
-        let since_fetch = now_ms() - handle.schedule.last_fetch_ms.load(Ordering::Relaxed);
-        if since_fetch >= millis(MIN_GAP) {
+        let now = Instant::now();
+        for (index, slot) in slots.iter_mut().enumerate() {
+            let too_soon = slot.last_fetch.is_some_and(|at| at.elapsed() < MIN_GAP);
+            if slot.due > now || too_soon {
+                continue;
+            }
+            slot.last_fetch = Some(Instant::now());
             handle
                 .schedule
                 .last_fetch_ms
                 .store(now_ms(), Ordering::Relaxed);
-            let outcome = provider.fetch(&http).await;
-            failures = if outcome.is_ok() {
+            let outcome = slot.provider.fetch(&http).await;
+            slot.failures = if outcome.is_ok() {
                 0
             } else {
-                failures.saturating_add(1)
+                slot.failures.saturating_add(1)
             };
-            wait = match &outcome {
+            let wait = match &outcome {
                 Ok(_) => handle.schedule.healthy_interval(now_ms()),
-                Err(error) => retry_delay(error, failures),
+                Err(error) => retry_delay(error, slot.failures),
             };
-            publish(&app, &handle, outcome);
-        } else {
-            // Woken right after a fetch: show the same answer again instead of asking twice.
-            publish_current(&app, &handle);
+            slot.due = Instant::now() + wait;
+            store(&handle, index, outcome);
         }
-        wait_or_wake(&handle, wait).await;
+        publish(&app, &handle);
+
+        let next = slots.iter().map(|slot| slot.due).min().unwrap_or(now);
+        let woken = wait_or_wake(&handle, next.saturating_duration_since(Instant::now())).await;
+        if woken {
+            // A refresh, an opened flyout or new activity: everyone is due now.
+            let now = Instant::now();
+            for slot in &mut slots {
+                slot.due = now;
+            }
+        }
     }
 }
 
-async fn wait_or_wake(handle: &PollerHandle, wait: Duration) {
+/// Waits for `wait`, or less when someone asks for a fresh reading; returns whether they did.
+async fn wait_or_wake(handle: &PollerHandle, wait: Duration) -> bool {
     tokio::select! {
-        () = tokio::time::sleep(wait) => {}
-        () = handle.wake.notified() => {}
+        () = tokio::time::sleep(wait) => false,
+        () = handle.wake.notified() => true,
     }
 }
 
-fn publish(app: &AppHandle, handle: &PollerHandle, outcome: Result<UsageSnapshot, ProviderError>) {
-    {
-        let mut report = handle.report.lock().unwrap_or_else(PoisonError::into_inner);
-        *report = merge(&report, outcome);
+fn store(handle: &PollerHandle, index: usize, outcome: Result<UsageSnapshot, ProviderError>) {
+    let mut reports = handle
+        .reports
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner);
+    if let Some(report) = reports.get_mut(index) {
+        *report = merge(report, outcome);
     }
-    publish_current(app, handle);
 }
 
-fn publish_current(app: &AppHandle, handle: &PollerHandle) {
-    let report = handle.report();
-    let level = report
-        .snapshot
-        .as_ref()
-        .and_then(|snapshot| snapshot.headline.as_ref())
+fn publish(app: &AppHandle, handle: &PollerHandle) {
+    let reports = handle.reports();
+    // The tray icon follows the first provider that has a reading.
+    let level = reports
+        .iter()
+        .find_map(|report| report.snapshot.as_ref()?.headline.as_ref())
         .map(|headline| headline.percent);
     crate::tray::show_level(app, level);
-    if let Err(error) = app.emit(events::REPORT_UPDATED, report) {
-        log::warn!("could not publish the report: {error}");
+    if let Err(error) = app.emit(events::REPORT_UPDATED, reports) {
+        log::warn!("could not publish the reports: {error}");
     }
 }
 
@@ -186,6 +235,8 @@ fn merge(
 ) -> ProviderReport {
     match outcome {
         Ok(snapshot) => ProviderReport {
+            provider_id: previous.provider_id.clone(),
+            provider_name: previous.provider_name.clone(),
             state: ReportState::Ok,
             snapshot: Some(snapshot),
             detail: None,
@@ -199,8 +250,12 @@ fn merge(
                 }
                 ProviderError::Unexpected(_) => ReportState::Error,
             };
-            log::warn!("usage refresh failed: {error}");
+            if !matches!(error, ProviderError::NoCredentials) {
+                log::warn!("{} refresh failed: {error}", previous.provider_name);
+            }
             ProviderReport {
+                provider_id: previous.provider_id.clone(),
+                provider_name: previous.provider_name.clone(),
                 state,
                 snapshot: previous.snapshot.clone(),
                 detail: Some(error.to_string()),
@@ -288,7 +343,7 @@ mod tests {
 
     #[test]
     fn a_failure_keeps_the_last_good_snapshot() {
-        let good = merge(&ProviderReport::loading(), Ok(snapshot()));
+        let good = merge(&ProviderReport::loading("claude", "Claude"), Ok(snapshot()));
         let offline = merge(&good, Err(ProviderError::Unreachable("timeout".into())));
         assert_eq!(offline.state, ReportState::Offline);
         assert_eq!(offline.snapshot, good.snapshot);
@@ -296,7 +351,10 @@ mod tests {
 
     #[test]
     fn rejected_credentials_ask_the_user_to_sign_in() {
-        let report = merge(&ProviderReport::loading(), Err(ProviderError::AuthRequired));
+        let report = merge(
+            &ProviderReport::loading("claude", "Claude"),
+            Err(ProviderError::AuthRequired),
+        );
         assert_eq!(report.state, ReportState::AuthRequired);
     }
 

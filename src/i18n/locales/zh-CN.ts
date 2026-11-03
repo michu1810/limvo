@@ -61,5 +61,8 @@ export const zhCN: LocaleDefinition = {
     shortcutTaken: "两个快捷键都已被其他应用占用",
     planColors: "套餐颜色",
     planColorsHint: "用套餐颜色为小组件着色",
+    services: "服务",
+    taskbarPins: "任务栏中的限额",
+    taskbarPinsHint: "最多 {count} 项，按开启顺序显示",
   },
 };

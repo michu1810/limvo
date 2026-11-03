@@ -7,3 +7,6 @@ export type { Bridge, RefreshMode, Settings, Unsubscribe } from "./types";
 export const isTauri = "__TAURI_INTERNALS__" in window;
 
 export const bridge: Bridge = isTauri ? tauriBridge : createBrowserBridge();
+
+/** The service the flyout opens on until the user picks another tab. */
+export const PRIMARY_PROVIDER = "claude";

@@ -61,5 +61,8 @@ export const ptBR: LocaleDefinition = {
     shortcutTaken: "Os dois atalhos já estão em uso por outros apps",
     planColors: "Cores do plano",
     planColorsHint: "Pinta o widget com a cor do seu plano",
+    services: "Serviços",
+    taskbarPins: "Limites na barra de tarefas",
+    taskbarPinsHint: "Até {count} limites, na ordem em que você os ativar",
   },
 };

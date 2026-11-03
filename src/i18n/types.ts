@@ -87,6 +87,9 @@ export interface Messages {
   shortcutTaken: string;
   planColors: string;
   planColorsHint: string;
+  services: string;
+  taskbarPins: string;
+  taskbarPinsHint: string;
 }
 
 export interface LocaleDefinition {

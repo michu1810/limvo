@@ -61,5 +61,8 @@ export const it: LocaleDefinition = {
     shortcutTaken: "Entrambe le scorciatoie sono già usate da altre app",
     planColors: "Colori del piano",
     planColorsHint: "Colora il widget con il colore del tuo piano",
+    services: "Servizi",
+    taskbarPins: "Limiti nella barra delle applicazioni",
+    taskbarPinsHint: "Fino a {count} limiti, nell'ordine in cui li attivi",
   },
 };

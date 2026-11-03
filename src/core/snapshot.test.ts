@@ -4,10 +4,13 @@ import type { BreakdownRow, ProviderReport, UsageSnapshot, UsageWindow } from ".
 
 // `satisfies` makes each list complete and exact for its type, so these lists
 // fail to compile when a field is added or renamed in `snapshot.ts`.
-const reportKeys = { state: true, snapshot: true, detail: true } satisfies Record<
-  keyof ProviderReport,
-  true
->;
+const reportKeys = {
+  providerId: true,
+  providerName: true,
+  state: true,
+  snapshot: true,
+  detail: true,
+} satisfies Record<keyof ProviderReport, true>;
 const snapshotKeys = {
   providerId: true,
   providerName: true,

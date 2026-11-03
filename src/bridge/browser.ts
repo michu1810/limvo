@@ -1,21 +1,23 @@
 import type { ProviderReport } from "../core/snapshot";
-import { SCENARIOS, type ScenarioName } from "./scenarios";
+import { SCENARIOS, type ScenarioName, scenarioReports } from "./scenarios";
 import type { Bridge, Settings } from "./types";
 
 /**
  * Development host for `npm run dev` in a plain browser. Query parameters:
- * `scenario` (see `SCENARIOS`), `locale` (for example `he`) and `now`
- * (an ISO instant, for reproducible screenshots). Refresh cycles through a
- * small change so motion can be checked without the app.
+ * `scenario` (see `SCENARIOS`), `codex=off`, `locale` (for example `he`) and
+ * `now` (an ISO instant, for reproducible screenshots). Refresh cycles
+ * through a small change so motion can be checked without the app.
  */
 export function createBrowserBridge(): Bridge {
   const params = new URLSearchParams(window.location.search);
-  const scenario = (params.get("scenario") ?? "reference") as ScenarioName;
+  const requested = params.get("scenario") ?? "reference";
+  const name: ScenarioName = requested in SCENARIOS ? (requested as ScenarioName) : "reference";
+  const withCodex = params.get("codex") !== "off";
   const fixedNow = params.get("now");
   const now = () => (fixedNow ? new Date(fixedNow) : new Date());
-  const build = SCENARIOS[scenario] ?? SCENARIOS.reference;
+  const build = () => scenarioReports(name, now(), withCodex);
 
-  let report: ProviderReport = build(now());
+  let reports: ProviderReport[] = build();
   let settings: Settings = {
     locale: params.get("locale"),
     showStrip: true,
@@ -24,10 +26,11 @@ export function createBrowserBridge(): Bridge {
     desktopCard: false,
     shortcut: true,
     planColors: true,
+    pinned: params.get("pins")?.split(",") ?? null,
   };
   let launchAtLogin = true;
   let refreshes = 0;
-  const reportListeners = new Set<(report: ProviderReport) => void>();
+  const reportListeners = new Set<(reports: ProviderReport[]) => void>();
   const settingsListeners = new Set<(settings: Settings) => void>();
   const shownListeners = new Set<() => void>();
 
@@ -46,16 +49,18 @@ export function createBrowserBridge(): Bridge {
   });
 
   return {
-    getReport: () => Promise.resolve(report),
-    onReport: (listener) => subscribe(reportListeners, listener),
+    getReports: () => Promise.resolve(reports),
+    onReports: (listener) => subscribe(reportListeners, listener),
     async refresh() {
       refreshes += 1;
-      const next = build(now());
-      const headline = next.snapshot?.headline;
-      if (headline) headline.percent = Math.min(100, headline.percent + (refreshes % 3) * 4);
-      if (next.snapshot) next.snapshot.fetchedAt = now().toISOString();
-      report = next;
-      for (const listener of reportListeners) listener(report);
+      const next = build();
+      for (const report of next) {
+        const headline = report.snapshot?.headline;
+        if (headline) headline.percent = Math.min(100, headline.percent + (refreshes % 3) * 4);
+        if (report.snapshot) report.snapshot.fetchedAt = now().toISOString();
+      }
+      reports = next;
+      for (const listener of reportListeners) listener(reports);
     },
 
     getSettings: () => Promise.resolve(settings),
@@ -90,8 +95,9 @@ export function createBrowserBridge(): Bridge {
       });
     },
 
-    async openUsagePage() {
-      const url = report.snapshot?.usagePageUrl;
+    async openUsagePage(providerId) {
+      const url = reports.find((report) => report.providerId === providerId)?.snapshot
+        ?.usagePageUrl;
       if (url) window.open(url, "_blank", "noopener");
     },
     fitFlyout: () => Promise.resolve(),

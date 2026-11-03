@@ -50,6 +50,8 @@ pub struct Settings {
     pub shortcut: bool,
     /// Tint the interface with the colour of the account's plan.
     pub plan_colors: bool,
+    /// Limits shown in the taskbar, as `<provider>:<window>`. `None` shows each provider's main limit.
+    pub pinned: Option<Vec<String>>,
     #[serde(flatten)]
     other: serde_json::Map<String, serde_json::Value>,
 }
@@ -65,6 +67,7 @@ impl Default for Settings {
             card_position: None,
             shortcut: true,
             plan_colors: true,
+            pinned: None,
             other: serde_json::Map::new(),
         }
     }
@@ -86,6 +89,8 @@ pub struct SettingsPatch {
     pub card_position: Option<Option<CardPosition>>,
     pub shortcut: Option<bool>,
     pub plan_colors: Option<bool>,
+    #[serde(default, deserialize_with = "present")]
+    pub pinned: Option<Option<Vec<String>>>,
 }
 
 /// Turns a field that is present into `Some`, even when its value is `null`.
@@ -123,6 +128,15 @@ impl Settings {
         }
         if let Some(plan_colors) = patch.plan_colors {
             self.plan_colors = plan_colors;
+        }
+        if let Some(pinned) = patch.pinned {
+            // A pin names a provider and a window; anything else is dropped.
+            self.pinned = pinned.map(|pins| {
+                pins.into_iter()
+                    .filter(|pin| pin.len() <= 80 && pin.split_once(':').is_some())
+                    .take(6)
+                    .collect()
+            });
         }
     }
 }
@@ -206,6 +220,26 @@ mod tests {
         };
         settings.apply(serde_json::from_str(r#"{"locale": null}"#).unwrap());
         assert_eq!(settings.locale, None);
+    }
+
+    #[test]
+    fn pins_keep_their_order_and_drop_malformed_entries() {
+        let mut settings = Settings::default();
+        settings.apply(
+            serde_json::from_str(
+                r#"{"pinned": ["codex:session", "nonsense", "claude:weekly_all"]}"#,
+            )
+            .unwrap(),
+        );
+        assert_eq!(
+            settings.pinned,
+            Some(vec!["codex:session".into(), "claude:weekly_all".into()])
+        );
+        let many: Vec<String> = (0..10).map(|n| format!("p:{n}")).collect();
+        settings.apply(serde_json::from_value(serde_json::json!({ "pinned": many })).unwrap());
+        assert_eq!(settings.pinned.as_ref().map(Vec::len), Some(6));
+        settings.apply(serde_json::from_str(r#"{"pinned": null}"#).unwrap());
+        assert_eq!(settings.pinned, None);
     }
 
     #[test]

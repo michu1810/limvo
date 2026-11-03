@@ -1,11 +1,12 @@
 //! Usage providers.
 //!
 //! A provider turns one service's API into a [`UsageSnapshot`]. Adding a
-//! service means adding a module here and registering it in
-//! [`default_provider`]; nothing in the UI or the poller changes. See
+//! service means adding a module here and registering it in [`all`];
+//! nothing in the UI or the poller changes. See
 //! `CONTRIBUTING.md` for a walkthrough.
 
 pub mod claude;
+pub mod codex;
 
 use std::future::Future;
 use std::path::PathBuf;
@@ -19,6 +20,12 @@ pub type FetchFuture<'a> =
 
 /// A source of usage readings. Implementations must never log or return credentials.
 pub trait UsageProvider: Send + Sync {
+    /// Stable identifier, also the name of the optional brand mark file.
+    fn id(&self) -> &'static str;
+
+    /// Name of the service as the interface shows it.
+    fn name(&self) -> &'static str;
+
     /// Reads the current usage. Called by the poller, never concurrently.
     fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a>;
 
@@ -49,6 +56,10 @@ pub enum ProviderError {
     Unexpected(String),
 }
 
-pub fn default_provider() -> Box<dyn UsageProvider> {
-    Box::new(claude::ClaudeProvider::new())
+/// Every provider, in the order the interface lists them.
+pub fn all() -> Vec<Box<dyn UsageProvider>> {
+    vec![
+        Box::new(claude::ClaudeProvider::new()),
+        Box::new(codex::CodexProvider::new()),
+    ]
 }

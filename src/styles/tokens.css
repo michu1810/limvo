@@ -9,6 +9,7 @@
   --font-display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
 
   --surface: #f3f3f3;
+  --tab-plate: rgb(255 255 255 / 0.92);
   --surface-translucent: rgb(243 243 243 / 0.62);
   --stroke: rgb(0 0 0 / 0.07);
   --text: #1b1b1b;
@@ -45,6 +46,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --surface: #2b2b2b;
+    --tab-plate: rgb(255 255 255 / 0.1);
     --surface-translucent: rgb(32 32 32 / 0.55);
     --stroke: rgb(255 255 255 / 0.08);
     --text: #ffffff;
@@ -71,6 +73,7 @@
 
 :root[data-theme="dark"] {
   --surface: #2b2b2b;
+  --tab-plate: rgb(255 255 255 / 0.1);
   --surface-translucent: rgb(32 32 32 / 0.55);
   --stroke: rgb(255 255 255 / 0.08);
   --text: #ffffff;
@@ -97,97 +100,113 @@
 /*
  * Plan colours. With the setting on, the accent follows the account's plan:
  * Pro keeps the default terracotta, Free is a quiet graphite, Max is copper,
- * Max 20x a deep rose, Team teal and Enterprise indigo. Only the accent
- * moves; the status colours keep their meaning on every plan.
+ * Max 20x a deep rose, Team teal and Enterprise indigo; every ChatGPT plan is
+ * green. Set per element with data-plan, so two services in the taskbar can
+ * each wear their own. Only the accent moves; status colours keep their meaning.
  */
-:root[data-plan="free"] {
+[data-plan="free"] {
   --accent: #6b6f76;
   --accent-soft: #858a92;
 }
 
-:root[data-plan="max"] {
+[data-plan="max"] {
   --accent: #b5651d;
   --accent-soft: #c97b32;
 }
 
-:root[data-plan="max_5x"] {
+[data-plan="max_5x"] {
   --accent: #b5651d;
   --accent-soft: #c97b32;
 }
 
-:root[data-plan="max_20x"] {
+[data-plan="max_20x"] {
   --accent: #b33a5c;
   --accent-soft: #c95574;
 }
 
-:root[data-plan="team"] {
+[data-plan="team"] {
   --accent: #187a7a;
   --accent-soft: #2b9090;
 }
 
-:root[data-plan="enterprise"] {
+[data-plan="enterprise"] {
   --accent: #4a4fb8;
   --accent-soft: #5f64c8;
 }
 
+[data-plan^="chatgpt"] {
+  --accent: #0f8a6c;
+  --accent-soft: #1fa283;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root[data-plan="free"]:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) [data-plan="free"] {
     --accent: #a3a8b0;
     --accent-soft: #b8bcc3;
   }
 
-  :root[data-plan="max"]:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) [data-plan="max"] {
     --accent: #e0954d;
     --accent-soft: #eaa968;
   }
 
-  :root[data-plan="max_5x"]:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) [data-plan="max_5x"] {
     --accent: #e0954d;
     --accent-soft: #eaa968;
   }
 
-  :root[data-plan="max_20x"]:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) [data-plan="max_20x"] {
     --accent: #e0708f;
     --accent-soft: #ea8ba5;
   }
 
-  :root[data-plan="team"]:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) [data-plan="team"] {
     --accent: #4cc2bf;
     --accent-soft: #6fd0cd;
   }
 
-  :root[data-plan="enterprise"]:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) [data-plan="enterprise"] {
     --accent: #8f93f0;
     --accent-soft: #a6a9f4;
   }
+
+  :root:not([data-theme="light"]) [data-plan^="chatgpt"] {
+    --accent: #3fc9a2;
+    --accent-soft: #62d6b4;
+  }
 }
 
-:root[data-plan="free"][data-theme="dark"] {
+:root[data-theme="dark"] [data-plan="free"] {
   --accent: #a3a8b0;
   --accent-soft: #b8bcc3;
 }
 
-:root[data-plan="max"][data-theme="dark"] {
+:root[data-theme="dark"] [data-plan="max"] {
   --accent: #e0954d;
   --accent-soft: #eaa968;
 }
 
-:root[data-plan="max_5x"][data-theme="dark"] {
+:root[data-theme="dark"] [data-plan="max_5x"] {
   --accent: #e0954d;
   --accent-soft: #eaa968;
 }
 
-:root[data-plan="max_20x"][data-theme="dark"] {
+:root[data-theme="dark"] [data-plan="max_20x"] {
   --accent: #e0708f;
   --accent-soft: #ea8ba5;
 }
 
-:root[data-plan="team"][data-theme="dark"] {
+:root[data-theme="dark"] [data-plan="team"] {
   --accent: #4cc2bf;
   --accent-soft: #6fd0cd;
 }
 
-:root[data-plan="enterprise"][data-theme="dark"] {
+:root[data-theme="dark"] [data-plan="enterprise"] {
   --accent: #8f93f0;
   --accent-soft: #a6a9f4;
+}
+
+:root[data-theme="dark"] [data-plan^="chatgpt"] {
+  --accent: #3fc9a2;
+  --accent-soft: #62d6b4;
 }

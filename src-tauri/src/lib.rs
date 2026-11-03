@@ -63,7 +63,7 @@ pub fn run() {
             None,
         ))
         .invoke_handler(tauri::generate_handler![
-            commands::get_report,
+            commands::get_reports,
             commands::refresh,
             commands::get_settings,
             commands::update_settings,
@@ -86,9 +86,12 @@ pub fn run() {
             let tray = tray::build(app)?;
             tray::use_brand(app.handle(), "claude");
 
-            let provider = providers::default_provider();
-            let activity_paths = provider.activity_paths();
-            let poller = poller::start(app.handle().clone(), provider, settings.refresh);
+            let providers = providers::all();
+            let activity_paths = providers
+                .iter()
+                .flat_map(|provider| provider.activity_paths())
+                .collect();
+            let poller = poller::start(app.handle().clone(), providers, settings.refresh);
             let activity = activity::watch(activity_paths, &poller);
 
             #[cfg(windows)]

@@ -62,5 +62,8 @@ export const ja: LocaleDefinition = {
     shortcutTaken: "両方のショートカットが他のアプリで使用中です",
     planColors: "プランの色",
     planColorsHint: "ウィジェットをプランの色で表示",
+    services: "サービス",
+    taskbarPins: "タスクバーに出す制限",
+    taskbarPinsHint: "最大 {count} 件、オンにした順に表示",
   },
 };

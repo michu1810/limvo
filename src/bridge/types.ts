@@ -14,6 +14,8 @@ export interface Settings {
   shortcut: boolean;
   /** Tint the interface with the colour of the account's plan. */
   planColors: boolean;
+  /** Limits in the taskbar as `<provider>:<window>`; `null` shows each provider's main limit. */
+  pinned: string[] | null;
 }
 
 /** Only the fields named in a patch change; the host keeps everything else. */
@@ -46,8 +48,9 @@ export type Unsubscribe = () => void;
  * Rust core; the browser implementation serves scenarios for development.
  */
 export interface Bridge {
-  getReport(): Promise<ProviderReport>;
-  onReport(listener: (report: ProviderReport) => void): Promise<Unsubscribe>;
+  /** One report per provider, in the order the interface lists them. */
+  getReports(): Promise<ProviderReport[]>;
+  onReports(listener: (reports: ProviderReport[]) => void): Promise<Unsubscribe>;
   refresh(): Promise<void>;
 
   getSettings(): Promise<Settings>;
@@ -69,7 +72,7 @@ export interface Bridge {
   /** Fires each time the flyout is brought on screen, so it can play its entrance. */
   onFlyoutShown(listener: () => void): Promise<Unsubscribe>;
 
-  openUsagePage(): Promise<void>;
+  openUsagePage(providerId: string): Promise<void>;
   /** Tells the host how tall the flyout content is, so the window can fit it. */
   fitFlyout(height: number): Promise<void>;
   /** Tells the host how wide the taskbar strip content is. */

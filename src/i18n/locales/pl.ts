@@ -62,5 +62,8 @@ export const pl: LocaleDefinition = {
     shortcutTaken: "Oba skróty są zajęte przez inne aplikacje",
     planColors: "Kolory planu",
     planColorsHint: "Zabarwia widżet kolorem Twojego planu",
+    services: "Usługi",
+    taskbarPins: "Limity na pasku",
+    taskbarPinsHint: "Do {count} limitów, w kolejności włączania",
   },
 };

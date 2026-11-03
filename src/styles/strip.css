@@ -23,6 +23,32 @@
   background: var(--fill-subtle-pressed);
 }
 
+.strip__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Several limits: tighter readings with a hairline between services. */
+.strip[data-layout="multi"] {
+  gap: 0;
+  padding: 0 4px;
+}
+
+.strip__item--compact {
+  gap: 6px;
+  padding: 0 8px;
+}
+
+.strip__item--compact + .strip__item--compact {
+  border-inline-start: 1px solid color-mix(in srgb, var(--text-secondary) 28%, transparent);
+}
+
+.strip__tag {
+  margin-inline-start: 4px;
+  font-size: 11px;
+}
+
 /* Like taskbar icons, the mark gives a little under the finger. */
 .strip .mark {
   transition: transform var(--duration-fast) var(--ease-standard);
@@ -36,6 +62,10 @@
   display: grid;
   gap: 5px;
   min-width: 0;
+}
+
+.strip__item--compact .strip__body {
+  min-width: 34px;
 }
 
 .strip__text {
@@ -53,7 +83,7 @@
   color: var(--text-secondary);
 }
 
-.strip[data-stale] .strip__value {
+.strip__item[data-stale] .strip__value {
   color: var(--text-secondary);
 }
 

@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import { bridge, type RefreshMode, type Settings } from "../../bridge";
+import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { Segmented, SwitchRow } from "../controls";
 import { BackIcon, ChevronIcon } from "../icons";
+import { TaskbarPins } from "./TaskbarPins";
 
 const MINUTES: Record<Exclude<RefreshMode, "adaptive">, number> = { "2m": 2, "5m": 5, "15m": 15 };
 
 export function SettingsPanel({
   settings,
+  reports,
   onBack,
   onLanguage,
 }: {
   settings: Settings | null;
+  reports: readonly ProviderReport[];
   onBack: () => void;
   onLanguage: () => void;
 }) {
@@ -77,6 +81,7 @@ export function SettingsPanel({
           checked={settings?.showStrip ?? true}
           onChange={(showStrip) => update({ showStrip })}
         />
+        {(settings?.showStrip ?? true) && <TaskbarPins reports={reports} settings={settings} />}
         <SwitchRow
           label={t("desktopCard")}
           checked={settings?.desktopCard ?? false}

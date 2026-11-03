@@ -61,5 +61,8 @@ export const uk: LocaleDefinition = {
     shortcutTaken: "Обидва сполучення зайняті іншими застосунками",
     planColors: "Кольори плану",
     planColorsHint: "Фарбує віджет у колір вашого плану",
+    services: "Сервіси",
+    taskbarPins: "Ліміти на панелі завдань",
+    taskbarPinsHint: "До {count} лімітів, у порядку ввімкнення",
   },
 };

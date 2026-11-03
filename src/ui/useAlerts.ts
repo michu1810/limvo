@@ -7,6 +7,7 @@ import {
   HEADLINE_POLICY,
   SECONDARY_POLICY,
 } from "../core/alerts";
+import { limitKey, visibleReports } from "../core/pins";
 import type { ProviderReport, UsageWindow } from "../core/snapshot";
 import { type I18n, useI18n } from "../i18n/I18nProvider";
 import { headlineLabel, windowLabel } from "./labels";
@@ -16,41 +17,51 @@ const STORAGE_KEY = "limvo.alerts.v1";
 /**
  * Turns fresh readings into Windows notifications. Runs in the flyout
  * window, which lives for the whole session whether or not it is visible.
+ * With several services signed in, each title names its service.
  */
-export function useAlerts(report: ProviderReport, settings: Settings | null) {
+export function useAlerts(reports: readonly ProviderReport[], settings: Settings | null) {
   const i18n = useI18n();
 
   useEffect(() => {
-    const snapshot = report.snapshot;
-    if (report.state !== "ok" || !snapshot || !settings) return;
-
+    if (!settings) return;
     const memory = load();
-    const watched = [
-      ...(snapshot.headline
-        ? [
-            {
-              window: snapshot.headline,
-              policy: HEADLINE_POLICY,
-              label: headlineLabel(snapshot.headline, i18n),
-            },
-          ]
-        : []),
-      ...snapshot.windows.map((window) => ({
-        window,
-        policy: SECONDARY_POLICY,
-        label: windowLabel(window, i18n),
-      })),
-    ];
+    const named = visibleReports(reports).length > 1;
 
-    for (const { window, policy, label } of watched) {
-      const result = evaluate(window, memory[window.id], policy);
-      memory[window.id] = result.memory;
-      // Memory is always updated, so turning notifications back on never replays old news.
-      if (result.alert && settings.notifications)
-        bridge.notify(toast(result.alert, window, label, i18n));
+    for (const report of reports) {
+      const snapshot = report.snapshot;
+      if (report.state !== "ok" || !snapshot) continue;
+      const prefix = named ? `${report.providerName}: ` : "";
+      const watched = [
+        ...(snapshot.headline
+          ? [
+              {
+                window: snapshot.headline,
+                policy: HEADLINE_POLICY,
+                label: headlineLabel(snapshot.headline, i18n),
+              },
+            ]
+          : []),
+        ...snapshot.windows.map((window) => ({
+          window,
+          policy: SECONDARY_POLICY,
+          label: windowLabel(window, i18n),
+        })),
+      ];
+
+      for (const { window, policy, label } of watched) {
+        const key = limitKey(report.providerId, window.id);
+        // Before several services, memory was keyed by window alone; that was Claude.
+        const previous =
+          memory[key] ?? (report.providerId === "claude" ? memory[window.id] : undefined);
+        const result = evaluate(window, previous, policy);
+        memory[key] = result.memory;
+        // Memory is always updated, so turning notifications back on never replays old news.
+        if (result.alert && settings.notifications)
+          bridge.notify(toast(result.alert, window, `${prefix}${label}`, i18n));
+      }
     }
     save(memory);
-  }, [report, settings, i18n]);
+  }, [reports, settings, i18n]);
 }
 
 function toast(alert: Alert, window: UsageWindow, label: string, { t, format }: I18n) {

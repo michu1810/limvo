@@ -15,9 +15,10 @@ use crate::snapshot::ProviderReport;
 use crate::system::{self, HostInfo};
 use crate::{AppState, card, events, tray};
 
+/// One report per provider, in the order the interface lists them.
 #[tauri::command]
-pub fn get_report(state: State<'_, AppState>) -> ProviderReport {
-    state.poller.report()
+pub fn get_reports(state: State<'_, AppState>) -> Vec<ProviderReport> {
+    state.poller.reports()
 }
 
 #[tauri::command]
@@ -104,14 +105,18 @@ pub fn host_info() -> HostInfo {
     system::host_info()
 }
 
-/// Opens the provider's own usage page. Only the URL from the provider is
-/// accepted, so the UI cannot be used to open arbitrary links.
+/// Opens a provider's own usage page. Only the URL from that provider's
+/// reading is accepted, so the UI cannot be used to open arbitrary links.
 #[tauri::command]
-pub fn open_usage_page(app: AppHandle, state: State<'_, AppState>) -> Result<(), String> {
+pub fn open_usage_page(
+    app: AppHandle,
+    state: State<'_, AppState>,
+    provider_id: String,
+) -> Result<(), String> {
     let Some(url) = state
         .poller
-        .report()
-        .snapshot
+        .report(&provider_id)
+        .and_then(|report| report.snapshot)
         .and_then(|snapshot| snapshot.usage_page_url)
     else {
         return Ok(());

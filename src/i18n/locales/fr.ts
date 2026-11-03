@@ -62,5 +62,8 @@ export const fr: LocaleDefinition = {
     shortcutTaken: "Les deux raccourcis sont déjà pris par d’autres apps",
     planColors: "Couleurs du forfait",
     planColorsHint: "Teinte le widget de la couleur de votre forfait",
+    services: "Services",
+    taskbarPins: "Limites dans la barre des tâches",
+    taskbarPinsHint: "Jusqu'à {count} limites, dans l'ordre d'activation",
   },
 };

@@ -4,19 +4,21 @@ import type { ProviderReport } from "../core/snapshot";
 import { findLocale, resolveLocale } from "../i18n/resolve";
 import type { LocaleDefinition } from "../i18n/types";
 
-const LOADING: ProviderReport = { state: "loading", snapshot: null, detail: null };
+const LOADING: ProviderReport[] = [
+  { providerId: "claude", providerName: "Claude", state: "loading", snapshot: null, detail: null },
+];
 
-/** The latest report from the host, kept current through its events. */
-export function useReport(): ProviderReport {
-  const [report, setReport] = useState<ProviderReport>(LOADING);
+/** The latest report of every provider, kept current through the host's events. */
+export function useReports(): ProviderReport[] {
+  const [reports, setReports] = useState<ProviderReport[]>(LOADING);
 
   useEffect(() => {
     let active = true;
-    const unsubscribe = bridge.onReport((next) => {
-      if (active) setReport(next);
+    const unsubscribe = bridge.onReports((next) => {
+      if (active) setReports(next);
     });
-    bridge.getReport().then((initial) => {
-      if (active) setReport(initial);
+    bridge.getReports().then((initial) => {
+      if (active) setReports(initial);
     });
     return () => {
       active = false;
@@ -24,7 +26,7 @@ export function useReport(): ProviderReport {
     };
   }, []);
 
-  return report;
+  return reports;
 }
 
 /** The saved settings, or `null` until the host has answered. */
@@ -49,18 +51,17 @@ export function useSettings(): Settings | null {
 }
 
 /**
- * Tints the window with the colour of the account's plan by setting
- * `data-plan` on the root element; `tokens.css` maps each plan to an accent.
- * Status colours (on track, tight, reached) never change with the plan.
+ * The `data-plan` value that tints an element with the colour of the
+ * account's plan; `tokens.css` maps each plan to an accent. Set per element,
+ * so a taskbar showing two services gives each its own colour. Status
+ * colours (on track, tight, reached) never change with the plan.
  */
-export function usePlanTheme(report: ProviderReport, settings: Settings | null) {
-  const plan = report.snapshot?.plan?.id ?? null;
-  const enabled = settings?.planColors ?? true;
-  useEffect(() => {
-    const root = document.documentElement;
-    if (plan && enabled) root.dataset.plan = plan;
-    else delete root.dataset.plan;
-  }, [plan, enabled]);
+export function planAttribute(
+  report: ProviderReport | undefined,
+  settings: Settings | null,
+): string | undefined {
+  if (!(settings?.planColors ?? true)) return undefined;
+  return report?.snapshot?.plan?.id ?? undefined;
 }
 
 /** The locale the user picked, or the best match for the system languages. */

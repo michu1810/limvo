@@ -30,6 +30,14 @@ impl ClaudeProvider {
 }
 
 impl UsageProvider for ClaudeProvider {
+    fn id(&self) -> &'static str {
+        PROVIDER_ID
+    }
+
+    fn name(&self) -> &'static str {
+        "Claude"
+    }
+
     fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a> {
         Box::pin(fetch(http))
     }
