@@ -2,7 +2,7 @@
 
 <img src="src-tauri/icons/128x128.png" width="72" alt="" />
 
-# Headroom
+# Limvo
 
 **Your Claude plan limits and the pace you are using them at, right in the Windows taskbar.**
 
@@ -12,14 +12,14 @@
 
 ---
 
-Headroom puts the weekly limit of your Claude plan next to the clock, tells you
+Limvo puts the weekly limit of your Claude plan next to the clock, tells you
 whether you are on track to make it to the reset, and stays out of the way
 until you want the details. It reads the same numbers as the usage page on
 claude.ai, refreshes them on its own while you work, and nudges you with a
 Windows notification before you run out.
 
 <p align="center">
-  <img src="docs/images/flyout-light.png" width="380" alt="The Headroom flyout in the light theme: 51% of the weekly limit used, resets in 1 day 16 hr, on track with a projection of 67%" />
+  <img src="docs/images/flyout-light.png" width="380" alt="The Limvo flyout in the light theme: 51% of the weekly limit used, resets in 1 day 16 hr, on track with a projection of 67%" />
   <img src="docs/images/flyout-dark.png" width="380" alt="The same flyout in the dark theme" />
 </p>
 
@@ -36,19 +36,19 @@ Windows notification before you run out.
   open the flyout.
 - **A counter with some craft.** The percentage rolls in on drum wheels like an
   old odometer: each digit drops in from above, and a wheel only moves on when
-  the one to its right passes nine. The tray icon is alive too: the crossbar of
-  its H rises with your usage, so the icon itself shows how much headroom is
-  left.
+  the one to its right passes nine. The tray icon is alive too: the foot of
+  its L is a meter that fills with your usage, so the icon itself shows how
+  much is left.
 
   <img src="docs/images/counter-frames.png" width="640" alt="Four frames of the counter rolling up from 26% to 51%" />
 
-- **Your plan at a glance.** Headroom reads which plan the sign-in belongs to
+- **Your plan at a glance.** Limvo reads which plan the sign-in belongs to
   and shows it as a badge: Free, Pro, Max 5×, Max 20×, Team and Enterprise.
   With _Plan colours_ on, the whole widget takes the plan's accent: graphite,
   terracotta, copper, rose, teal or indigo. Status colours keep their meaning.
 - **A forecast, not just a reading.** A small chart plots this week against an
   even pace, with today's rate carried on to the reset. When that rate would
-  empty the limit early, Headroom says when.
+  empty the limit early, Limvo says when.
 
   <img src="docs/images/flyout-forecast.png" width="380" alt="The flyout running hot at 78%, with the week chart, the forecast that the limit runs out on Monday, and extra usage of 12.40 dollars" />
 
@@ -57,7 +57,7 @@ Windows notification before you run out.
 - **Keyboard shortcut.** Win+Shift+H opens the flyout from anywhere, or
   Ctrl+Alt+H when another app holds the first.
 - **Pace, not just a percentage.** The tick on the meter marks how much of the
-  week has passed. Headroom projects your usage to the reset and labels it
+  week has passed. Limvo projects your usage to the reset and labels it
   _On track_, _Tight_, _Running hot_ or _Limit reached_.
 - **The whole picture in one flyout.** Weekly limit, time to reset, the split
   between Claude Code, chats and Cowork, and model-specific caps such as
@@ -85,19 +85,19 @@ Windows notification before you run out.
 
 ## Install
 
-1. Download `Headroom_<version>_x64-setup.exe` from the
+1. Download `Limvo_<version>_x64-setup.exe` from the
    [latest release](../../releases/latest).
 2. Run it. It installs for your user only, so no administrator prompt.
    Choose your language on the first screen.
-3. Headroom starts in the notification area and docks its reading in the
+3. Limvo starts in the notification area and docks its reading in the
    taskbar. Make sure you are signed in to the Claude desktop app or Claude
    Code (see [Setups](#setups-and-scenarios)).
-4. Windows tucks new tray icons behind the `^` arrow. To keep the H next to the
+4. Windows tucks new tray icons behind the `^` arrow. To keep the L next to the
    clock, drag it out of the overflow, or turn it on under _Settings >
    Personalization > Taskbar > Other system tray icons_.
 
 <p align="center">
-  <img src="docs/images/installer-welcome.png" width="420" alt="The Headroom installer welcome page with the language already matched to Windows" />
+  <img src="docs/images/installer-welcome.png" width="420" alt="The Limvo installer welcome page with the language already matched to Windows" />
 </p>
 
 > **"Windows protected your PC"**
@@ -112,11 +112,11 @@ and keeps your settings.
 **Requirements:** Windows 10 or Windows 11, 64-bit. The WebView2 runtime ships
 with Windows 11; on Windows 10 the installer fetches it if it is missing.
 
-**Uninstall:** _Settings > Apps > Installed apps > Headroom > Uninstall_. Your
-preferences live in `%APPDATA%\app.headroom.desktop` and can be deleted
+**Uninstall:** _Settings > Apps > Installed apps > Limvo > Uninstall_. Your
+preferences live in `%APPDATA%\io.github.michu1810.limvo` and can be deleted
 afterwards.
 
-## Using Headroom
+## Using Limvo
 
 | Where           | What it does                                                                                                                                                       |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -130,7 +130,7 @@ afterwards.
 | Setting            | Default  | Notes                                                                                             |
 | ------------------ | -------- | ------------------------------------------------------------------------------------------------- |
 | Language           | System   | Any of the eleven languages, or follow Windows.                                                   |
-| Start with Windows | Off      | Adds Headroom to your user's startup apps.                                                        |
+| Start with Windows | Off      | Adds Limvo to your user's startup apps.                                                           |
 | Show in taskbar    | On       | Turn off to keep only the tray icon.                                                              |
 | Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                               |
 | Notifications      | On       | 80%, 95%, limit reached, and the reset after a week above 80%. Each one is shown once per window. |
@@ -140,25 +140,25 @@ afterwards.
 
 ## How it works
 
-Headroom asks the same endpoint the Claude apps use to draw their usage
+Limvo asks the same endpoint the Claude apps use to draw their usage
 screens, `api.anthropic.com/api/oauth/usage`, with the sign-in that is already
 on your computer. It does not have its own login.
 
 It looks for a sign-in in this order and uses the first one that works:
 
 1. **Claude desktop app.** The app keeps its sign-in in its `config.json`,
-   encrypted with Windows DPAPI for your user account. Headroom decrypts it in
+   encrypted with Windows DPAPI for your user account. Limvo decrypts it in
    memory, read-only, to borrow the access token. Both the classic installer
    (`%APPDATA%\Claude`) and the Microsoft Store version
    (`%LOCALAPPDATA%\Claude-Data`) are supported.
 2. **Claude Code CLI.** `~/.claude/.credentials.json`, or
    `%CLAUDE_CONFIG_DIR%\.credentials.json` when that variable is set.
 
-Headroom never refreshes, writes or copies a token. An expired sign-in is
+Limvo never refreshes, writes or copies a token. An expired sign-in is
 reported as _sign in again_ instead of being renewed behind your back, because
 refreshing would sign Claude Code out.
 
-**Adaptive updates.** The usage endpoint cannot push changes, so Headroom
+**Adaptive updates.** The usage endpoint cannot push changes, so Limvo
 watches the folder where Claude Code writes its transcripts
 (`~/.claude/projects`). It only notices that files changed; it never opens
 them. A change means you are working, so the next reading comes within a
@@ -166,7 +166,7 @@ minute. Manual refreshes closer than ten seconds apart reuse the last answer,
 and rate limits from the server are honoured.
 
 > **This endpoint is undocumented.** Anthropic can change it at any time.
-> Headroom tolerates missing and new fields, keeps showing the last good
+> Limvo tolerates missing and new fields, keeps showing the last good
 > reading when a refresh fails, and says so in the flyout, but a larger change
 > on the server side may need an update of the app.
 
@@ -176,9 +176,9 @@ and rate limits from the server are honoured.
 | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Claude desktop app, signed in           | Works out of the box, including the Microsoft Store version.                                                                |
 | Claude Code CLI only                    | Works if you have signed in with `claude` at least once. Run `claude` and `/login` if the flyout says your sign-in expired. |
-| Both installed                          | Headroom picks the freshest sign-in that has the required scope.                                                            |
-| Signed out everywhere                   | The flyout asks you to sign in. Headroom checks again every two minutes, no restart needed.                                 |
-| Custom Claude Code folder               | Set `CLAUDE_CONFIG_DIR` before starting Headroom; it follows the same variable as Claude Code.                              |
+| Both installed                          | Limvo picks the freshest sign-in that has the required scope.                                                               |
+| Signed out everywhere                   | The flyout asks you to sign in. Limvo checks again every two minutes, no restart needed.                                    |
+| Custom Claude Code folder               | Set `CLAUDE_CONFIG_DIR` before starting Limvo; it follows the same variable as Claude Code.                                 |
 | Several monitors                        | The reading docks on the main taskbar. Flyout and card open on the monitor you use them from.                               |
 | Auto-hide taskbar                       | The reading hides with the taskbar and returns with it.                                                                     |
 | Full-screen game, video or presentation | The reading steps aside on that monitor only. Live wallpapers and full-screen windows on other monitors do not hide it.     |
@@ -196,22 +196,22 @@ and rate limits from the server are honoured.
   Rust core (`src-tauri/src`). The interface runs with a strict content
   security policy and can only call the commands listed in
   [`src-tauri/src/commands.rs`](src-tauri/src/commands.rs).
-- Logs: `%LOCALAPPDATA%\app.headroom.desktop\logs`. Settings:
-  `%APPDATA%\app.headroom.desktop\settings.json`.
+- Logs: `%LOCALAPPDATA%\io.github.michu1810.limvo\logs`. Settings:
+  `%APPDATA%\io.github.michu1810.limvo\settings.json`.
 
 Found a security problem? Please follow [SECURITY.md](SECURITY.md) instead of
 opening a public issue.
 
 ## Troubleshooting
 
-| Symptom                                        | Try this                                                                                                |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| _Sign in to the Claude app to see your limits_ | Sign in to the Claude desktop app, or run `claude` once in a terminal.                                  |
-| _Your Claude sign-in expired_                  | Open the Claude desktop app or run `claude`; both renew the sign-in themselves.                         |
-| _Offline. Last reading ..._                    | No connection to `api.anthropic.com`, or the server asked to slow down. Headroom retries with back-off. |
-| The taskbar reading is missing                 | Check _Settings > Show in taskbar_, a full-screen window on the main monitor, or a vertical taskbar.    |
-| Numbers look stale                             | _Refresh_ in the flyout. Adaptive mode slows down after five idle minutes.                              |
-| Something else                                 | Attach the newest file from the logs folder to an issue. It contains no tokens.                         |
+| Symptom                                        | Try this                                                                                             |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| _Sign in to the Claude app to see your limits_ | Sign in to the Claude desktop app, or run `claude` once in a terminal.                               |
+| _Your Claude sign-in expired_                  | Open the Claude desktop app or run `claude`; both renew the sign-in themselves.                      |
+| _Offline. Last reading ..._                    | No connection to `api.anthropic.com`, or the server asked to slow down. Limvo retries with back-off. |
+| The taskbar reading is missing                 | Check _Settings > Show in taskbar_, a full-screen window on the main monitor, or a vertical taskbar. |
+| Numbers look stale                             | _Refresh_ in the flyout. Adaptive mode slows down after five idle minutes.                           |
+| Something else                                 | Attach the newest file from the logs folder to an issue. It contains no tokens.                      |
 
 ## Build from source
 
@@ -245,7 +245,7 @@ Open `/strip.html` and `/card.html` for the other windows.
 
 ### Your own brand mark
 
-Headroom ships with its own mark. To see a provider's official logo in the
+Limvo ships with its own mark. To see a provider's official logo in the
 app, put the SVG from the provider's brand or press page at
 `public/brand/<provider>.svg` (for example `claude.svg`) and rebuild. Brand
 files are ignored by git; please do not commit them to a public fork.
@@ -274,13 +274,13 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, and
 - macOS menu bar version
 - In-app updates from GitHub Releases
 - Readings on secondary taskbars
-- Code-signed releases and `winget install Headroom`
+- Code-signed releases and `winget install Limvo`
 - More providers through the same provider interface
 - A Windows 11 Widgets board card
 
 ## Disclaimer
 
-Headroom is an independent open-source project. It is not affiliated with,
+Limvo is an independent open-source project. It is not affiliated with,
 endorsed by or sponsored by Anthropic. Claude is a trademark of Anthropic,
 PBC, used here only to describe what the app works with.
 

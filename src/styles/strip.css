@@ -64,6 +64,11 @@
   background: #e8ecf1;
 }
 
+/* A dark taskbar behind the strip when previewing the dark taskbar theme. */
+:root[data-host="browser"][data-theme="dark"] body {
+  background: #1c1c1c;
+}
+
 :root[data-host="browser"] .strip {
   width: auto;
   height: 40px;

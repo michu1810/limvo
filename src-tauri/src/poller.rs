@@ -228,7 +228,7 @@ fn backoff(failures: u32) -> Duration {
 
 fn http_client() -> reqwest::Result<reqwest::Client> {
     reqwest::Client::builder()
-        .user_agent(concat!("Headroom/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("Limvo/", env!("CARGO_PKG_VERSION")))
         .connect_timeout(Duration::from_secs(10))
         .timeout(Duration::from_secs(20))
         .build()

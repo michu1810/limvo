@@ -36,7 +36,7 @@ pub fn build(app: &App) -> tauri::Result<TrayMenu> {
     let menu = Menu::with_items(app, &[&refresh, &quit])?;
 
     let mut builder = TrayIconBuilder::with_id(ID)
-        .tooltip("Headroom")
+        .tooltip("Limvo")
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(|app, event| match event.id.as_ref() {
@@ -72,7 +72,7 @@ pub fn build(app: &App) -> tauri::Result<TrayMenu> {
     Ok(TrayMenu { refresh, quit })
 }
 
-/// Redraws the icon so its crossbar shows percent. Cheap to call often: it only redraws on change.
+/// Redraws the icon so its meter shows the reading. Cheap to call often: it only redraws on change.
 pub fn show_level(app: &AppHandle, percent: Option<f64>) {
     if BRANDED.load(Ordering::Relaxed) {
         return;

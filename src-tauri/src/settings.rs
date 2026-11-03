@@ -215,7 +215,7 @@ mod tests {
 
     #[test]
     fn round_trips_through_disk() {
-        let dir = std::env::temp_dir().join(format!("headroom-settings-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("limvo-settings-{}", std::process::id()));
         let store = SettingsStore::new(&dir);
         let settings = Settings {
             locale: Some("he".into()),

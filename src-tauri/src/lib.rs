@@ -1,4 +1,4 @@
-//! Headroom: plan limits in the Windows taskbar.
+//! Limvo: plan limits in the Windows taskbar.
 //!
 //! The Rust core owns everything that touches the system: credentials, the
 //! network, windows and the tray. The UI in `src/` only renders reports and
@@ -130,5 +130,5 @@ pub fn run() {
             }
         })
         .run(tauri::generate_context!())
-        .unwrap_or_else(|error| log::error!("Headroom stopped: {error}"));
+        .unwrap_or_else(|error| log::error!("Limvo stopped: {error}"));
 }

@@ -54,7 +54,7 @@ def sidebar() -> Image.Image:
     image.alpha_composite(icon(64), (34 * SCALE, 60 * SCALE))
     title = font(["SegUIVar.ttf", "segoeuib.ttf"], 21)
     body = font(["SegUIVar.ttf", "segoeui.ttf"], 10)
-    draw.text((38 * SCALE, 140 * SCALE), "Headroom", font=title, fill=TEXT_ON_DARK)
+    draw.text((38 * SCALE, 140 * SCALE), "Limvo", font=title, fill=TEXT_ON_DARK)
     for i, line in enumerate(["Plan limits and pace,", "right in your taskbar."]):
         draw.text((39 * SCALE, (172 + i * 15) * SCALE), line, font=body, fill=MUTED_ON_DARK)
     return image.convert("RGB").resize((164, 314), Image.Resampling.LANCZOS)

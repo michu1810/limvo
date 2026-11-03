@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Headroom",
+  "productName": "Limvo",
   "version": "0.1.0",
-  "identifier": "app.headroom.desktop",
+  "identifier": "io.github.michu1810.limvo",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -14,7 +14,7 @@
       {
         "label": "flyout",
         "url": "index.html",
-        "title": "Headroom",
+        "title": "Limvo",
         "width": 380,
         "height": 480,
         "resizable": false,
@@ -32,7 +32,7 @@
       {
         "label": "strip",
         "url": "strip.html",
-        "title": "Headroom strip",
+        "title": "Limvo strip",
         "width": 150,
         "height": 48,
         "resizable": false,
@@ -49,7 +49,7 @@
       {
         "label": "card",
         "url": "card.html",
-        "title": "Headroom card",
+        "title": "Limvo card",
         "width": 300,
         "height": 176,
         "resizable": false,
@@ -74,10 +74,10 @@
     "targets": ["nsis"],
     "category": "Utility",
     "shortDescription": "Plan limits in the Windows taskbar",
-    "longDescription": "Headroom shows how much of your AI plan is left, with the pace you are using it at, in the Windows taskbar.",
-    "copyright": "Headroom contributors, MIT License",
+    "longDescription": "Limvo shows how much of your AI plan is left, with the pace you are using it at, in the Windows taskbar.",
+    "copyright": "Limvo contributors, MIT License",
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
-    "publisher": "Headroom contributors",
+    "publisher": "Limvo contributors",
     "windows": {
       "webviewInstallMode": { "type": "downloadBootstrapper", "silent": true },
       "nsis": {
@@ -104,7 +104,7 @@
           "Hebrew": "installer/Hebrew.nsh"
         },
         "compression": "lzma",
-        "startMenuFolder": "Headroom"
+        "startMenuFolder": "Limvo"
       }
     }
   }

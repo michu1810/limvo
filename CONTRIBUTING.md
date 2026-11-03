@@ -1,4 +1,4 @@
-# Contributing to Headroom
+# Contributing to Limvo
 
 Thanks for helping. This guide covers the setup, the standards every change
 meets, and the two most common contributions: a new language and a new

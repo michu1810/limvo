@@ -1,6 +1,6 @@
 # Architecture
 
-Headroom is a Tauri 2 application: a Rust core that owns everything touching
+Limvo is a Tauri 2 application: a Rust core that owns everything touching
 the system, and a React interface that only draws what the core reports.
 
 ```

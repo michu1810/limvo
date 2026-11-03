@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { addReading, type WindowHistory } from "../core/history";
 import type { ProviderReport } from "../core/snapshot";
 
-const STORAGE_KEY = "headroom.history.v1";
+const STORAGE_KEY = "limvo.history.v1";
 
 /**
  * Remembers the headline readings of the running period, for the weekly

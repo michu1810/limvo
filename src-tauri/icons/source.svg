@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <title>Headroom</title>
+  <title>Limvo</title>
   <defs>
     <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#34302d"/>
@@ -9,9 +9,9 @@
       <stop offset="0" stop-color="#e07a5f"/>
       <stop offset="1" stop-color="#c24f37"/>
     </linearGradient>
-    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#f08d71"/>
-      <stop offset="1" stop-color="#d86347"/>
+    <linearGradient id="fill" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c24f37"/>
+      <stop offset="1" stop-color="#f08d71"/>
     </linearGradient>
     <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
@@ -24,11 +24,9 @@
   <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#sheen)"/>
   <rect x="66" y="66" width="892" height="892" rx="206" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="4"/>
 
-  <!-- The ceiling: the limit the crossbar rises towards. -->
-  <rect x="404" y="262" width="216" height="20" rx="10" fill="#ffffff" fill-opacity="0.22"/>
-
-  <!-- The H: two posts and a crossbar that is a gauge; the space above it is the headroom. -->
-  <rect x="268" y="224" width="136" height="576" rx="68" fill="url(#post)"/>
-  <rect x="620" y="224" width="136" height="576" rx="68" fill="url(#post)"/>
-  <rect x="336" y="520" width="352" height="128" rx="64" fill="url(#bar)"/>
+  <!-- The L: a post, and a foot that is a meter. The fill is what is used, the tick is where the clock is. -->
+  <rect x="292" y="232" width="136" height="560" rx="68" fill="url(#post)"/>
+  <rect x="292" y="656" width="440" height="136" rx="68" fill="#ffffff" fill-opacity="0.16"/>
+  <rect x="292" y="656" width="300" height="136" rx="68" fill="url(#fill)"/>
+  <rect x="640" y="616" width="22" height="216" rx="11" fill="#ffffff" fill-opacity="0.92"/>
 </svg>

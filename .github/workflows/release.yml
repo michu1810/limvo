@@ -38,7 +38,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: Headroom ${{ github.ref_name }}
+          releaseName: Limvo ${{ github.ref_name }}
           releaseBody: See CHANGELOG.md for what changed in this version.
           releaseDraft: true
           prerelease: false

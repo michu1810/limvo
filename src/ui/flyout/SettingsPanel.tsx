@@ -124,7 +124,7 @@ export function SettingsPanel({
           />
         </div>
       </div>
-      <p className="settings__version">Headroom {__APP_VERSION__}</p>
+      <p className="settings__version">Limvo {__APP_VERSION__}</p>
     </>
   );
 }

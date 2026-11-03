@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Headroom are listed here. The format follows
+All notable changes to Limvo are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
@@ -24,7 +24,7 @@ All notable changes to Headroom are listed here. The format follows
 - Eleven languages, including right-to-left Hebrew.
 - Rolling drum counter for the percentage, with odometer-style carries.
 - Plan badge (Free, Pro, Max 5×, Max 20×, Team, Enterprise), styled per plan.
-- Tray icon whose crossbar rises with usage, or the provider's own mark when it is bundled.
+- Tray icon whose meter fills with usage, or the provider's own mark when it is bundled.
 - Plan colours: the accent follows the account's plan.
 - Week chart against an even pace, and a forecast of when the limit runs out.
 - Extra usage (paid credits) among the other limits.

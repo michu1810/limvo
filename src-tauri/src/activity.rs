@@ -1,7 +1,7 @@
 //! Notices when the user is working with the service, so readings can follow along.
 //!
 //! The usage endpoint has no push channel. Instead of polling it fast all
-//! day, Headroom watches files the provider's own tools write while they
+//! day, Limvo watches files the provider's own tools write while they
 //! work (for Claude, the Claude Code transcripts) and reads the usage soon
 //! after something happens there. Only modification events are observed;
 //! the files are never opened.

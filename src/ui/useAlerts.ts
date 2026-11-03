@@ -11,7 +11,7 @@ import type { ProviderReport, UsageWindow } from "../core/snapshot";
 import { type I18n, useI18n } from "../i18n/I18nProvider";
 import { headlineLabel, windowLabel } from "./labels";
 
-const STORAGE_KEY = "headroom.alerts.v1";
+const STORAGE_KEY = "limvo.alerts.v1";
 
 /**
  * Turns fresh readings into Windows notifications. Runs in the flyout

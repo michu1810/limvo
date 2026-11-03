@@ -50,10 +50,10 @@ button {
   display: block;
 }
 
-/* The Headroom crossbar is a gauge: it glides to the new level. */
-.mark__bar {
-  y: var(--bar-y);
-  transition: y var(--duration-slow) var(--ease-out);
+/* The foot of the Limvo L is a meter: it glides to the new level. */
+.mark__fill {
+  width: var(--fill-width);
+  transition: width var(--duration-slow) var(--ease-out);
 }
 
 /* Rolling counter ------------------------------------------------------------
