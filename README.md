@@ -134,6 +134,8 @@ afterwards.
 | Show in taskbar    | On       | Turn off to keep only the tray icon.                                                              |
 | Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                               |
 | Notifications      | On       | 80%, 95%, limit reached, and the reset after a week above 80%. Each one is shown once per window. |
+| Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.          |
+| Plan colours       | On       | Tints the widget with the colour of your plan.                                                    |
 | Update frequency   | Adaptive | Adaptive follows Claude Code activity. 2, 5 or 15 minutes are fixed schedules.                    |
 
 ## How it works
