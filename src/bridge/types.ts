@@ -10,6 +10,10 @@ export interface Settings {
   notifications: boolean;
   refresh: RefreshMode;
   desktopCard: boolean;
+  /** The system-wide shortcut that opens the flyout. */
+  shortcut: boolean;
+  /** Tint the interface with the colour of the account's plan. */
+  planColors: boolean;
 }
 
 /** Only the fields named in a patch change; the host keeps everything else. */
@@ -51,6 +55,8 @@ export interface Bridge {
   updateSettings(patch: SettingsPatch): Promise<Settings>;
   getLaunchAtLogin(): Promise<boolean>;
   setLaunchAtLogin(enabled: boolean): Promise<boolean>;
+  /** The shortcut that registered, such as "Win+Shift+H", or `null` when none is active. */
+  shortcutLabel(): Promise<string | null>;
 
   /** Preferred UI languages of the operating system, most preferred first. */
   systemLocales(): Promise<readonly string[]>;

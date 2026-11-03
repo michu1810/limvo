@@ -56,5 +56,10 @@ export const uk: LocaleDefinition = {
     extraUsageOf: "{used} з {limit}",
     forecastLimitAt: "У такому темпі ліміт закінчиться {when}",
     weekChart: "Використання цього тижня порівняно з рівномірним темпом",
+    shortcut: "Сполучення клавіш",
+    shortcutHint: "{keys} відкриває з будь-якого місця",
+    shortcutTaken: "Обидва сполучення зайняті іншими застосунками",
+    planColors: "Кольори плану",
+    planColorsHint: "Фарбує віджет у колір вашого плану",
   },
 };

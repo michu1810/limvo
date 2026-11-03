@@ -25,6 +25,7 @@ export const tauriBridge: Bridge = {
   updateSettings: (patch) => invoke<Settings>("update_settings", { patch }),
   getLaunchAtLogin: () => invoke<boolean>("get_launch_at_login"),
   setLaunchAtLogin: (enabled) => invoke<boolean>("set_launch_at_login", { enabled }),
+  shortcutLabel: () => invoke<string | null>("shortcut_label"),
 
   systemLocales: () => invoke<string[]>("system_locales"),
   hostInfo: () => invoke<HostInfo>("host_info"),

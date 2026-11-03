@@ -57,5 +57,10 @@ export const pl: LocaleDefinition = {
     extraUsageOf: "{used} z {limit}",
     forecastLimitAt: "W tym tempie limit skończy się {when}",
     weekChart: "Zużycie w tym tygodniu na tle równego tempa",
+    shortcut: "Skrót klawiszowy",
+    shortcutHint: "{keys} otwiera okienko z dowolnego miejsca",
+    shortcutTaken: "Oba skróty są zajęte przez inne aplikacje",
+    planColors: "Kolory planu",
+    planColorsHint: "Zabarwia widżet kolorem Twojego planu",
   },
 };

@@ -22,6 +22,8 @@ export function createBrowserBridge(): Bridge {
     notifications: true,
     refresh: "adaptive",
     desktopCard: false,
+    shortcut: true,
+    planColors: true,
   };
   let launchAtLogin = true;
   let refreshes = 0;
@@ -64,6 +66,7 @@ export function createBrowserBridge(): Bridge {
       return settings;
     },
     getLaunchAtLogin: () => Promise.resolve(launchAtLogin),
+    shortcutLabel: () => Promise.resolve(settings.shortcut ? "Win+Shift+H" : null),
     async setLaunchAtLogin(enabled) {
       launchAtLogin = enabled;
       return enabled;

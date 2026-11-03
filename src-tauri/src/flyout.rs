@@ -34,6 +34,28 @@ pub struct FlyoutState {
 
 pub type SharedFlyoutState = Mutex<FlyoutState>;
 
+/// Opens or closes the flyout above the taskbar strip, or above the notification area when the strip is hidden.
+pub fn toggle_from_strip(app: &AppHandle) {
+    let anchor = app
+        .get_webview_window("strip")
+        .filter(|strip| strip.is_visible().unwrap_or(false))
+        .and_then(|strip| Some((strip.outer_position().ok()?, strip.outer_size().ok()?)))
+        .map(|(position, size)| Anchor {
+            x: f64::from(position.x) + f64::from(size.width) / 2.0,
+            y: f64::from(position.y),
+        });
+    match anchor {
+        Some(anchor) => toggle(app, anchor),
+        None if is_visible(app) => hide(app),
+        None => show(app, None),
+    }
+}
+
+fn is_visible(app: &AppHandle) -> bool {
+    app.get_webview_window(LABEL)
+        .is_some_and(|window| window.is_visible().unwrap_or(false))
+}
+
 pub fn toggle(app: &AppHandle, anchor: Anchor) {
     let Some(window) = app.get_webview_window(LABEL) else {
         return;

@@ -9,7 +9,7 @@ use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_autostart::ManagerExt as _;
 use tauri_plugin_opener::OpenerExt;
 
-use crate::flyout::{self, Anchor};
+use crate::flyout;
 use crate::settings::{Settings, SettingsPatch};
 use crate::snapshot::ProviderReport;
 use crate::system::{self, HostInfo};
@@ -66,6 +66,9 @@ pub fn apply_patch(app: &AppHandle, mut patch: SettingsPatch) -> Result<Settings
     }
     #[cfg(windows)]
     crate::taskbar::set_enabled(after.show_strip);
+    if before.shortcut != after.shortcut {
+        crate::hotkey::apply(app, after.shortcut);
+    }
     if before.desktop_card != after.desktop_card {
         card::set_visible(app, after.desktop_card, after.card_position);
     }
@@ -138,17 +141,13 @@ pub fn fit_strip(width: f64) {
 /// Opens or closes the flyout above the taskbar strip.
 #[tauri::command]
 pub fn toggle_flyout(app: AppHandle) {
-    let anchor = app
-        .get_webview_window("strip")
-        .and_then(|strip| Some((strip.outer_position().ok()?, strip.outer_size().ok()?)))
-        .map(|(position, size)| Anchor {
-            x: f64::from(position.x) + f64::from(size.width) / 2.0,
-            y: f64::from(position.y),
-        });
-    match anchor {
-        Some(anchor) => flyout::toggle(&app, anchor),
-        None => flyout::show(&app, None),
-    }
+    flyout::toggle_from_strip(&app);
+}
+
+/// The system-wide shortcut that is active, for the settings panel.
+#[tauri::command]
+pub fn shortcut_label() -> Option<&'static str> {
+    crate::hotkey::active_label()
 }
 
 #[tauri::command]

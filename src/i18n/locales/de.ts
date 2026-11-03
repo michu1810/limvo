@@ -57,5 +57,10 @@ export const de: LocaleDefinition = {
     extraUsageOf: "{used} von {limit}",
     forecastLimitAt: "Bei diesem Tempo ist das Limit {when} erreicht",
     weekChart: "Nutzung dieser Woche im Vergleich zu gleichmäßigem Tempo",
+    shortcut: "Tastenkürzel",
+    shortcutHint: "{keys} öffnet es von überall",
+    shortcutTaken: "Beide Kürzel sind von anderen Apps belegt",
+    planColors: "Planfarben",
+    planColorsHint: "Färbt das Widget in der Farbe deines Plans",
   },
 };

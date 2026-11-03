@@ -56,5 +56,10 @@ export const ptBR: LocaleDefinition = {
     extraUsageOf: "{used} de {limit}",
     forecastLimitAt: "Nesse ritmo o limite acaba {when}",
     weekChart: "Uso da semana comparado a um ritmo constante",
+    shortcut: "Atalho de teclado",
+    shortcutHint: "{keys} abre de qualquer lugar",
+    shortcutTaken: "Os dois atalhos já estão em uso por outros apps",
+    planColors: "Cores do plano",
+    planColorsHint: "Pinta o widget com a cor do seu plano",
   },
 };

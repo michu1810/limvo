@@ -1,16 +1,17 @@
 import type { PointerEvent } from "react";
-import { bridge } from "../../bridge";
+import { bridge, type Settings } from "../../bridge";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { Headline } from "../flyout/Headline";
-import { useNow } from "../hooks";
+import { useNow, usePlanTheme } from "../hooks";
 import { ProviderMark } from "../ProviderMark";
 
 /**
  * The reading pinned to the desktop. The whole card is a drag handle; a
  * double click opens the full flyout.
  */
-export function Card({ report }: { report: ProviderReport }) {
+export function Card({ report, settings }: { report: ProviderReport; settings: Settings | null }) {
+  usePlanTheme(report, settings);
   const { t, format } = useI18n();
   const now = useNow();
   const snapshot = report.snapshot;

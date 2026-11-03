@@ -10,6 +10,7 @@ mod card;
 mod commands;
 mod events;
 mod flyout;
+mod hotkey;
 mod mark;
 mod poller;
 mod providers;
@@ -56,6 +57,7 @@ pub fn run() {
         )
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(hotkey::plugin())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
@@ -73,6 +75,7 @@ pub fn run() {
             commands::fit_flyout,
             commands::fit_strip,
             commands::toggle_flyout,
+            commands::shortcut_label,
             commands::hide_flyout,
             commands::localize_tray,
             commands::quit,
@@ -91,6 +94,7 @@ pub fn run() {
             #[cfg(windows)]
             taskbar::set_enabled(settings.show_strip);
             let (desktop_card, card_position) = (settings.desktop_card, settings.card_position);
+            let shortcut = settings.shortcut;
             app.manage(AppState {
                 poller,
                 settings: Mutex::new(settings),
@@ -103,6 +107,7 @@ pub fn run() {
             #[cfg(windows)]
             taskbar::start(app.handle().clone());
             card::set_visible(app.handle(), desktop_card, card_position);
+            hotkey::apply(app.handle(), shortcut);
             Ok(())
         })
         .on_window_event(|window, event| {

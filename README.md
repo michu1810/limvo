@@ -43,8 +43,19 @@ Windows notification before you run out.
   <img src="docs/images/counter-frames.png" width="640" alt="Four frames of the counter rolling up from 26% to 51%" />
 
 - **Your plan at a glance.** Headroom reads which plan the sign-in belongs to
-  and shows it as a badge, styled per plan: Free, Pro, Max 5×, Max 20×, Team
-  and Enterprise.
+  and shows it as a badge: Free, Pro, Max 5×, Max 20×, Team and Enterprise.
+  With _Plan colours_ on, the whole widget takes the plan's accent: graphite,
+  terracotta, copper, rose, teal or indigo. Status colours keep their meaning.
+- **A forecast, not just a reading.** A small chart plots this week against an
+  even pace, with today's rate carried on to the reset. When that rate would
+  empty the limit early, Headroom says when.
+
+  <img src="docs/images/flyout-forecast.png" width="380" alt="The flyout running hot at 78%, with the week chart, the forecast that the limit runs out on Monday, and extra usage of 12.40 dollars" />
+
+- **Extra usage.** When paid credits are turned on, what you spent this month
+  shows next to the other limits, in your currency.
+- **Keyboard shortcut.** Win+Shift+H opens the flyout from anywhere, or
+  Ctrl+Alt+H when another app holds the first.
 - **Pace, not just a percentage.** The tick on the meter marks how much of the
   week has passed. Headroom projects your usage to the reset and labels it
   _On track_, _Tight_, _Running hot_ or _Limit reached_.

@@ -80,6 +80,13 @@ export interface Messages {
   forecastLimitAt: string;
   /** Accessible description of the weekly chart. */
   weekChart: string;
+
+  shortcut: string;
+  /** Placeholder `{keys}`, for example "Win+Shift+H". */
+  shortcutHint: string;
+  shortcutTaken: string;
+  planColors: string;
+  planColorsHint: string;
 }
 
 export interface LocaleDefinition {

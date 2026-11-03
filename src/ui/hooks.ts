@@ -48,6 +48,21 @@ export function useSettings(): Settings | null {
   return settings;
 }
 
+/**
+ * Tints the window with the colour of the account's plan by setting
+ * `data-plan` on the root element; `tokens.css` maps each plan to an accent.
+ * Status colours (on track, tight, reached) never change with the plan.
+ */
+export function usePlanTheme(report: ProviderReport, settings: Settings | null) {
+  const plan = report.snapshot?.plan?.id ?? null;
+  const enabled = settings?.planColors ?? true;
+  useEffect(() => {
+    const root = document.documentElement;
+    if (plan && enabled) root.dataset.plan = plan;
+    else delete root.dataset.plan;
+  }, [plan, enabled]);
+}
+
 /** The locale the user picked, or the best match for the system languages. */
 export function useActiveLocale(settings: Settings | null): LocaleDefinition {
   const [system, setSystem] = useState<readonly string[]>(navigator.languages);

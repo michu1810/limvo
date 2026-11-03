@@ -56,5 +56,10 @@ export const he: LocaleDefinition = {
     extraUsageOf: "{used} מתוך {limit}",
     forecastLimitAt: "בקצב הזה המגבלה תיגמר {when}",
     weekChart: "השימוש השבוע לעומת קצב אחיד",
+    shortcut: "קיצור מקשים",
+    shortcutHint: "{keys} פותח מכל מקום",
+    shortcutTaken: "שני הקיצורים תפוסים על ידי אפליקציות אחרות",
+    planColors: "צבעי התוכנית",
+    planColorsHint: "צביעת הווידג׳ט בצבע התוכנית שלך",
   },
 };

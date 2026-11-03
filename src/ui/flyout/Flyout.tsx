@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { bridge, type Settings } from "../../bridge";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
-import { useNow, useShowCount } from "../hooks";
+import { useNow, usePlanTheme, useShowCount } from "../hooks";
 import { SettingsIcon } from "../icons";
 import { ProviderMark } from "../ProviderMark";
 import { useAlerts } from "../useAlerts";
@@ -35,6 +35,7 @@ export function Flyout({
   const root = useFitToContent();
   useTrayTexts(report, now);
   useAlerts(report, settings);
+  usePlanTheme(report, settings);
   const history = useWeekHistory(report);
 
   const go = (next: View) => {

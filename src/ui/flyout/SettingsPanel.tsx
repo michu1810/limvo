@@ -17,10 +17,18 @@ export function SettingsPanel({
 }) {
   const { t, locale } = useI18n();
   const [launchAtLogin, setLaunchAtLogin] = useState<boolean | null>(null);
+  const [shortcutKeys, setShortcutKeys] = useState<string | null>(null);
 
   useEffect(() => {
     bridge.getLaunchAtLogin().then(setLaunchAtLogin);
   }, []);
+
+  // The host registers the shortcut when the setting changes; ask which one took.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-read whenever the switch moves.
+  useEffect(() => {
+    bridge.shortcutLabel().then(setShortcutKeys);
+  }, [settings?.shortcut]);
+  const shortcutOn = settings?.shortcut ?? true;
 
   const update = (patch: Partial<Settings>) => bridge.updateSettings(patch);
   const minutes = (count: number) =>
@@ -79,6 +87,24 @@ export function SettingsPanel({
           hint={t("notificationsHint")}
           checked={settings?.notifications ?? true}
           onChange={(notifications) => update({ notifications })}
+        />
+        <SwitchRow
+          label={t("shortcut")}
+          hint={
+            !shortcutOn
+              ? undefined
+              : shortcutKeys
+                ? t("shortcutHint", { keys: shortcutKeys })
+                : t("shortcutTaken")
+          }
+          checked={shortcutOn}
+          onChange={(shortcut) => update({ shortcut })}
+        />
+        <SwitchRow
+          label={t("planColors")}
+          hint={t("planColorsHint")}
+          checked={settings?.planColors ?? true}
+          onChange={(planColors) => update({ planColors })}
         />
 
         <div className="setting setting--stacked">

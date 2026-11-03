@@ -31,6 +31,8 @@ pub struct CardPosition {
     pub y: i32,
 }
 
+// Each switch in the settings panel is one independent on/off preference.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
@@ -44,6 +46,10 @@ pub struct Settings {
     /// The card pinned to the desktop.
     pub desktop_card: bool,
     pub card_position: Option<CardPosition>,
+    /// The system-wide shortcut that opens the flyout.
+    pub shortcut: bool,
+    /// Tint the interface with the colour of the account's plan.
+    pub plan_colors: bool,
     #[serde(flatten)]
     other: serde_json::Map<String, serde_json::Value>,
 }
@@ -57,6 +63,8 @@ impl Default for Settings {
             refresh: RefreshMode::Adaptive,
             desktop_card: false,
             card_position: None,
+            shortcut: true,
+            plan_colors: true,
             other: serde_json::Map::new(),
         }
     }
@@ -76,6 +84,8 @@ pub struct SettingsPatch {
     pub desktop_card: Option<bool>,
     #[serde(default, deserialize_with = "present")]
     pub card_position: Option<Option<CardPosition>>,
+    pub shortcut: Option<bool>,
+    pub plan_colors: Option<bool>,
 }
 
 /// Turns a field that is present into `Some`, even when its value is `null`.
@@ -107,6 +117,12 @@ impl Settings {
         }
         if let Some(card_position) = patch.card_position {
             self.card_position = card_position;
+        }
+        if let Some(shortcut) = patch.shortcut {
+            self.shortcut = shortcut;
+        }
+        if let Some(plan_colors) = patch.plan_colors {
+            self.plan_colors = plan_colors;
         }
     }
 }

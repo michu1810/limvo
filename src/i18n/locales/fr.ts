@@ -57,5 +57,10 @@ export const fr: LocaleDefinition = {
     extraUsageOf: "{used} sur {limit}",
     forecastLimitAt: "À ce rythme, la limite sera atteinte {when}",
     weekChart: "Utilisation de la semaine face à un rythme régulier",
+    shortcut: "Raccourci clavier",
+    shortcutHint: "{keys} l’ouvre depuis n’importe où",
+    shortcutTaken: "Les deux raccourcis sont déjà pris par d’autres apps",
+    planColors: "Couleurs du forfait",
+    planColorsHint: "Teinte le widget de la couleur de votre forfait",
   },
 };

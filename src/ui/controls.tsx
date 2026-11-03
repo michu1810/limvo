@@ -9,7 +9,7 @@ export function SwitchRow({
   onChange,
 }: {
   label: string;
-  hint?: string;
+  hint?: string | undefined;
   checked: boolean;
   disabled?: boolean;
   onChange: (checked: boolean) => void;

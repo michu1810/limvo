@@ -56,5 +56,10 @@ export const it: LocaleDefinition = {
     extraUsageOf: "{used} su {limit}",
     forecastLimitAt: "A questo ritmo il limite si esaurisce {when}",
     weekChart: "Utilizzo della settimana rispetto a un ritmo costante",
+    shortcut: "Scorciatoia da tastiera",
+    shortcutHint: "{keys} lo apre da qualsiasi punto",
+    shortcutTaken: "Entrambe le scorciatoie sono già usate da altre app",
+    planColors: "Colori del piano",
+    planColorsHint: "Colora il widget con il colore del tuo piano",
   },
 };

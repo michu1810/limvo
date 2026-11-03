@@ -93,3 +93,101 @@
 
   --focus: #ffffff;
 }
+
+/*
+ * Plan colours. With the setting on, the accent follows the account's plan:
+ * Pro keeps the default terracotta, Free is a quiet graphite, Max is copper,
+ * Max 20x a deep rose, Team teal and Enterprise indigo. Only the accent
+ * moves; the status colours keep their meaning on every plan.
+ */
+:root[data-plan="free"] {
+  --accent: #6b6f76;
+  --accent-soft: #858a92;
+}
+
+:root[data-plan="max"] {
+  --accent: #b5651d;
+  --accent-soft: #c97b32;
+}
+
+:root[data-plan="max_5x"] {
+  --accent: #b5651d;
+  --accent-soft: #c97b32;
+}
+
+:root[data-plan="max_20x"] {
+  --accent: #b33a5c;
+  --accent-soft: #c95574;
+}
+
+:root[data-plan="team"] {
+  --accent: #187a7a;
+  --accent-soft: #2b9090;
+}
+
+:root[data-plan="enterprise"] {
+  --accent: #4a4fb8;
+  --accent-soft: #5f64c8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-plan="free"]:not([data-theme="light"]) {
+    --accent: #a3a8b0;
+    --accent-soft: #b8bcc3;
+  }
+
+  :root[data-plan="max"]:not([data-theme="light"]) {
+    --accent: #e0954d;
+    --accent-soft: #eaa968;
+  }
+
+  :root[data-plan="max_5x"]:not([data-theme="light"]) {
+    --accent: #e0954d;
+    --accent-soft: #eaa968;
+  }
+
+  :root[data-plan="max_20x"]:not([data-theme="light"]) {
+    --accent: #e0708f;
+    --accent-soft: #ea8ba5;
+  }
+
+  :root[data-plan="team"]:not([data-theme="light"]) {
+    --accent: #4cc2bf;
+    --accent-soft: #6fd0cd;
+  }
+
+  :root[data-plan="enterprise"]:not([data-theme="light"]) {
+    --accent: #8f93f0;
+    --accent-soft: #a6a9f4;
+  }
+}
+
+:root[data-plan="free"][data-theme="dark"] {
+  --accent: #a3a8b0;
+  --accent-soft: #b8bcc3;
+}
+
+:root[data-plan="max"][data-theme="dark"] {
+  --accent: #e0954d;
+  --accent-soft: #eaa968;
+}
+
+:root[data-plan="max_5x"][data-theme="dark"] {
+  --accent: #e0954d;
+  --accent-soft: #eaa968;
+}
+
+:root[data-plan="max_20x"][data-theme="dark"] {
+  --accent: #e0708f;
+  --accent-soft: #ea8ba5;
+}
+
+:root[data-plan="team"][data-theme="dark"] {
+  --accent: #4cc2bf;
+  --accent-soft: #6fd0cd;
+}
+
+:root[data-plan="enterprise"][data-theme="dark"] {
+  --accent: #8f93f0;
+  --accent-soft: #a6a9f4;
+}

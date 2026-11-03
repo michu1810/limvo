@@ -1,16 +1,17 @@
 import { useLayoutEffect, useRef } from "react";
-import { bridge } from "../../bridge";
+import { bridge, type Settings } from "../../bridge";
 import { computePace } from "../../core/pace";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { splitTemplate } from "../../i18n/resolve";
-import { useNow } from "../hooks";
+import { useNow, usePlanTheme } from "../hooks";
 import { Meter } from "../Meter";
 import { ProviderMark } from "../ProviderMark";
 import { RollingPercent } from "../RollingNumber";
 
 /** The compact reading docked in the taskbar. Clicking it opens the flyout. */
-export function Strip({ report }: { report: ProviderReport }) {
+export function Strip({ report, settings }: { report: ProviderReport; settings: Settings | null }) {
+  usePlanTheme(report, settings);
   const { t, format, locale } = useI18n();
   const now = useNow();
   const snapshot = report.snapshot;

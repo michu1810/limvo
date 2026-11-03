@@ -56,5 +56,10 @@ export const zhCN: LocaleDefinition = {
     extraUsageOf: "{used} / {limit}",
     forecastLimitAt: "按此速度，限额将在{when}用完",
     weekChart: "本周用量与均匀节奏对比",
+    shortcut: "键盘快捷键",
+    shortcutHint: "{keys} 可随时打开",
+    shortcutTaken: "两个快捷键都已被其他应用占用",
+    planColors: "套餐颜色",
+    planColorsHint: "用套餐颜色为小组件着色",
   },
 };

@@ -6,7 +6,7 @@ import { mount } from "./mount";
 
 function StripWindow() {
   const report = useReport();
-  return <Root>{() => <Strip report={report} />}</Root>;
+  return <Root>{(settings) => <Strip report={report} settings={settings} />}</Root>;
 }
 
 mount(<StripWindow />, { followTaskbarTheme: true });

@@ -56,5 +56,10 @@ export const en: LocaleDefinition = {
     extraUsageOf: "{used} of {limit}",
     forecastLimitAt: "At this pace the limit runs out {when}",
     weekChart: "Usage this week against an even pace",
+    shortcut: "Keyboard shortcut",
+    shortcutHint: "{keys} opens it from anywhere",
+    shortcutTaken: "Both shortcuts are taken by other apps",
+    planColors: "Plan colours",
+    planColorsHint: "Tint the widget with the colour of your plan",
   },
 };
