@@ -1,0 +1,303 @@
+.flyout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 20px 24px 12px;
+  background: var(--surface-translucent);
+}
+
+/* Without a native material (Windows 10, or the browser) the surface is solid. */
+:root[data-material="none"] .flyout {
+  background: var(--surface);
+}
+
+.flyout__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+  margin-bottom: 22px;
+}
+
+.flyout__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.flyout__updated {
+  margin-inline-start: auto;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.headline__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.headline__value {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+.headline__reset {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  margin: 0 0 4px;
+  text-align: end;
+}
+
+.headline__reset strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.headline__reset time {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.headline .meter {
+  margin-block: 16px 16px;
+}
+
+.pace {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.pill {
+  padding: 3px 10px;
+  border-radius: var(--radius-control);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pill[data-status="on_track"] {
+  color: var(--success-text);
+  background: var(--success-fill);
+}
+
+.pill[data-status="tight"],
+.pill[data-status="running_hot"] {
+  color: var(--caution-text);
+  background: var(--caution-fill);
+}
+
+.pill[data-status="limit_reached"] {
+  color: var(--critical);
+  background: var(--critical-fill);
+}
+
+.pace__detail {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.group {
+  margin-top: 28px;
+}
+
+.group__title {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.group__rows {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.limit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34% 44px;
+  align-items: center;
+  gap: 16px;
+}
+
+.limit__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.limit__value {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -6px 0 20px;
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background: var(--fill-subtle-hover);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.notice[data-state="auth_required"],
+.notice[data-state="error"] {
+  background: var(--critical-fill);
+  color: var(--text);
+}
+
+.notice__text {
+  flex: 1;
+  margin: 0;
+}
+
+.flyout__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: 26px;
+  margin-inline: -12px;
+}
+
+.action {
+  padding: 7px 12px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.action:hover:not(:disabled) {
+  background: var(--fill-subtle-hover);
+}
+
+.action:active:not(:disabled) {
+  background: var(--fill-subtle-pressed);
+  color: var(--text-secondary);
+}
+
+.action:disabled {
+  color: var(--text-tertiary);
+}
+
+/* The first action carries the longest label; it gives way before the window overflows. */
+.flyout__footer > .action:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action--language {
+  min-width: 40px;
+}
+
+.action--inline {
+  flex: none;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-inline-start: -6px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+}
+
+.icon-button:hover {
+  background: var(--fill-subtle-hover);
+}
+
+.languages {
+  display: grid;
+  gap: 2px;
+  margin: -10px -12px 0;
+  padding: 0;
+  border: 0;
+}
+
+.languages__option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+}
+
+.languages__option:hover {
+  background: var(--fill-subtle-hover);
+}
+
+.languages__option:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.languages__option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.languages__check {
+  color: var(--accent);
+}
+
+/* Development frame: in a browser, show the flyout as it sits on the desktop. */
+:root[data-host="browser"] body {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  overflow: auto;
+  background: #d9dde3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-host="browser"]:not([data-theme="light"]) body {
+    background: #15181c;
+  }
+}
+
+:root[data-host="browser"] .flyout {
+  width: 380px;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-window);
+  box-shadow:
+    0 8px 16px rgb(0 0 0 / 0.14),
+    0 0 2px rgb(0 0 0 / 0.1);
+}

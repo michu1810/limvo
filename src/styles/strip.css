@@ -1,0 +1,58 @@
+.strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* The natural width is reported to the host, which sizes the window to it. */
+  width: max-content;
+  height: 100vh;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  text-align: start;
+}
+
+.strip:hover {
+  background: var(--fill-subtle-hover);
+}
+
+.strip:active {
+  background: var(--fill-subtle-pressed);
+}
+
+.strip__body {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.strip__text {
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.strip__value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.strip__muted {
+  color: var(--text-secondary);
+}
+
+.strip[data-stale] .strip__value {
+  color: var(--text-secondary);
+}
+
+:root[data-host="browser"] body {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  background: #e8ecf1;
+}
+
+:root[data-host="browser"] .strip {
+  width: auto;
+  height: 48px;
+}

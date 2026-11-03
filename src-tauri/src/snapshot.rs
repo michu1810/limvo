@@ -1,0 +1,106 @@
+//! Provider-neutral usage model shared with the UI.
+//!
+//! Mirrors `src/core/snapshot.ts`. Both sides are checked against
+//! `fixtures/report.sample.json`, so a field renamed on one side fails a test.
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum WindowKind {
+    Session,
+    Weekly,
+    Scoped,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Severity {
+    Normal,
+    Warning,
+    Critical,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UsageWindow {
+    /// Stable id, for example `weekly_all`, `session` or `scoped:fable`.
+    pub id: String,
+    pub kind: WindowKind,
+    /// Name supplied by the provider; `None` lets the UI label it by kind.
+    pub label: Option<String>,
+    /// Share of the allowance used, 0 to 100.
+    pub percent: f64,
+    /// RFC 3339 instant of the next reset.
+    pub resets_at: Option<String>,
+    /// Length of the rolling window, used for pace.
+    pub period_seconds: Option<u64>,
+    pub severity: Severity,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BreakdownRow {
+    pub key: String,
+    pub label: String,
+    /// Share of the headline window's usage, 0 to 100.
+    pub percent: f64,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UsageSnapshot {
+    pub provider_id: String,
+    pub provider_name: String,
+    /// RFC 3339 instant the provider answered.
+    pub fetched_at: String,
+    pub headline: Option<UsageWindow>,
+    pub windows: Vec<UsageWindow>,
+    pub breakdown: Vec<BreakdownRow>,
+    pub usage_page_url: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReportState {
+    Loading,
+    Ok,
+    Offline,
+    AuthRequired,
+    NoCredentials,
+    Error,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProviderReport {
+    pub state: ReportState,
+    /// The last good reading, kept when a later refresh fails.
+    pub snapshot: Option<UsageSnapshot>,
+    /// Diagnostic detail for errors. Never contains credentials.
+    pub detail: Option<String>,
+}
+
+impl ProviderReport {
+    pub fn loading() -> Self {
+        Self {
+            state: ReportState::Loading,
+            snapshot: None,
+            detail: None,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn matches_the_contract_fixture_shared_with_the_ui() {
+        let fixture = include_str!("../../fixtures/report.sample.json");
+        let report: ProviderReport = serde_json::from_str(fixture).expect("fixture parses");
+        let round_trip: serde_json::Value = serde_json::to_value(&report).unwrap();
+        let original: serde_json::Value = serde_json::from_str(fixture).unwrap();
+        assert_eq!(round_trip, original);
+    }
+}

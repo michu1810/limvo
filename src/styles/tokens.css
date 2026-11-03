@@ -1,0 +1,87 @@
+/*
+ * Design tokens. Light values follow the Windows 11 flyout palette; dark
+ * values follow its dark counterpart. Components only read these variables.
+ */
+:root {
+  color-scheme: light dark;
+
+  --font-text: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+
+  --surface: #f3f3f3;
+  --surface-translucent: rgb(243 243 243 / 0.62);
+  --stroke: rgb(0 0 0 / 0.07);
+  --text: #1b1b1b;
+  --text-secondary: #5d5d5d;
+  --text-tertiary: #8a8a8a;
+  --fill-subtle-hover: rgb(0 0 0 / 0.045);
+  --fill-subtle-pressed: rgb(0 0 0 / 0.03);
+
+  --accent: #c8553d;
+  --accent-soft: #d36a50;
+  --track: rgb(0 0 0 / 0.09);
+  --marker: #2b2b2b;
+
+  --success-text: #0f7b0f;
+  --success-fill: rgb(15 123 15 / 0.09);
+  --caution-text: #8a5300;
+  --caution-fill: rgb(157 93 0 / 0.11);
+  --critical: #c42b1c;
+  --critical-fill: rgb(196 43 28 / 0.09);
+
+  --focus: #1b1b1b;
+  --radius-window: 8px;
+  --radius-control: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: #2b2b2b;
+    --surface-translucent: rgb(32 32 32 / 0.55);
+    --stroke: rgb(255 255 255 / 0.08);
+    --text: #ffffff;
+    --text-secondary: #cfcfcf;
+    --text-tertiary: #9d9d9d;
+    --fill-subtle-hover: rgb(255 255 255 / 0.06);
+    --fill-subtle-pressed: rgb(255 255 255 / 0.04);
+
+    --accent: #e07a5f;
+    --accent-soft: #e8907a;
+    --track: rgb(255 255 255 / 0.14);
+    --marker: #f2f2f2;
+
+    --success-text: #6ccb5f;
+    --success-fill: rgb(108 203 95 / 0.13);
+    --caution-text: #f2c94c;
+    --caution-fill: rgb(242 201 76 / 0.13);
+    --critical: #ff99a4;
+    --critical-fill: rgb(255 153 164 / 0.12);
+
+    --focus: #ffffff;
+  }
+}
+
+:root[data-theme="dark"] {
+  --surface: #2b2b2b;
+  --surface-translucent: rgb(32 32 32 / 0.55);
+  --stroke: rgb(255 255 255 / 0.08);
+  --text: #ffffff;
+  --text-secondary: #cfcfcf;
+  --text-tertiary: #9d9d9d;
+  --fill-subtle-hover: rgb(255 255 255 / 0.06);
+  --fill-subtle-pressed: rgb(255 255 255 / 0.04);
+
+  --accent: #e07a5f;
+  --accent-soft: #e8907a;
+  --track: rgb(255 255 255 / 0.14);
+  --marker: #f2f2f2;
+
+  --success-text: #6ccb5f;
+  --success-fill: rgb(108 203 95 / 0.13);
+  --caution-text: #f2c94c;
+  --caution-fill: rgb(242 201 76 / 0.13);
+  --critical: #ff99a4;
+  --critical-fill: rgb(255 153 164 / 0.12);
+
+  --focus: #ffffff;
+}

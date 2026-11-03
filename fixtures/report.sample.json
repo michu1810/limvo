@@ -1,0 +1,35 @@
+{
+  "state": "ok",
+  "snapshot": {
+    "providerId": "claude",
+    "providerName": "Claude",
+    "fetchedAt": "2026-11-08T14:57:00Z",
+    "headline": {
+      "id": "weekly_all",
+      "kind": "weekly",
+      "label": null,
+      "percent": 51.0,
+      "resetsAt": "2026-11-10T07:00:00Z",
+      "periodSeconds": 604800,
+      "severity": "normal"
+    },
+    "windows": [
+      {
+        "id": "scoped:fable",
+        "kind": "scoped",
+        "label": "Fable",
+        "percent": 0.0,
+        "resetsAt": "2026-11-10T07:00:00Z",
+        "periodSeconds": 604800,
+        "severity": "normal"
+      }
+    ],
+    "breakdown": [
+      { "key": "claude_code", "label": "Claude Code", "percent": 51.0 },
+      { "key": "cowork", "label": "Cowork", "percent": 48.0 },
+      { "key": "chat", "label": "Chats", "percent": 1.0 }
+    ],
+    "usagePageUrl": "https://claude.ai/settings/usage"
+  },
+  "detail": null
+}

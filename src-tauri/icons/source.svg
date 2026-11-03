@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 24 24">
+  <title>Headroom</title>
+  <rect x="4" y="3" width="4" height="18" rx="2" fill="#c8553d"/>
+  <rect x="16" y="3" width="4" height="18" rx="2" fill="#c8553d"/>
+  <rect x="6" y="14" width="12" height="4" rx="2" fill="#c8553d"/>
+  <rect x="10" y="7" width="4" height="2.5" rx="1.25" fill="#c8553d" opacity="0.35"/>
+</svg>
