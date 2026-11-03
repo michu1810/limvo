@@ -1,17 +1,20 @@
 import { computePace } from "../../core/pace";
-import type { UsageWindow } from "../../core/snapshot";
+import type { PlanBadge, UsageWindow } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
-import { useAnimatedNumber } from "../hooks";
 import { headlineLabel, PACE_MESSAGE } from "../labels";
 import { Meter } from "../Meter";
+import { RollingPercent } from "../RollingNumber";
 
 export function Headline({
   window,
   now,
   replay = 0,
   compact = false,
+  plan = null,
 }: {
   window: UsageWindow;
+  /** The account's plan, shown as a badge beside the label. */
+  plan?: PlanBadge | null;
   now: Date;
   /** Changing it counts the number up again, as when the flyout opens. */
   replay?: number;
@@ -24,17 +27,19 @@ export function Headline({
   const resetsAt = window.resetsAt ? new Date(window.resetsAt) : null;
   const remaining = resetsAt ? resetsAt.getTime() - now.getTime() : null;
   const label = headlineLabel(window, i18n);
-  const counted = useAnimatedNumber(window.percent, replay);
 
   return (
     <section className="headline" data-compact={compact || undefined} aria-label={label}>
-      <p className="eyebrow">{label}</p>
+      <div className="headline__label">
+        <p className="eyebrow">{label}</p>
+        {plan && (
+          <span className="plan" data-plan={plan.id}>
+            {plan.label}
+          </span>
+        )}
+      </div>
       <div className="headline__row">
-        {/* Screen readers get the final value, not every frame of the count. */}
-        <span className="headline__value">
-          <span aria-hidden="true">{format.percent(Math.round(counted))}</span>
-          <span className="sr-only">{format.percent(window.percent)}</span>
-        </span>
+        <RollingPercent className="headline__value" value={window.percent} replay={replay} />
         {resetsAt && remaining !== null && (
           <p className="headline__reset">
             <strong>

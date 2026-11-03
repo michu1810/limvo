@@ -10,6 +10,8 @@ use std::path::PathBuf;
 
 use serde::Deserialize;
 
+use crate::snapshot::PlanBadge;
+
 /// The scope the usage endpoint requires.
 pub const PROFILE_SCOPE: &str = "user:profile";
 
@@ -19,6 +21,8 @@ pub struct Token {
     pub expires_at_ms: Option<i64>,
     /// Whether the token carries [`PROFILE_SCOPE`]; `None` when the source does not say.
     pub has_profile_scope: Option<bool>,
+    /// The plan the sign-in belongs to, when the source records it.
+    pub plan: Option<PlanBadge>,
     /// Human-readable origin, for diagnostics.
     pub source: &'static str,
 }
@@ -28,11 +32,13 @@ impl Token {
         secret: String,
         expires_at_ms: Option<i64>,
         has_profile_scope: bool,
+        plan: Option<PlanBadge>,
     ) -> Self {
         Self {
             secret,
             expires_at_ms,
             has_profile_scope: Some(has_profile_scope),
+            plan,
             source: "Claude desktop app",
         }
     }
@@ -52,6 +58,7 @@ impl fmt::Debug for Token {
             .field("secret", &"<redacted>")
             .field("expires_at_ms", &self.expires_at_ms)
             .field("has_profile_scope", &self.has_profile_scope)
+            .field("plan", &self.plan)
             .field("source", &self.source)
             .finish()
     }
@@ -124,6 +131,8 @@ struct CliOauth {
     access_token: Option<String>,
     expires_at: Option<i64>,
     scopes: Option<Vec<String>>,
+    subscription_type: Option<String>,
+    rate_limit_tier: Option<String>,
 }
 
 fn parse_cli_credentials(text: &str) -> Option<Token> {
@@ -135,6 +144,10 @@ fn parse_cli_credentials(text: &str) -> Option<Token> {
         has_profile_scope: oauth
             .scopes
             .map(|scopes| scopes.iter().any(|scope| scope == PROFILE_SCOPE)),
+        plan: super::plan::badge(
+            oauth.subscription_type.as_deref(),
+            oauth.rate_limit_tier.as_deref(),
+        ),
         source: "Claude Code CLI",
     })
 }
@@ -148,6 +161,7 @@ mod tests {
             secret: "x".into(),
             expires_at_ms,
             has_profile_scope: scope,
+            plan: None,
             source,
         }
     }

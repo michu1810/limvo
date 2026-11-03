@@ -7,8 +7,8 @@ export const pl: LocaleDefinition = {
   dir: "ltr",
   messages: {
     usageTitle: "Zużycie {provider}",
-    updated: "Zaktualizowano {time}",
-    updatedJustNow: "Zaktualizowano teraz",
+    updated: "Odświeżono {time}",
+    updatedJustNow: "Odświeżono teraz",
     headlineWeekly: "Limit tygodniowy · wszystkie modele",
     headlineSession: "Bieżąca sesja",
     resetsIn: "Reset za {duration}",

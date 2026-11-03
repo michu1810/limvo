@@ -1,7 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 24 24">
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <title>Headroom</title>
-  <rect x="4" y="3" width="4" height="18" rx="2" fill="#c8553d"/>
-  <rect x="16" y="3" width="4" height="18" rx="2" fill="#c8553d"/>
-  <rect x="6" y="14" width="12" height="4" rx="2" fill="#c8553d"/>
-  <rect x="10" y="7" width="4" height="2.5" rx="1.25" fill="#c8553d" opacity="0.35"/>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34302d"/>
+      <stop offset="1" stop-color="#1b1918"/>
+    </linearGradient>
+    <linearGradient id="post" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e07a5f"/>
+      <stop offset="1" stop-color="#c24f37"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f08d71"/>
+      <stop offset="1" stop-color="#d86347"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Tile with a soft top light, the way Windows 11 app icons catch the light. -->
+  <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#tile)"/>
+  <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#sheen)"/>
+  <rect x="66" y="66" width="892" height="892" rx="206" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="4"/>
+
+  <!-- The ceiling: the limit the crossbar rises towards. -->
+  <rect x="404" y="262" width="216" height="20" rx="10" fill="#ffffff" fill-opacity="0.22"/>
+
+  <!-- The H: two posts and a crossbar that is a gauge; the space above it is the headroom. -->
+  <rect x="268" y="224" width="136" height="576" rx="68" fill="url(#post)"/>
+  <rect x="620" y="224" width="136" height="576" rx="68" fill="url(#post)"/>
+  <rect x="336" y="520" width="352" height="128" rx="64" fill="url(#bar)"/>
 </svg>

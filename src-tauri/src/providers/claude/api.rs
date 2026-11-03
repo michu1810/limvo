@@ -120,6 +120,8 @@ pub fn to_snapshot(response: UsageResponse, fetched_at: String) -> UsageSnapshot
     UsageSnapshot {
         provider_id: super::PROVIDER_ID.to_owned(),
         provider_name: "Claude".to_owned(),
+        // The plan comes with the sign-in, not with the usage answer.
+        plan: None,
         fetched_at,
         headline,
         windows,

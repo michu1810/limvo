@@ -56,6 +56,50 @@ button {
   transition: y var(--duration-slow) var(--ease-out);
 }
 
+/* Rolling counter ------------------------------------------------------------
+ * Each digit sits on a wheel that turns behind a small window. The window's
+ * top and bottom fade out, so digits appear to curve away like printed drums.
+ */
+.rolling {
+  display: inline-flex;
+  --cell: 1.12em;
+}
+
+.rolling__face {
+  display: inline-flex;
+  align-items: flex-end;
+  line-height: var(--cell);
+}
+
+.rolling__digits {
+  display: inline-flex;
+}
+
+.rolling__wheel {
+  display: inline-block;
+  width: 1ch;
+  height: var(--cell);
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
+}
+
+.rolling__strip {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(var(--wheel-offset) * -1 * var(--cell)));
+}
+
+.rolling__digit {
+  display: block;
+  height: var(--cell);
+}
+
+.rolling__literal {
+  white-space: pre;
+}
+
 /* Meter: one component for the flyout, the rows, the card and the strip ------ */
 
 .meter {

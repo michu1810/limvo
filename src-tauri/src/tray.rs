@@ -1,5 +1,8 @@
 //! The notification area icon and its menu.
 
+use std::sync::atomic::{AtomicI32, Ordering};
+
+use tauri::image::Image;
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{App, AppHandle, Manager, Wry};
@@ -10,6 +13,8 @@ use crate::flyout::{self, Anchor};
 pub const ID: &str = "main";
 const REFRESH: &str = "refresh";
 const QUIT: &str = "quit";
+/// Level the icon was last drawn at, in whole percent; -1 means "no reading".
+static DRAWN_LEVEL: AtomicI32 = AtomicI32::new(i32::MIN);
 
 /// Menu items kept so the UI can translate them.
 pub struct TrayMenu {
@@ -59,12 +64,30 @@ pub fn build(app: &App) -> tauri::Result<TrayMenu> {
                 flyout::toggle(tray.app_handle(), anchor);
             }
         });
-    if let Some(icon) = app.default_window_icon() {
-        builder = builder.icon(icon.clone());
-    }
+    builder = builder.icon(level_icon(None));
     builder.build(app)?;
 
     Ok(TrayMenu { refresh, quit })
+}
+
+/// Redraws the icon so its crossbar shows percent. Cheap to call often: it only redraws on change.
+pub fn show_level(app: &AppHandle, percent: Option<f64>) {
+    #[allow(clippy::cast_possible_truncation)]
+    let level = percent.map_or(-1, |value| value.round() as i32);
+    if DRAWN_LEVEL.swap(level, Ordering::Relaxed) == level {
+        return;
+    }
+    if let Some(tray) = app.tray_by_id(ID) {
+        let _ = tray.set_icon(Some(level_icon(percent)));
+    }
+}
+
+fn level_icon(percent: Option<f64>) -> Image<'static> {
+    Image::new_owned(
+        crate::mark::rgba(percent),
+        crate::mark::SIZE,
+        crate::mark::SIZE,
+    )
 }
 
 /// Applies texts translated by the UI.

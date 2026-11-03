@@ -33,10 +33,18 @@ export interface BreakdownRow {
   percent: number;
 }
 
+/** The plan the account is on. Plan names are product names and are not translated. */
+export interface PlanBadge {
+  /** Stable id to style by, for example `max_20x`. */
+  id: string;
+  label: string;
+}
+
 export interface UsageSnapshot {
   providerId: string;
   /** Name of the service, shown as "<name> usage". */
   providerName: string;
+  plan: PlanBadge | null;
   /** ISO 8601 instant the provider answered. */
   fetchedAt: string;
   /** The window that matters most, shown large. */

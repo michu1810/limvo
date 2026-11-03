@@ -187,9 +187,59 @@
 /* Headline ------------------------------------------------------------------ */
 
 .eyebrow {
-  margin: 0 0 6px;
+  margin: 0;
   font-size: 14px;
   color: var(--text-secondary);
+}
+
+.headline__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+/*
+ * Plan badge. Each plan reads differently at a glance: Free and Pro are
+ * outlined, Max is filled with the accent, Max 20x adds a fine inner light,
+ * Team and Enterprise use a calm neutral fill.
+ */
+.plan {
+  flex: none;
+  padding: 1px 8px;
+  border: 1px solid var(--plan-stroke, var(--stroke));
+  border-radius: 999px;
+  background: var(--plan-fill, transparent);
+  color: var(--plan-text, var(--text-secondary));
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  animation: pill-in var(--duration-slow) var(--ease-spring) 200ms both;
+}
+
+.plan[data-plan="pro"] {
+  --plan-stroke: var(--accent);
+  --plan-text: var(--accent);
+}
+
+.plan[data-plan^="max"] {
+  --plan-stroke: transparent;
+  --plan-fill: var(--accent);
+  --plan-text: #fff;
+}
+
+.plan[data-plan="max_20x"] {
+  --plan-fill: linear-gradient(135deg, var(--accent-soft), var(--accent) 60%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28);
+}
+
+.plan[data-plan="team"],
+.plan[data-plan="enterprise"] {
+  --plan-stroke: transparent;
+  --plan-fill: var(--fill-subtle-hover);
+  --plan-text: var(--text);
 }
 
 .headline__row {

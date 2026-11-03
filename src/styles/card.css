@@ -23,8 +23,11 @@
 }
 
 .card .eyebrow {
-  margin-bottom: 4px;
   font-size: 12px;
+}
+
+.card .headline__label {
+  margin-bottom: 4px;
 }
 
 .card .headline__value {

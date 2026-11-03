@@ -9,6 +9,7 @@ mod card;
 mod commands;
 mod events;
 mod flyout;
+mod mark;
 mod poller;
 mod providers;
 mod settings;

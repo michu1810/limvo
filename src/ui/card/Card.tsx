@@ -45,7 +45,7 @@ export function Card({ report }: { report: ProviderReport }) {
         )}
       </header>
       {snapshot?.headline ? (
-        <Headline window={snapshot.headline} now={now} compact />
+        <Headline window={snapshot.headline} now={now} plan={snapshot.plan} compact />
       ) : (
         <p className="card__empty">{t("stateLoading")}</p>
       )}

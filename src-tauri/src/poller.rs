@@ -167,7 +167,14 @@ fn publish(app: &AppHandle, handle: &PollerHandle, outcome: Result<UsageSnapshot
 }
 
 fn publish_current(app: &AppHandle, handle: &PollerHandle) {
-    if let Err(error) = app.emit(events::REPORT_UPDATED, handle.report()) {
+    let report = handle.report();
+    let level = report
+        .snapshot
+        .as_ref()
+        .and_then(|snapshot| snapshot.headline.as_ref())
+        .map(|headline| headline.percent);
+    crate::tray::show_level(app, level);
+    if let Err(error) = app.emit(events::REPORT_UPDATED, report) {
         log::warn!("could not publish the report: {error}");
     }
 }
@@ -261,6 +268,7 @@ mod tests {
         UsageSnapshot {
             provider_id: "claude".into(),
             provider_name: "Claude".into(),
+            plan: None,
             fetched_at: "2026-11-08T14:57:00Z".into(),
             headline: None,
             windows: Vec::new(),

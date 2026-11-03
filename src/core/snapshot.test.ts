@@ -11,6 +11,7 @@ const reportKeys = { state: true, snapshot: true, detail: true } satisfies Recor
 const snapshotKeys = {
   providerId: true,
   providerName: true,
+  plan: true,
   fetchedAt: true,
   headline: true,
   windows: true,

@@ -3,6 +3,7 @@
   "snapshot": {
     "providerId": "claude",
     "providerName": "Claude",
+    "plan": { "id": "max_20x", "label": "Max 20\u00d7" },
     "fetchedAt": "2026-11-08T14:57:00Z",
     "headline": {
       "id": "weekly_all",

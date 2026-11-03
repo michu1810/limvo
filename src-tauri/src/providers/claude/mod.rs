@@ -3,6 +3,7 @@
 mod api;
 mod credentials;
 mod desktop;
+mod plan;
 
 use std::path::PathBuf;
 use std::time::Duration;
@@ -56,10 +57,9 @@ async fn fetch(http: &reqwest::Client) -> Result<UsageSnapshot, ProviderError> {
         match request(http, token.secret()).await {
             Ok(response) => {
                 log::debug!("usage read with a token from the {}", token.source);
-                return Ok(api::to_snapshot(
-                    response,
-                    jiff::Timestamp::now().to_string(),
-                ));
+                let mut snapshot = api::to_snapshot(response, jiff::Timestamp::now().to_string());
+                snapshot.plan.clone_from(&token.plan);
+                return Ok(snapshot);
             }
             // A token without the profile scope or a revoked one: try the next sign-in.
             Err(Attempt::Rejected(status)) => {

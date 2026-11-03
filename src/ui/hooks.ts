@@ -109,17 +109,27 @@ export function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+export const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+
+/** Spins up briskly and coasts into place, like a mechanical counter winding down. */
+export const easeOutQuint = (t: number) => 1 - (1 - t) ** 5;
 
 /**
  * A number that glides to `target` instead of jumping. `replay` restarts the
  * glide from zero, which the flyout uses each time it opens. Runs only while
  * the value changes, so an idle window costs nothing.
  */
-export function useAnimatedNumber(target: number, replay: number, duration = 650): number {
+export function useAnimatedNumber(
+  target: number,
+  replay: number,
+  duration = 650,
+  ease: (t: number) => number = easeOutCubic,
+): number {
   const reduced = usePrefersReducedMotion();
-  const [value, setValue] = useState(target);
-  const shown = useRef(target);
+  // Mounted as part of a replay (the flyout remounts its view when it opens): start from zero.
+  const initial = replay > 0 && !reduced ? 0 : target;
+  const [value, setValue] = useState(initial);
+  const shown = useRef(initial);
   const lastReplay = useRef(replay);
 
   useEffect(() => {
@@ -136,14 +146,14 @@ export function useAnimatedNumber(target: number, replay: number, duration = 650
     let frame = 0;
     const step = (time: number) => {
       const progress = Math.min(1, (time - start) / duration);
-      const next = from + (target - from) * easeOutCubic(progress);
+      const next = from + (target - from) * ease(progress);
       shown.current = next;
       setValue(next);
       if (progress < 1) frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [target, replay, duration, reduced]);
+  }, [target, replay, duration, ease, reduced]);
 
   return value;
 }

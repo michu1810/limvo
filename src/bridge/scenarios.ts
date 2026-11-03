@@ -47,6 +47,7 @@ function snapshot(now: Date, shape: Shape): UsageSnapshot {
   return {
     providerId: "claude",
     providerName: "Claude",
+    plan: { id: "max_20x", label: "Max 20\u00d7" },
     fetchedAt: at(-shape.updatedMinutesAgo / 60),
     headline: {
       id: "weekly_all",

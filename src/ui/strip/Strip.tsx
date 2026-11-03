@@ -4,9 +4,10 @@ import { computePace } from "../../core/pace";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { splitTemplate } from "../../i18n/resolve";
-import { useAnimatedNumber, useNow } from "../hooks";
+import { useNow } from "../hooks";
 import { Meter } from "../Meter";
 import { ProviderMark } from "../ProviderMark";
+import { RollingPercent } from "../RollingNumber";
 
 /** The compact reading docked in the taskbar. Clicking it opens the flyout. */
 export function Strip({ report }: { report: ProviderReport }) {
@@ -16,9 +17,7 @@ export function Strip({ report }: { report: ProviderReport }) {
   const headline = snapshot?.headline ?? null;
   const pace = headline ? computePace(headline, now) : null;
   const resetsAt = headline?.resetsAt ? new Date(headline.resetsAt) : null;
-  // A new reading counts to its value instead of jumping.
-  const counted = useAnimatedNumber(headline?.percent ?? 0, 0);
-  const percent = headline ? format.percent(Math.round(counted)) : "--";
+  const percent = headline ? format.percent(headline.percent) : "--";
 
   // "{percent} until {day}": the number is emphasised, the rest stays quiet.
   const parts = resetsAt ? splitTemplate(locale.messages.stripUntil) : [{ placeholder: "percent" }];
@@ -50,9 +49,14 @@ export function Strip({ report }: { report: ProviderReport }) {
               );
             if (part.placeholder === "percent")
               return (
-                <span key={key} className="strip__value">
-                  {percent}
-                </span>
+                // A new reading rolls in on the counter instead of jumping.
+                headline ? (
+                  <RollingPercent key={key} className="strip__value" value={headline.percent} />
+                ) : (
+                  <span key={key} className="strip__value">
+                    {percent}
+                  </span>
+                )
               );
             return (
               <span key={key} className="strip__muted">

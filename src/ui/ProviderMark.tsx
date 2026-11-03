@@ -1,5 +1,8 @@
 import { type CSSProperties, useState } from "react";
 
+/** `?nobrand` forces the Headroom mark, for screenshots that must not show third-party logos. */
+const BRANDS_OFF = new URLSearchParams(window.location.search).has("nobrand");
+
 /**
  * The provider's own mark if the user supplied one in `public/brand/<id>.svg`,
  * otherwise the Headroom mark. Brand files are not shipped with the project:
@@ -17,7 +20,7 @@ export function ProviderMark({
 }) {
   const [missing, setMissing] = useState(false);
 
-  if (missing) return <HeadroomMark size={size} level={level} />;
+  if (missing || BRANDS_OFF) return <HeadroomMark size={size} level={level} />;
   return (
     <img
       className="mark"

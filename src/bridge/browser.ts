@@ -36,9 +36,11 @@ export function createBrowserBridge(): Bridge {
     });
   };
 
-  // A browser tab is "shown" once, when it loads.
-  queueMicrotask(() => {
-    for (const listener of shownListeners) listener();
+  // A browser tab is "shown" once, after it loads and React has subscribed.
+  window.addEventListener("load", () => {
+    window.setTimeout(() => {
+      for (const listener of shownListeners) listener();
+    }, 60);
   });
 
   return {

@@ -113,6 +113,14 @@ mod windows_impl {
                     secret,
                     entry.get("expiresAt").and_then(serde_json::Value::as_i64),
                     key.contains(PROFILE_SCOPE),
+                    crate::providers::claude::plan::badge(
+                        entry
+                            .get("subscriptionType")
+                            .and_then(serde_json::Value::as_str),
+                        entry
+                            .get("rateLimitTier")
+                            .and_then(serde_json::Value::as_str),
+                    ),
                 ))
             })
             .collect()

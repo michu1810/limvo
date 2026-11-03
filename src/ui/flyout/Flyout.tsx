@@ -106,7 +106,9 @@ export function Flyout({
 
             <StateNotice report={report} now={now} onRetry={refresh} />
 
-            {snapshot?.headline && <Headline window={snapshot.headline} now={now} replay={shown} />}
+            {snapshot?.headline && (
+              <Headline window={snapshot.headline} now={now} replay={shown} plan={snapshot.plan} />
+            )}
             {snapshot && <Breakdown rows={snapshot.breakdown} replay={shown} />}
             {snapshot && <OtherLimits windows={snapshot.windows} replay={shown} />}
 

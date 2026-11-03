@@ -47,11 +47,21 @@ pub struct BreakdownRow {
     pub percent: f64,
 }
 
+/// The plan the account is on, shown as a badge. Plan names are product names and are not translated.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlanBadge {
+    /// Stable id the interface styles by, for example `max_20x`.
+    pub id: String,
+    pub label: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UsageSnapshot {
     pub provider_id: String,
     pub provider_name: String,
+    pub plan: Option<PlanBadge>,
     /// RFC 3339 instant the provider answered.
     pub fetched_at: String,
     pub headline: Option<UsageWindow>,
