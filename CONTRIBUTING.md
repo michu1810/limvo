@@ -60,6 +60,10 @@ neutral `UsageSnapshot` the interface already knows how to draw.
 
    ```rust
    impl UsageProvider for MyProvider {
+       // Stable id: used in pins (`<id>:<window>`), brand files and plan colours.
+       fn id(&self) -> &'static str { "my_service" }
+       fn name(&self) -> &'static str { "My Service" }
+
        fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a> {
            Box::pin(async move {
                // Find credentials, call the API, map the answer.
@@ -75,8 +79,13 @@ neutral `UsageSnapshot` the interface already knows how to draw.
 2. Map errors to `ProviderError`. The poller turns them into the states the
    flyout explains: no credentials, sign in again, offline, rate limited.
 3. Keep the mapping a pure function and test it against a fixture of a real,
-   anonymised response, as `providers/claude/api.rs` does.
-4. Register the provider in `providers::default_provider`.
+   anonymised response, as `providers/claude/api.rs` and
+   `providers/codex.rs` do.
+4. Add it to `providers::all()`. The flyout gets a tab for it as soon as it
+   reports a sign-in, and its limits show up in the taskbar pins.
+5. Optional: give its plans a colour in `src/styles/tokens.css`
+   (`[data-plan^="<prefix>"]`), and put the service's official logo at
+   `public/brand/<id>.svg` on your own machine.
 
 Rules for credentials, without exception:
 

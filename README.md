@@ -4,7 +4,7 @@
 
 # Limvo
 
-**Your Claude plan limits and the pace you are using them at, right in the Windows taskbar.**
+**Your AI plan limits and the pace you are using them at, right in the Windows taskbar. Claude and Codex today, more through a small provider interface.**
 
 [Download](#install) · [Features](#features) · [How it works](#how-it-works) · [Setups](#setups-and-scenarios) · [Build from source](#build-from-source) · [Contributing](CONTRIBUTING.md)
 
@@ -16,7 +16,8 @@ Limvo puts the weekly limit of your Claude plan next to the clock, tells you
 whether you are on track to make it to the reset, and stays out of the way
 until you want the details. It reads the same numbers as the usage page on
 claude.ai, refreshes them on its own while you work, and nudges you with a
-Windows notification before you run out.
+Windows notification before you run out. Signed in to Codex as well? Each
+service gets its own tab, and the taskbar can show several limits side by side.
 
 <p align="center">
   <img src="docs/images/flyout-light.png" width="380" alt="The Limvo flyout in the light theme: 51% of the weekly limit used, resets in 1 day 16 hr, on track with a projection of 67%" />
@@ -34,6 +35,15 @@ Windows notification before you run out.
 - **Taskbar reading.** `51% until Tue` with a slim meter, docked next to the
   notification area. Hover lights it up like any taskbar button; click it to
   open the flyout.
+- **Several services side by side.** Claude and Codex (ChatGPT plans) each get
+  a tab in the flyout, with their own plan colour. Choose which limits the
+  taskbar shows: one reads as a sentence, several sit next to each other as
+  mark, number and meter.
+
+  <img src="docs/images/flyout-tabs-dark.png" width="380" alt="The flyout with a Claude tab and a Codex tab; the Claude tab is open at 51%" />
+  <br />
+  <img src="docs/images/strip-pins-dark.png" height="64" alt="The taskbar showing three pinned limits: Claude weekly 51%, Codex weekly 23% and the Codex 5 hour session 61%" />
+
 - **A counter with some craft.** The percentage rolls in on drum wheels like an
   old odometer: each digit drops in from above, and a wheel only moves on when
   the one to its right passes nine. The tray icon is alive too: the foot of
@@ -132,6 +142,7 @@ afterwards.
 | Language           | System   | Any of the eleven languages, or follow Windows.                                                   |
 | Start with Windows | Off      | Adds Limvo to your user's startup apps.                                                           |
 | Show in taskbar    | On       | Turn off to keep only the tray icon.                                                              |
+| Limits in taskbar  | Main     | With more than one limit available: pick up to six, in the order you turn them on.               |
 | Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                               |
 | Notifications      | On       | 80%, 95%, limit reached, and the reset after a week above 80%. Each one is shown once per window. |
 | Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.          |
@@ -153,6 +164,13 @@ It looks for a sign-in in this order and uses the first one that works:
    (`%LOCALAPPDATA%\Claude-Data`) are supported.
 2. **Claude Code CLI.** `~/.claude/.credentials.json`, or
    `%CLAUDE_CONFIG_DIR%\.credentials.json` when that variable is set.
+
+**Codex.** With the Codex CLI signed in with a ChatGPT account, Limvo reads
+`~/.codex/auth.json` (or `%CODEX_HOME%uth.json`) and asks
+`chatgpt.com/backend-api/wham/usage`, the endpoint behind the Codex usage
+page. The weekly window becomes the main reading and the five-hour window sits
+among the other limits. Activity in `~/.codex/sessions` drives adaptive updates
+the same way.
 
 Limvo never refreshes, writes or copies a token. An expired sign-in is
 reported as _sign in again_ instead of being renewed behind your back, because
@@ -177,6 +195,8 @@ and rate limits from the server are honoured.
 | Claude desktop app, signed in           | Works out of the box, including the Microsoft Store version.                                                                |
 | Claude Code CLI only                    | Works if you have signed in with `claude` at least once. Run `claude` and `/login` if the flyout says your sign-in expired. |
 | Both installed                          | Limvo picks the freshest sign-in that has the required scope.                                                               |
+| Codex CLI signed in with ChatGPT        | A Codex tab appears next to Claude. With only Codex signed in, Limvo shows Codex alone.                                     |
+| Codex with an API key only              | Not shown: API keys have no plan limits to read.                                                                            |
 | Signed out everywhere                   | The flyout asks you to sign in. Limvo checks again every two minutes, no restart needed.                                    |
 | Custom Claude Code folder               | Set `CLAUDE_CONFIG_DIR` before starting Limvo; it follows the same variable as Claude Code.                                 |
 | Several monitors                        | The reading docks on the main taskbar. Flyout and card open on the monitor you use them from.                               |
@@ -188,8 +208,9 @@ and rate limits from the server are honoured.
 
 ## Privacy and security
 
-- No telemetry, analytics or crash reporting. The only network request is the
-  usage request to `api.anthropic.com`.
+- No telemetry, analytics or crash reporting. The only network requests are
+  the usage requests to `api.anthropic.com` and, with Codex signed in,
+  `chatgpt.com`.
 - Tokens stay in memory for the duration of one request and are never logged.
   Logs record only which source was used and HTTP status codes.
 - Everything that touches credentials, the network and the system lives in the

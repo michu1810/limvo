@@ -6,6 +6,14 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Codex (ChatGPT plans) as a second service, read from the Codex CLI sign-in.
+- Service tabs in the flyout, each with its mark, reading and plan colour.
+- Taskbar pins: choose up to six limits across services; several limits sit
+  side by side in the taskbar.
+- Notifications, the week chart and the tray tooltip cover every service.
+
 ## [0.1.0] - 2026-11-03
 
 ### Added
