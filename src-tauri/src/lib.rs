@@ -5,6 +5,7 @@
 //! asks for actions through the commands in [`commands`].
 
 mod activity;
+mod brand;
 mod card;
 mod commands;
 mod events;
@@ -80,6 +81,7 @@ pub fn run() {
             let store = SettingsStore::new(&app.path().app_config_dir()?);
             let settings = store.load();
             let tray = tray::build(app)?;
+            tray::use_brand(app.handle(), "claude");
 
             let provider = providers::default_provider();
             let activity_paths = provider.activity_paths();

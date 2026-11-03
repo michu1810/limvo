@@ -1,6 +1,6 @@
 //! The notification area icon and its menu.
 
-use std::sync::atomic::{AtomicI32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
 
 use tauri::image::Image;
 use tauri::menu::{Menu, MenuItem};
@@ -15,6 +15,8 @@ const REFRESH: &str = "refresh";
 const QUIT: &str = "quit";
 /// Level the icon was last drawn at, in whole percent; -1 means "no reading".
 static DRAWN_LEVEL: AtomicI32 = AtomicI32::new(i32::MIN);
+/// The provider's own mark is in use, so readings no longer redraw the icon.
+static BRANDED: AtomicBool = AtomicBool::new(false);
 
 /// Menu items kept so the UI can translate them.
 pub struct TrayMenu {
@@ -72,6 +74,9 @@ pub fn build(app: &App) -> tauri::Result<TrayMenu> {
 
 /// Redraws the icon so its crossbar shows percent. Cheap to call often: it only redraws on change.
 pub fn show_level(app: &AppHandle, percent: Option<f64>) {
+    if BRANDED.load(Ordering::Relaxed) {
+        return;
+    }
     #[allow(clippy::cast_possible_truncation)]
     let level = percent.map_or(-1, |value| value.round() as i32);
     if DRAWN_LEVEL.swap(level, Ordering::Relaxed) == level {
@@ -79,6 +84,19 @@ pub fn show_level(app: &AppHandle, percent: Option<f64>) {
     }
     if let Some(tray) = app.tray_by_id(ID) {
         let _ = tray.set_icon(Some(level_icon(percent)));
+    }
+}
+
+/// Uses the provider's own mark for the icon when the user bundled one.
+pub fn use_brand(app: &AppHandle, provider: &str) {
+    let Some(icon) = crate::brand::svg(app, provider).and_then(|svg| crate::brand::icon(&svg, 32))
+    else {
+        return;
+    };
+    if let Some(tray) = app.tray_by_id(ID)
+        && tray.set_icon(Some(icon)).is_ok()
+    {
+        BRANDED.store(true, Ordering::Relaxed);
     }
 }
 
