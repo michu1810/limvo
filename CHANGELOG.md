@@ -6,12 +6,25 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-04
+
 ### Added
 
 - In-app updates: Limvo checks GitHub Releases twice a day and offers a newer
   version in the flyout. It installs only when you choose _Update_ and only if
   the update is signed with the release key. _Settings > Check for updates_
-  turns the check off.
+  turns the check off. _Later_ hides a version for three days; a newer one
+  shows at once.
+
+### Fixed
+
+- The taskbar reading no longer disappears after you open the hidden tray
+  icons or click the taskbar: it comes back on top of the taskbar at once,
+  below the tray overflow and menus.
+- The taskbar reading no longer blinks off during Alt+Tab, Task View and
+  window previews.
+- A minimised taskbar reading (for example after Win+D) returns within a
+  moment instead of up to half a second later.
 
 ## [0.1.1] - 2026-11-04
 
