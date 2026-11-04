@@ -41,6 +41,8 @@ export const es: LocaleDefinition = {
       "Tu sesión de {provider} ha caducado. Vuelve a iniciar sesión en la app de {provider}.",
     stateNoCredentials: "Inicia sesión en la app de {provider} para ver tus límites.",
     stateError: "No se pudieron leer tus límites.",
+    stateRateLimited:
+      "{provider} pidió a Limvo que consulte más despacio. Lo intentará de nuevo en unos minutos.",
     retry: "Reintentar",
     settings: "Ajustes",
     launchAtLogin: "Iniciar con Windows",

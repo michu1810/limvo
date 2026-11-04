@@ -40,6 +40,7 @@ export const he: LocaleDefinition = {
     stateAuthRequired: "פג תוקף ההתחברות ל-{provider}. יש להתחבר שוב באפליקציית {provider}.",
     stateNoCredentials: "יש להתחבר לאפליקציית {provider} כדי לראות את המגבלות.",
     stateError: "לא ניתן לקרוא את המגבלות.",
+    stateRateLimited: "{provider} ביקש מ-Limvo להאט. ניסיון נוסף בעוד כמה דקות.",
     retry: "ניסיון חוזר",
     settings: "הגדרות",
     launchAtLogin: "הפעלה עם Windows",

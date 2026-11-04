@@ -40,6 +40,8 @@ export const ptBR: LocaleDefinition = {
     stateAuthRequired: "Seu login no {provider} expirou. Entre novamente no app do {provider}.",
     stateNoCredentials: "Entre no app do {provider} para ver seus limites.",
     stateError: "Não foi possível ler seus limites.",
+    stateRateLimited:
+      "{provider} pediu ao Limvo para consultar mais devagar. Ele tenta de novo em alguns minutos.",
     retry: "Tentar novamente",
     settings: "Configurações",
     launchAtLogin: "Iniciar com o Windows",

@@ -41,6 +41,8 @@ export const ja: LocaleDefinition = {
       "{provider} のログインが期限切れです。{provider} アプリで再度ログインしてください。",
     stateNoCredentials: "上限を表示するには {provider} アプリにログインしてください。",
     stateError: "上限を読み込めませんでした。",
+    stateRateLimited:
+      "{provider} から問い合わせを減らすよう求められました。数分後にもう一度試します。",
     retry: "再試行",
     settings: "設定",
     launchAtLogin: "Windows と同時に起動",

@@ -25,6 +25,8 @@ const IDLE_INTERVAL: Duration = Duration::from_mins(5);
 const ACTIVE_WINDOW: Duration = Duration::from_mins(5);
 const SIGNED_OUT_INTERVAL: Duration = Duration::from_mins(2);
 const FIRST_RETRY: Duration = Duration::from_secs(30);
+/// A service that asked to slow down waits at least this long, longer each time.
+const FIRST_RATE_LIMIT: Duration = Duration::from_mins(2);
 const MAX_RETRY: Duration = Duration::from_mins(15);
 /// Requests to one provider closer together than this reuse the last answer.
 const MIN_GAP: Duration = Duration::from_secs(10);
@@ -133,6 +135,10 @@ struct Slot {
     due: Instant,
     failures: u32,
     last_fetch: Option<Instant>,
+    /// Set when the service asked to slow down: no refresh, opened flyout or
+    /// activity brings the next request before it. Waking it early would
+    /// only renew the limit, and the reading would never come back.
+    held_until: Option<Instant>,
 }
 
 pub fn start(
@@ -175,6 +181,7 @@ async fn run(app: AppHandle, providers: Vec<Box<dyn UsageProvider>>, handle: Pol
             due: start,
             failures: 0,
             last_fetch: None,
+            held_until: None,
         })
         .collect();
 
@@ -209,6 +216,8 @@ async fn run(app: AppHandle, providers: Vec<Box<dyn UsageProvider>>, handle: Pol
                 Err(error) => retry_delay(error, slot.failures),
             };
             slot.due = Instant::now() + wait;
+            slot.held_until =
+                matches!(outcome, Err(ProviderError::RateLimited { .. })).then_some(slot.due);
             store(&handle, index, outcome);
         }
         publish(&app, &handle);
@@ -216,10 +225,11 @@ async fn run(app: AppHandle, providers: Vec<Box<dyn UsageProvider>>, handle: Pol
         let next = slots.iter().map(|slot| slot.due).min().unwrap_or(now);
         let woken = wait_or_wake(&handle, next.saturating_duration_since(Instant::now())).await;
         if woken {
-            // A refresh, an opened flyout or new activity: everyone is due now.
+            // A refresh, an opened flyout or new activity: everyone is due
+            // now, except a service that asked to slow down.
             let now = Instant::now();
             for slot in &mut slots {
-                slot.due = now;
+                slot.due = woken_due(slot.held_until, now);
             }
         }
     }
@@ -268,6 +278,7 @@ fn replace_slots(
                 due: Instant::now(),
                 failures: 0,
                 last_fetch: None,
+                held_until: None,
             },
         });
     }
@@ -324,9 +335,11 @@ fn merge(
             let state = match &error {
                 ProviderError::NoCredentials => ReportState::NoCredentials,
                 ProviderError::AuthRequired => ReportState::AuthRequired,
-                ProviderError::Unreachable(_) | ProviderError::RateLimited { .. } => {
-                    ReportState::Offline
-                }
+                ProviderError::Unreachable(_) => ReportState::Offline,
+                // Not a connection problem: the last reading stands, and its
+                // age in the header tells how fresh it is.
+                ProviderError::RateLimited { .. } if previous.snapshot.is_some() => ReportState::Ok,
+                ProviderError::RateLimited { .. } => ReportState::RateLimited,
                 ProviderError::Unexpected(_) => ReportState::Error,
             };
             if !matches!(error, ProviderError::NoCredentials) {
@@ -348,11 +361,24 @@ fn retry_delay(error: &ProviderError, failures: u32) -> Duration {
     match error {
         // Signing in happens outside the app; check again soon, without hammering.
         ProviderError::NoCredentials | ProviderError::AuthRequired => SIGNED_OUT_INTERVAL,
-        ProviderError::RateLimited {
-            retry_after: Some(wait),
-        } => (*wait).clamp(FIRST_RETRY, MAX_RETRY),
+        ProviderError::RateLimited { retry_after } => retry_after
+            .unwrap_or_else(|| rate_limit_backoff(failures))
+            .clamp(FIRST_RATE_LIMIT, MAX_RETRY),
         _ => backoff(failures),
     }
+}
+
+/// 2 min, 4 min, 8 min, then 15 min.
+fn rate_limit_backoff(failures: u32) -> Duration {
+    let exponent = failures.saturating_sub(1).min(8);
+    FIRST_RATE_LIMIT
+        .saturating_mul(1 << exponent)
+        .min(MAX_RETRY)
+}
+
+/// When a woken slot is due: now, or when its rate limit ends.
+fn woken_due(held_until: Option<Instant>, now: Instant) -> Instant {
+    held_until.map_or(now, |until| until.max(now))
 }
 
 /// 30 s, 60 s, 2 min, 4 min ... capped at 15 min.
@@ -481,7 +507,46 @@ mod tests {
         let limited = ProviderError::RateLimited {
             retry_after: Some(Duration::from_secs(3)),
         };
-        assert_eq!(retry_delay(&limited, 1), FIRST_RETRY);
+        assert_eq!(retry_delay(&limited, 1), FIRST_RATE_LIMIT);
+        let long = ProviderError::RateLimited {
+            retry_after: Some(Duration::from_hours(2)),
+        };
+        assert_eq!(retry_delay(&long, 1), MAX_RETRY);
+    }
+
+    #[test]
+    fn a_rate_limit_without_retry_after_waits_longer_each_time() {
+        let limited = ProviderError::RateLimited { retry_after: None };
+        assert_eq!(retry_delay(&limited, 1), Duration::from_mins(2));
+        assert_eq!(retry_delay(&limited, 2), Duration::from_mins(4));
+        assert_eq!(retry_delay(&limited, 9), MAX_RETRY);
+    }
+
+    #[test]
+    fn waking_never_cuts_a_rate_limit_short() {
+        let now = Instant::now();
+        let later = now + Duration::from_mins(3);
+        assert_eq!(woken_due(None, now), now);
+        assert_eq!(woken_due(Some(later), now), later);
+        // A limit that has run out no longer holds anything back.
+        assert_eq!(woken_due(now.checked_sub(Duration::from_secs(1)), now), now);
+    }
+
+    #[test]
+    fn a_rate_limit_keeps_the_last_reading_on_screen() {
+        let good = merge(
+            &ProviderReport::loading("claude", "claude", "Claude"),
+            Ok(snapshot()),
+        );
+        let limited = merge(&good, Err(ProviderError::RateLimited { retry_after: None }));
+        assert_eq!(limited.state, ReportState::Ok);
+        assert_eq!(limited.snapshot, good.snapshot);
+
+        let first = merge(
+            &ProviderReport::loading("claude", "claude", "Claude"),
+            Err(ProviderError::RateLimited { retry_after: None }),
+        );
+        assert_eq!(first.state, ReportState::RateLimited);
     }
 
     struct Fake(&'static str, &'static str);
@@ -526,12 +591,14 @@ mod tests {
                 due: later,
                 failures: 2,
                 last_fetch: None,
+                held_until: None,
             },
             Slot {
                 provider: fake("claude~2", "Claude · Old"),
                 due: later,
                 failures: 0,
                 last_fetch: None,
+                held_until: None,
             },
         ];
 
@@ -579,12 +646,14 @@ mod tests {
                 due: now,
                 failures: 0,
                 last_fetch: None,
+                held_until: None,
             },
             Slot {
                 provider: fake("codex~2", "Codex · Work"),
                 due: now,
                 failures: 0,
                 last_fetch: None,
+                held_until: None,
             },
         ];
         let slots = replace_slots(&handle, old, vec![fake("claude", "Claude")]);
