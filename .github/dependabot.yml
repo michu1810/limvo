@@ -15,6 +15,11 @@ updates:
     groups:
       npm:
         patterns: ["*"]
+    # The types follow the Node version the project builds with (22, see
+    # package.json engines and CI); newer majors describe APIs it lacks.
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: cargo
     directory: /src-tauri
