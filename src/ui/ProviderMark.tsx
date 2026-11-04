@@ -1,12 +1,14 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 
 /** `?nobrand` forces the Limvo mark, for screenshots that must not show third-party logos. */
 const BRANDS_OFF = new URLSearchParams(window.location.search).has("nobrand");
 
 /**
  * The provider's own mark if the user supplied one in `public/brand/<id>.svg`,
- * otherwise the Limvo mark. Brand files are not shipped with the project:
- * they belong to their owners, so each user adds the official asset locally.
+ * otherwise the Limvo mark. A logo drawn in dark ink can come with a light
+ * variant, `<id>-dark.svg`, used on dark surfaces. Brand files are not shipped
+ * with the project: they belong to their owners, so each user adds the
+ * official asset locally.
  */
 export function ProviderMark({
   providerId,
@@ -18,20 +20,52 @@ export function ProviderMark({
   /** Usage in percent; the Limvo mark shows it. */
   level?: number | null;
 }) {
-  const [missing, setMissing] = useState(false);
+  const dark = useDarkSurface();
+  // Which files turned out to be missing: the dark variant, then the mark itself.
+  const [missing, setMissing] = useState({ dark: false, base: false });
 
-  if (missing || BRANDS_OFF) return <LimvoMark size={size} level={level} />;
+  if (missing.base || BRANDS_OFF) return <LimvoMark size={size} level={level} />;
+  const useDark = dark && !missing.dark;
   return (
     <img
+      key={useDark ? "dark" : "base"}
       className="mark"
-      src={`/brand/${providerId}.svg`}
+      src={`/brand/${providerId}${useDark ? "-dark" : ""}.svg`}
       width={size}
       height={size}
       alt=""
       draggable={false}
-      onError={() => setMissing(true)}
+      onError={() => setMissing((previous) => ({ ...previous, [useDark ? "dark" : "base"]: true }))}
     />
   );
+}
+
+/**
+ * Whether the window is drawn dark: the theme the host forced on the root
+ * (the strip follows the taskbar), otherwise the system scheme.
+ */
+function useDarkSurface(): boolean {
+  const [dark, setDark] = useState(readDark);
+
+  useEffect(() => {
+    const update = () => setDark(readDark());
+    const query = window.matchMedia("(prefers-color-scheme: dark)");
+    query.addEventListener("change", update);
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributeFilter: ["data-theme"] });
+    return () => {
+      query.removeEventListener("change", update);
+      observer.disconnect();
+    };
+  }, []);
+
+  return dark;
+}
+
+function readDark(): boolean {
+  const forced = document.documentElement.dataset.theme;
+  if (forced === "dark" || forced === "light") return forced === "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
 /**

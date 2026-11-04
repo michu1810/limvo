@@ -72,7 +72,7 @@ service gets its own tab, and the taskbar can show several limits side by side.
 - **The whole picture in one flyout.** Weekly limit, time to reset, the split
   between Claude Code, chats and Cowork, and model-specific caps such as
   _Fable · weekly_.
-- **Live without polling all day.** While you work in Claude Code the reading
+- **Live without polling all day.** While you work in Claude Code or Codex the reading
   updates about once a minute; when you are idle it slows down to every five
   minutes. Fixed intervals are one click away.
 - **Windows notifications** at 80% and 95%, when a limit is reached and when a
@@ -129,12 +129,12 @@ afterwards.
 
 ## Using Limvo
 
-| Where           | What it does                                                                                                                                                       |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Taskbar reading | Click to open or close the flyout.                                                                                                                                 |
-| Tray icon       | Left click opens the flyout; right click offers _Refresh_ and _Quit_.                                                                                              |
-| Flyout          | Shows the limits. _Open usage page_ goes to claude.ai, _Refresh_ reads now, the language code switches language, the sliders icon opens settings. `Esc` closes it. |
-| Desktop card    | Drag it to move it; double click opens the flyout.                                                                                                                 |
+| Where           | What it does                                                                                                                                                                           |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Taskbar reading | Click to open or close the flyout.                                                                                                                                                     |
+| Tray icon       | Left click opens the flyout; right click offers _Refresh_ and _Quit_.                                                                                                                  |
+| Flyout          | Shows the limits. _Open usage page_ goes to the open service's usage page, _Refresh_ reads now, the language code switches language, the sliders icon opens settings. `Esc` closes it. |
+| Desktop card    | Drag it to move it; double click opens the flyout.                                                                                                                                     |
 
 ### Settings
 
@@ -148,7 +148,7 @@ afterwards.
 | Notifications      | On       | 80%, 95%, limit reached, and the reset after a week above 80%. Each one is shown once per window. |
 | Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.          |
 | Plan colours       | On       | Tints the widget with the colour of your plan.                                                    |
-| Update frequency   | Adaptive | Adaptive follows Claude Code activity. 2, 5 or 15 minutes are fixed schedules.                    |
+| Update frequency   | Adaptive | Adaptive follows Claude Code and Codex activity. 2, 5 or 15 minutes are fixed schedules.          |
 
 ## How it works
 
@@ -178,8 +178,8 @@ reported as _sign in again_ instead of being renewed behind your back, because
 refreshing would sign Claude Code out.
 
 **Adaptive updates.** The usage endpoint cannot push changes, so Limvo
-watches the folder where Claude Code writes its transcripts
-(`~/.claude/projects`). It only notices that files changed; it never opens
+watches the folders where Claude Code and Codex write their transcripts
+(`~/.claude/projects`, `~/.codex/sessions`). It only notices that files changed; it never opens
 them. A change means you are working, so the next reading comes within a
 minute. Manual refreshes closer than ten seconds apart reuse the last answer,
 and rate limits from the server are honoured.
@@ -267,10 +267,18 @@ Open `/strip.html` and `/card.html` for the other windows.
 
 ### Your own brand mark
 
-Limvo ships with its own mark. To see a provider's official logo in the
-app, put the SVG from the provider's brand or press page at
-`public/brand/<provider>.svg` (for example `claude.svg`) and rebuild. Brand
+Limvo ships with its own mark. To see a service's official logo in the app,
+put the SVG from the owner's brand or press page at `public/brand/<id>.svg`
+and rebuild. A logo drawn in dark ink can come with a light variant,
+`<id>-dark.svg`, which Limvo uses on dark surfaces (Cursor ships both). Brand
 files are ignored by git; please do not commit them to a public fork.
+
+| File                            | Logo        | Official source                                                                |
+| ------------------------------- | ----------- | ------------------------------------------------------------------------------ |
+| `claude.svg`                    | Claude      | [anthropic.com/press-kit](https://www.anthropic.com/press-kit)                 |
+| `codex.svg`, `codex-dark.svg`   | OpenAI      | [openai.com/brand](https://openai.com/brand/), after accepting its brand terms |
+| `cursor.svg`, `cursor-dark.svg` | Cursor cube | [cursor.com/brand](https://cursor.com/brand), _Download brand assets_          |
+| `antigravity.svg`               | Antigravity | [antigravity.google/press](https://antigravity.google/press), full-colour icon |
 
 ## Project layout
 

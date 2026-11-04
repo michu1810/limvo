@@ -27,4 +27,5 @@ reproduce. You can expect a first answer within a week.
 - The interface has no direct access to the file system, the network or the
   credentials. It can only call the commands in `src-tauri/src/commands.rs`,
   under a strict content security policy.
-- The only network destination is the provider's API over HTTPS.
+- The only network destinations are the usage APIs of the signed-in services
+  (`api.anthropic.com`, `chatgpt.com`), over HTTPS, each with its own token.

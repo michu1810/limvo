@@ -6,33 +6,38 @@ the system, and a React interface that only draws what the core reports.
 ```
           ┌──────────────── Rust core (src-tauri/src) ────────────────┐
           │                                                            │
- sign-in ─┤ providers/claude   credentials, API call, mapping          │
- files    │        │                                                   │
-          │        ▼                                                   │
- ~/.claude│ activity.rs ──nudge──▶ poller.rs ── ProviderReport ──┐     │
- projects │ (file events)         schedule, back-off, last good  │     │
+ sign-in ─┤ providers/claude   providers/codex   (one per service)    │
+ files    │        │                  │                                │
+          │        ▼                  ▼                                │
+ ~/.claude│ activity.rs ──nudge──▶ poller.rs ── Vec<ProviderReport> ─┐ │
+ ~/.codex │ (file events)     one slot per service: schedule,      │ │
+          │                   back-off, last good snapshot         │ │
           │                                                      │     │
-          │ settings.rs  tray.rs  flyout.rs  card.rs  taskbar.rs │     │
-          └──────────────────────────────────────────────────────┼─────┘
+          │ settings.rs  tray.rs  flyout.rs  card.rs  taskbar.rs   │ │
+          └────────────────────────────────────────────────────────┼─┘
                                                      events      │
                          ┌───────────────────────────────────────┘
                          ▼
           ┌──────────── Interface (src) ──────────────┐
           │ flyout window   strip window   card window │
-          │ core/ pace, alerts     i18n/ 11 languages  │
+          │ core/ pace, alerts, pins  i18n/ 11 langs   │
           └────────────────────────────────────────────┘
 ```
 
 ## The data model
 
 `UsageSnapshot` (`src/core/snapshot.ts`, mirrored in
-`src-tauri/src/snapshot.rs`) is provider-neutral:
+`src-tauri/src/snapshot.rs`) is provider-neutral, so Claude and Codex share
+every screen:
 
 - `headline`: the window that matters most, drawn large.
 - `windows`: every other limit, such as a model cap or the five-hour session.
 - `breakdown`: how the headline window splits across products.
+- `plan`: the plan badge (`max_20x`, `chatgpt_plus`, ...), which also picks the
+  plan colour in `tokens.css`.
+- `extraUsage`: paid credits spent this period, when the service reports them.
 
-`ProviderReport` wraps it with a state (`ok`, `offline`, `auth_required`,
+`ProviderReport` wraps it with the provider's id and name and a state (`ok`, `offline`, `auth_required`,
 `no_credentials`, `error`, `loading`). On failure the last good snapshot is
 kept, so the interface can show it as stale instead of going blank.
 
@@ -40,18 +45,35 @@ Both sides are tested against `fixtures/report.sample.json`: the Rust test
 round-trips it through serde, the TypeScript test checks that the field sets
 match exactly. Renaming a field on one side fails a test.
 
+## Services
+
+Each service implements the `UsageProvider` trait in
+`src-tauri/src/providers` (see [CONTRIBUTING](../CONTRIBUTING.md#add-a-service))
+and is listed in `providers::all()`. The host always reports every provider;
+the interface hides the ones without a sign-in (`core/pins.ts`,
+`visibleReports`), so signing in to a service makes its tab appear without a
+restart.
+
+| Service | Sign-in it reads                                               | Endpoint                             | Activity folder      |
+| ------- | -------------------------------------------------------------- | ------------------------------------ | -------------------- |
+| Claude  | Claude desktop app (DPAPI), then `~/.claude/.credentials.json` | `api.anthropic.com/api/oauth/usage`  | `~/.claude/projects` |
+| Codex   | `~/.codex/auth.json` (ChatGPT sign-in)                         | `chatgpt.com/backend-api/wham/usage` | `~/.codex/sessions`  |
+
 ## Refreshing
 
-One task in `poller.rs` owns all network access, so there is never more than
-one request in flight. Everything else only wakes it:
+One task in `poller.rs` owns all network access and fetches the services one
+after another, so there is never more than one request in flight. Each service
+has its own slot with its own due time, failure count and last good snapshot,
+so one service failing never delays or blanks another. Everything else only
+wakes the task:
 
-| Trigger                         | Effect                                                                  |
-| ------------------------------- | ----------------------------------------------------------------------- |
-| Timer                           | Adaptive: 1 minute while active, 5 minutes idle. Or 2, 5 or 15 minutes. |
-| Claude Code writes a transcript | Wakes the poller if the last reading is older than a minute.            |
-| Flyout opens, _Refresh_         | Wakes the poller; within 10 seconds of the last reading it reuses it.   |
-| Failure                         | Back-off from 30 seconds to 15 minutes; `Retry-After` is honoured.      |
-| Signed out                      | Checks again every 2 minutes, since signing in happens elsewhere.       |
+| Trigger                        | Effect                                                                  |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| Timer                          | Adaptive: 1 minute while active, 5 minutes idle. Or 2, 5 or 15 minutes. |
+| A service's tool writes a file | Wakes the poller if the last reading is older than a minute.            |
+| Flyout opens, _Refresh_        | Wakes the poller; within 10 seconds of the last reading it reuses it.   |
+| Failure                        | Back-off from 30 seconds to 15 minutes; `Retry-After` is honoured.      |
+| Signed out                     | Checks again every 2 minutes, since signing in happens elsewhere.       |
 
 ## Windows
 
@@ -76,19 +98,30 @@ started by a `flyout-shown` event from the core rather than by React mounting.
 
 ## Interface
 
-- `src/core` is pure TypeScript with no React: pace projection and alert
-  rules, unit tested.
+- `src/core` is pure TypeScript with no React: pace projection, alert rules,
+  the week history and taskbar pins, unit tested.
+- The flyout shows one tab per visible service (`ui/flyout/ProviderTabs.tsx`)
+  and remembers the chosen tab. Plan colours are set per element with
+  `data-plan`, so every tab, pin and taskbar reading wears its own service's
+  colour.
+- **Pins** are stored in the settings as `<provider>:<window>` keys, at most
+  six, in the order they were turned on. `null` means each service's main
+  limit. Pins of a signed-out service are skipped, and when none is left the
+  taskbar falls back to the main limits instead of going empty.
 - `src/i18n` holds the message catalogues. Only words are translated; numbers,
   dates and durations come from `Intl` for the active locale.
 - `src/bridge` is the only place that talks to the host. `tauri.ts` calls the
   core; `browser.ts` serves scenarios so the interface runs in a plain browser.
 - The tray icon and its menu are drawn by the core, which has no translations,
   so the flyout window (alive for the whole session) sends the translated texts
-  down whenever the language or the reading changes.
+  down whenever the language or the reading changes. The tooltip lists the
+  pinned limits, cut by whole lines to the 127 characters Windows allows.
+- Provider marks come from `public/brand/<id>.svg` (and `<id>-dark.svg` for
+  dark surfaces) on the user's machine; without them the Limvo mark is drawn.
 
 ## Notifications
 
 The flyout window evaluates each new report with `core/alerts.ts`. What has
-been announced for each window is remembered in `localStorage`, keyed by window
-id and reset time, so a restart never repeats a notification and turning
+been announced for each window is remembered in `localStorage`, keyed by
+`<provider>:<window>` and reset time, so a restart never repeats a notification and turning
 notifications back on never replays old news.
