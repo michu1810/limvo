@@ -16,7 +16,9 @@ export function UpdateBanner({ now }: { now: Date }) {
   if (!update || !showUpdateBanner(update.version, dismissal, now.getTime())) return null;
 
   const later = () => {
-    const next = { version: update.version, at: Date.now() };
+    // The flyout's clock, not Date.now(): it ticks less often, and a later
+    // stamp would look like a clock set back and keep the banner up.
+    const next = { version: update.version, at: now.getTime() };
     setDismissal(next);
     saveDismissal(next);
   };
