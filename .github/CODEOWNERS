@@ -1,0 +1,17 @@
+# Changes to these paths need the maintainer's review before they can be
+# merged. They decide what runs in CI and releases, what the interface may call,
+# and where credentials are read and sent.
+
+*                                   @michu1810
+
+/.github/                           @michu1810
+/src-tauri/tauri.conf.json          @michu1810
+/src-tauri/capabilities/            @michu1810
+/src-tauri/Cargo.toml               @michu1810
+/src-tauri/Cargo.lock               @michu1810
+/src-tauri/src/commands.rs          @michu1810
+/src-tauri/src/providers/           @michu1810
+/package.json                       @michu1810
+/package-lock.json                  @michu1810
+/SECURITY.md                        @michu1810
+/docs/CODE-SIGNING.md               @michu1810

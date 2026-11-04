@@ -26,7 +26,10 @@ certificate by [SignPath Foundation](https://signpath.org).
 2. After approval, in SignPath: create the project, a signing policy (for
    example `release-signing`) and connect the GitHub repository as a trusted
    build system.
-3. In GitHub, _Settings > Secrets and variables > Actions_:
+3. In GitHub, _Settings > Environments > release_ (not the repository-wide
+   secrets: the `release` environment only serves runs from `v*` tags and
+   waits for a maintainer's approval, so no branch or pull request can read
+   these):
    - secret `SIGNPATH_API_TOKEN`: an API token of a SignPath CI user that may
      submit to the project;
    - variables `SIGNPATH_ORGANIZATION_ID`, `SIGNPATH_PROJECT_SLUG` and

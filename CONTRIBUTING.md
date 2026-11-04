@@ -26,7 +26,9 @@ cargo clippy --all-targets -- -D warnings
 cargo test
 ```
 
-CI runs the same commands on Windows. A pull request should:
+CI runs the same commands on Windows. Work happens on `develop`: branch off
+it and open your pull request against it. `main` only receives `develop` when
+a release is ready, and releases are tagged from `main`. A pull request should:
 
 - Change one thing, with a description of what and why.
 - Keep the interface free of system access: credentials, network, files and
