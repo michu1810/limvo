@@ -47,4 +47,10 @@ describe("pinnedLimits", () => {
       pinnedLimits(claudeOnly, ["codex:session", "claude:weekly_all"]).map((l) => l.key),
     ).toEqual(["claude:weekly_all"]);
   });
+
+  it("falls back to the main limits when every pin is away", () => {
+    expect(pinnedLimits(claudeOnly, ["codex:session"]).map((l) => l.key)).toEqual([
+      "claude:weekly_all",
+    ]);
+  });
 });

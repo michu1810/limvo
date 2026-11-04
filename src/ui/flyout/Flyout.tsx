@@ -223,7 +223,7 @@ function useTrayTexts(reports: ProviderReport[], settings: Settings | null, now:
         : format.percent(window.percent);
     return `${report.providerName}: ${reading}`;
   });
-  const tooltip = lines.length > 0 ? ["Limvo", ...lines].join("\n") : "Limvo";
+  const tooltip = fitTooltip(["Limvo", ...lines]);
   const refresh = t("refresh");
   const quit = t("quit");
 
@@ -231,6 +231,17 @@ function useTrayTexts(reports: ProviderReport[], settings: Settings | null, now:
   useEffect(() => {
     bridge.localizeTray({ tooltip, refresh, quit });
   }, [tooltip, refresh, quit, locale]);
+}
+
+/** Windows cuts tray tooltips at 127 characters; drop whole lines instead of ending mid-word. */
+function fitTooltip(lines: readonly string[], limit = 127): string {
+  let text = "";
+  for (const line of lines) {
+    const next = text ? `${text}\n${line}` : line;
+    if (next.length > limit) break;
+    text = next;
+  }
+  return text;
 }
 
 function readTab(): string {

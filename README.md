@@ -111,8 +111,9 @@ service gets its own tab, and the taskbar can show several limits side by side.
 </p>
 
 > **"Windows protected your PC"**
-> Until releases are code-signed, Microsoft SmartScreen shows this warning for
-> new downloads. Choose **More info**, check that the publisher and file name
+> Free signing through SignPath Foundation is being set up (see
+> [docs/CODE-SIGNING.md](docs/CODE-SIGNING.md)). Until releases are
+> code-signed, Microsoft SmartScreen shows this warning for new downloads. Choose **More info**, check that the publisher and file name
 > match the release, then **Run anyway**. You can verify the download with the
 > SHA-256 checksum published next to each release.
 
@@ -142,7 +143,7 @@ afterwards.
 | Language           | System   | Any of the eleven languages, or follow Windows.                                                   |
 | Start with Windows | Off      | Adds Limvo to your user's startup apps.                                                           |
 | Show in taskbar    | On       | Turn off to keep only the tray icon.                                                              |
-| Limits in taskbar  | Main     | With more than one limit available: pick up to six, in the order you turn them on.               |
+| Limits in taskbar  | Main     | With more than one limit available: pick up to six, in the order you turn them on.                |
 | Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                               |
 | Notifications      | On       | 80%, 95%, limit reached, and the reset after a week above 80%. Each one is shown once per window. |
 | Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.          |

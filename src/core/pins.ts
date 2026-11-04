@@ -49,6 +49,9 @@ export function pinnedLimits(
   pinned: readonly string[] | null,
 ): Limit[] {
   const limits = availableLimits(reports);
-  if (pinned === null) return limits.filter((limit) => limit.headline);
-  return pinned.flatMap((key) => limits.filter((limit) => limit.key === key));
+  const defaults = limits.filter((limit) => limit.headline);
+  if (pinned === null) return defaults;
+  const chosen = pinned.flatMap((key) => limits.filter((limit) => limit.key === key));
+  // Every pin is away (say, only Codex pinned and Codex signed out): show the defaults, never an empty plate.
+  return chosen.length > 0 ? chosen : defaults;
 }
