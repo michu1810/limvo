@@ -119,6 +119,12 @@ export function SettingsPanel({
           checked={settings?.planColors ?? true}
           onChange={(planColors) => update({ planColors })}
         />
+        <SwitchRow
+          label={t("checkUpdates")}
+          hint={t("checkUpdatesHint")}
+          checked={settings?.checkUpdates ?? true}
+          onChange={(checkUpdates) => update({ checkUpdates })}
+        />
 
         <div className="setting setting--stacked">
           <span className="setting__text">

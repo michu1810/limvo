@@ -13,6 +13,7 @@ use crate::flyout;
 use crate::settings::{Settings, SettingsPatch};
 use crate::snapshot::ProviderReport;
 use crate::system::{self, HostInfo};
+use crate::updater::{self, AvailableUpdate};
 use crate::{AppState, card, events, tray};
 
 /// One report per provider, in the order the interface lists them.
@@ -171,6 +172,19 @@ pub fn localize_tray(
     quit: String,
 ) {
     tray::localize(&app, &state.tray, &tooltip, &refresh, &quit);
+}
+
+/// The newer version found by the last check, if any.
+#[tauri::command]
+pub fn get_update(app: AppHandle) -> Option<AvailableUpdate> {
+    updater::available(&app)
+}
+
+/// Installs the update that was found. Only the one from the verified feed
+/// can be installed: the interface names no version, URL or file.
+#[tauri::command]
+pub async fn install_update(app: AppHandle) -> Result<(), String> {
+    updater::install(&app).await
 }
 
 #[tauri::command]

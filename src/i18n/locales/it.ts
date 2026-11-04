@@ -70,5 +70,12 @@ export const it: LocaleDefinition = {
     services: "Servizi",
     taskbarPins: "Limiti nella barra delle applicazioni",
     taskbarPinsHint: "Fino a {count} limiti, nell'ordine in cui li attivi",
+    checkUpdates: "Cerca aggiornamenti",
+    checkUpdatesHint: "Cerca una nuova versione su GitHub due volte al giorno",
+    updateAvailable: "Limvo {version} è disponibile",
+    updateInstall: "Aggiorna",
+    updateLater: "Più tardi",
+    updateInstalling: "Aggiornamento in corso",
+    updateFailed: "Aggiornamento non riuscito. Riprova più tardi.",
   },
 };

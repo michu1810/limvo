@@ -70,5 +70,12 @@ export const zhCN: LocaleDefinition = {
     services: "服务",
     taskbarPins: "任务栏中的限额",
     taskbarPinsHint: "最多 {count} 项，按开启顺序显示",
+    checkUpdates: "检查更新",
+    checkUpdatesHint: "每天两次在 GitHub 上查找新版本",
+    updateAvailable: "Limvo {version} 已推出",
+    updateInstall: "更新",
+    updateLater: "稍后",
+    updateInstalling: "正在更新",
+    updateFailed: "更新失败，请稍后再试。",
   },
 };

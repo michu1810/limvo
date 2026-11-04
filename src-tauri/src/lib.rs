@@ -20,6 +20,7 @@ mod system;
 #[cfg(windows)]
 mod taskbar;
 mod tray;
+mod updater;
 
 use std::sync::Mutex;
 
@@ -58,6 +59,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(hotkey::plugin())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
@@ -78,6 +80,8 @@ pub fn run() {
             commands::shortcut_label,
             commands::hide_flyout,
             commands::localize_tray,
+            commands::get_update,
+            commands::install_update,
             commands::quit,
         ])
         .setup(|app| {
@@ -113,6 +117,7 @@ pub fn run() {
             taskbar::start(app.handle().clone());
             card::set_visible(app.handle(), desktop_card, card_position);
             hotkey::apply(app.handle(), shortcut);
+            updater::start(app.handle().clone());
             Ok(())
         })
         .on_window_event(|window, event| {

@@ -42,12 +42,17 @@ jobs:
         uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # The updater key. Its signature is redone below over the final,
+          # Authenticode-signed installer, so the feed is written there too.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: Limvo ${{ github.ref_name }}
           releaseBody: See CHANGELOG.md for what changed in this version.
           releaseDraft: true
           prerelease: false
+          includeUpdaterJson: false
 
       # Code signing through SignPath Foundation. Skipped until the repository
       # variables in docs/CODE-SIGNING.md are set, so forks build unsigned.
@@ -83,6 +88,40 @@ jobs:
             if ($signature.Status -ne "Valid") { throw "$($installer.Name) is not signed: $($signature.Status)" }
             gh release upload "${{ github.ref_name }}" $installer.FullName --clobber
           }
+
+      # Installed copies check latest.json of the newest published release and
+      # verify the installer against the public key in tauri.conf.json. The
+      # signature must cover the exact file people download, so it is made
+      # here, after Authenticode signing changed the installer's bytes.
+      - name: Sign the update and publish the feed
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          if ("v$version" -ne $env:TAG) { throw "tag $env:TAG does not match version $version" }
+          $installer = @(Get-ChildItem src-tauri/target/release/bundle/nsis/*-setup.exe)
+          if ($installer.Count -ne 1) { throw "expected one installer, found $($installer.Count)" }
+          $installer = $installer[0]
+          Remove-Item "$($installer.FullName).sig" -ErrorAction SilentlyContinue
+          npx tauri signer sign $installer.FullName
+          if ($LASTEXITCODE -ne 0) { throw "signing the update failed" }
+          $feed = [ordered]@{
+            version   = $env:TAG.TrimStart("v")
+            notes     = "See CHANGELOG.md for what changed in this version."
+            pub_date  = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+            platforms = [ordered]@{
+              "windows-x86_64" = [ordered]@{
+                signature = (Get-Content "$($installer.FullName).sig" -Raw).Trim()
+                url       = "https://github.com/${{ github.repository }}/releases/download/$env:TAG/$($installer.Name)"
+              }
+            }
+          }
+          $feed | ConvertTo-Json -Depth 4 | Set-Content -Path latest.json -Encoding utf8NoBOM
+          gh release upload $env:TAG "$($installer.FullName).sig" latest.json --clobber
 
       - name: Publish checksums
         shell: pwsh

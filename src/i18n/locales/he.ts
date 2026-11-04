@@ -70,5 +70,12 @@ export const he: LocaleDefinition = {
     services: "שירותים",
     taskbarPins: "מגבלות בשורת המשימות",
     taskbarPinsHint: "עד {count} מגבלות, לפי סדר ההפעלה",
+    checkUpdates: "חיפוש עדכונים",
+    checkUpdatesHint: "מחפש גרסה חדשה ב-GitHub פעמיים ביום",
+    updateAvailable: "Limvo {version} זמין",
+    updateInstall: "עדכון",
+    updateLater: "אחר כך",
+    updateInstalling: "מעדכן",
+    updateFailed: "העדכון נכשל. נסו שוב מאוחר יותר.",
   },
 };

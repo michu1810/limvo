@@ -6,6 +6,13 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- In-app updates: Limvo checks GitHub Releases twice a day and offers a newer
+  version in the flyout. It installs only when you choose _Update_ and only if
+  the update is signed with the release key. _Settings > Check for updates_
+  turns the check off.
+
 ## [0.1.1] - 2026-11-04
 
 ### Fixed

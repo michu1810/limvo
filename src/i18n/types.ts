@@ -96,6 +96,15 @@ export interface Messages {
   services: string;
   taskbarPins: string;
   taskbarPinsHint: string;
+
+  checkUpdates: string;
+  checkUpdatesHint: string;
+  /** Placeholder `{version}`, for example "0.2.0". */
+  updateAvailable: string;
+  updateInstall: string;
+  updateLater: string;
+  updateInstalling: string;
+  updateFailed: string;
 }
 
 export interface LocaleDefinition {

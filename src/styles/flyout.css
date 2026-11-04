@@ -571,6 +571,15 @@ html:has(.flyout:not(.card)) {
   color: var(--text);
 }
 
+.action--accent {
+  color: var(--accent);
+}
+
+/* Two buttons sit closer together than a single retry does. */
+.notice--update {
+  gap: 4px;
+}
+
 /* Service tabs ------------------------------------------------------------------- */
 
 /* Equal tabs on a quiet track; the lit plate glides to the chosen one. */

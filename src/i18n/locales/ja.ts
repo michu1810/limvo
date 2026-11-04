@@ -71,5 +71,12 @@ export const ja: LocaleDefinition = {
     services: "サービス",
     taskbarPins: "タスクバーに出す制限",
     taskbarPinsHint: "最大 {count} 件、オンにした順に表示",
+    checkUpdates: "アップデートを確認",
+    checkUpdatesHint: "1日2回、GitHub で新しいバージョンを探します",
+    updateAvailable: "Limvo {version} が利用できます",
+    updateInstall: "アップデート",
+    updateLater: "後で",
+    updateInstalling: "アップデート中",
+    updateFailed: "アップデートできませんでした。後でもう一度お試しください。",
   },
 };

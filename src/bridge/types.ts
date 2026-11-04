@@ -18,6 +18,8 @@ export interface Settings {
   planColors: boolean;
   /** Limits in the taskbar as `<provider>:<window>`; `null` shows each provider's main limit. */
   pinned: string[] | null;
+  /** Look for a newer Limvo on GitHub Releases now and then. */
+  checkUpdates: boolean;
 }
 
 /** Only the fields named in a patch change; the host keeps everything else. */
@@ -36,6 +38,12 @@ export interface TrayTexts {
   tooltip: string;
   refresh: string;
   quit: string;
+}
+
+/** Mirrors `AvailableUpdate` in `src-tauri/src/updater.rs`. */
+export interface AvailableUpdate {
+  version: string;
+  currentVersion: string;
 }
 
 export interface Toast {
@@ -73,6 +81,12 @@ export interface Bridge {
   notify(toast: Toast): Promise<void>;
   /** Fires each time the flyout is brought on screen, so it can play its entrance. */
   onFlyoutShown(listener: () => void): Promise<Unsubscribe>;
+
+  /** The newer version found by the host's last check, or `null`. */
+  getUpdate(): Promise<AvailableUpdate | null>;
+  onUpdate(listener: (update: AvailableUpdate) => void): Promise<Unsubscribe>;
+  /** Downloads and runs the verified installer; Limvo restarts as the new version. */
+  installUpdate(): Promise<void>;
 
   openUsagePage(providerId: string): Promise<void>;
   /** Tells the host how tall the flyout content is, so the window can fit it. */
