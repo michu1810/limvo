@@ -79,8 +79,8 @@ neutral `UsageSnapshot` the interface already knows how to draw.
 2. Map errors to `ProviderError`. The poller turns them into the states the
    flyout explains: no credentials, sign in again, offline, rate limited.
 3. Keep the mapping a pure function and test it against a fixture of a real,
-   anonymised response, as `providers/claude/api.rs` and
-   `providers/codex.rs` do.
+   anonymised response, as `providers/claude/api.rs`, `providers/codex.rs`,
+   `providers/cursor.rs` and `providers/antigravity.rs` do.
 4. Add it to `providers::all()`. The flyout gets a tab for it as soon as it
    reports a sign-in, and its limits show up in the taskbar pins.
 5. Optional: give its plans a colour in `src/styles/tokens.css`

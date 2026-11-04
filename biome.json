@@ -2,7 +2,13 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
-    "includes": ["**", "!**/src-tauri/target", "!**/dist", "!**/src-tauri/gen"]
+    "includes": [
+      "**",
+      "!**/src-tauri/target",
+      "!**/dist",
+      "!**/src-tauri/gen",
+      "!**/public/brand/*.svg"
+    ]
   },
   "formatter": {
     "enabled": true,

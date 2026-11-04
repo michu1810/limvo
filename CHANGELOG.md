@@ -6,22 +6,25 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-04
+
 ### Added
 
-- Codex (ChatGPT plans) as a second service, read from the Codex CLI sign-in.
-- Service tabs in the flyout, each with its mark, reading and plan colour.
+- Four services: Claude, Codex (ChatGPT plans), Cursor and Google Antigravity,
+  each with its logo, plan badge and colour, in tabs in the flyout.
+- Cursor's monthly included usage, split into Auto and API.
+- Antigravity's weekly quota per agent model.
 - Taskbar pins: choose up to six limits across services; several limits sit
   side by side in the taskbar.
 - Notifications, the week chart and the tray tooltip cover every service.
-
-## [0.1.0] - 2026-11-03
-
-### Added
-
+- A taskbar reading on every monitor, with the flyout opening above the one
+  that was clicked.
+- Long views scroll inside the flyout, which never grows past the screen.
 - Taskbar reading next to the notification area, following the taskbar theme.
 - Flyout with the weekly limit, time to reset, pace and projection, the split
   by product and model-specific caps.
-- Adaptive refresh that follows Claude Code activity, plus fixed schedules.
+- Adaptive refresh that follows activity in each service's tools, plus fixed
+  schedules.
 - Windows notifications at 80%, 95%, when a limit is reached and when a busy
   week resets.
 - Desktop card that stays below other windows and remembers its position.

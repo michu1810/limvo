@@ -6,7 +6,7 @@ the system, and a React interface that only draws what the core reports.
 ```
           ┌──────────────── Rust core (src-tauri/src) ────────────────┐
           │                                                            │
- sign-in ─┤ providers/claude   providers/codex   (one per service)    │
+ sign-in ─┤ providers/ claude codex cursor antigravity (one per service)│
  files    │        │                  │                                │
           │        ▼                  ▼                                │
  ~/.claude│ activity.rs ──nudge──▶ poller.rs ── Vec<ProviderReport> ─┐ │
@@ -54,10 +54,17 @@ the interface hides the ones without a sign-in (`core/pins.ts`,
 `visibleReports`), so signing in to a service makes its tab appear without a
 restart.
 
-| Service | Sign-in it reads                                               | Endpoint                             | Activity folder      |
-| ------- | -------------------------------------------------------------- | ------------------------------------ | -------------------- |
-| Claude  | Claude desktop app (DPAPI), then `~/.claude/.credentials.json` | `api.anthropic.com/api/oauth/usage`  | `~/.claude/projects` |
-| Codex   | `~/.codex/auth.json` (ChatGPT sign-in)                         | `chatgpt.com/backend-api/wham/usage` | `~/.codex/sessions`  |
+| Service     | Sign-in it reads                                               | Endpoint                             | Activity folder                       |
+| ----------- | -------------------------------------------------------------- | ------------------------------------ | ------------------------------------- |
+| Claude      | Claude desktop app (DPAPI), then `~/.claude/.credentials.json` | `api.anthropic.com/api/oauth/usage`  | `~/.claude/projects`                  |
+| Codex       | `~/.codex/auth.json` (ChatGPT sign-in)                         | `chatgpt.com/backend-api/wham/usage` | `~/.codex/sessions`                   |
+| Cursor      | `state.vscdb` of the editor, SQLite opened read-only           | `api2.cursor.sh` dashboard service   | Cursor `workspaceStorage`             |
+| Antigravity | Credential Manager entry `gemini:antigravity`                  | `cloudcode-pa.googleapis.com` quotas | `~/.gemini/antigravity/conversations` |
+
+Windows come in four kinds: `session` (five hours), `weekly`, `monthly`
+(a billing cycle, Cursor) and `scoped` (a weekly cap of one model, named by
+its label: Claude model caps and Antigravity's per-model quotas). The kind
+picks the label and the pace sentence.
 
 ## Refreshing
 
@@ -85,7 +92,12 @@ they are shown, moved and hidden, never recreated.
   system flyouts. The interface reports its content height so the window hugs
   it.
 - **strip**: a transparent tool window kept over the taskbar, left of the
-  notification area. It is not re-parented into `Shell_TrayWnd`, because a
+  notification area. Every other monitor's taskbar (`Shell_SecondaryTrayWnd`)
+  gets a copy, `strip-1`, `strip-2` and so on, built at run time from the
+  same declaration; clicking one opens the flyout above it. A secondary
+  taskbar draws its clock in XAML with no window to measure, so the copy
+  keeps the Windows 11 clock width free. A strip that was minimised or hidden
+  (Win+M, screen tools) is shown again on the next tick. It is not re-parented into `Shell_TrayWnd`, because a
   WebView2 child of the taskbar loses its transparency. Instead a watcher
   thread re-asserts its position and z-order every 400 ms and hides it for an
   auto-hidden taskbar or a full-screen window on the same monitor.

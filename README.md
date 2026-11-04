@@ -4,83 +4,79 @@
 
 # Limvo
 
-**Your AI plan limits and the pace you are using them at, right in the Windows taskbar. Claude and Codex today, more through a small provider interface.**
+**Your AI plan limits in the Windows taskbar: Claude, Codex, Cursor and Antigravity, with the pace you are using them at.**
 
-[Download](#install) · [Features](#features) · [How it works](#how-it-works) · [Setups](#setups-and-scenarios) · [Build from source](#build-from-source) · [Contributing](CONTRIBUTING.md)
+[Download](#install) · [Features](#features) · [Services](#supported-services) · [How it works](#how-it-works) · [Setups](#setups-and-scenarios) · [Build from source](#build-from-source) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
 ---
 
-Limvo puts the weekly limit of your Claude plan next to the clock, tells you
-whether you are on track to make it to the reset, and stays out of the way
-until you want the details. It reads the same numbers as the usage page on
-claude.ai, refreshes them on its own while you work, and nudges you with a
-Windows notification before you run out. Signed in to Codex as well? Each
-service gets its own tab, and the taskbar can show several limits side by side.
+Limvo puts the plan limits of the AI tools you use next to the clock. It tells
+you how much of each allowance is gone, whether you are on track to make it to
+the reset, and when a limit will run out at today's pace. It reads the same
+numbers as each service's own usage page, refreshes them on its own while you
+work, and nudges you with a Windows notification before you run out.
 
 <p align="center">
-  <img src="docs/images/flyout-light.png" width="380" alt="The Limvo flyout in the light theme: 51% of the weekly limit used, resets in 1 day 16 hr, on track with a projection of 67%" />
-  <img src="docs/images/flyout-dark.png" width="380" alt="The same flyout in the dark theme" />
+  <img src="docs/images/flyout-dark.png" width="380" alt="The Limvo flyout in the dark theme: tabs for Claude, Codex, Cursor and Antigravity; Claude at 51% of the weekly limit, resets in 1 day 16 hr, on track with a projection of 67%" />
+  <img src="docs/images/flyout-light.png" width="380" alt="The same flyout in the light theme" />
 </p>
 
 <p align="center">
-  <img src="docs/images/strip-dark.png" height="64" alt="The taskbar reading in the dark taskbar: 51% until Tue, with a slim meter and the pace tick" />
+  <img src="docs/images/strip-dark.png" height="48" alt="The taskbar showing four readings side by side: Claude 51%, Codex 23%, Cursor 34% and Antigravity 41%, each with its logo and a slim meter" />
   &nbsp;
-  <img src="docs/images/strip-light.png" height="64" alt="The taskbar reading in the light taskbar" />
+  <img src="docs/images/strip-light.png" height="48" alt="A single reading in a light taskbar: 51% until Tue" />
 </p>
 
 ## Features
 
-- **Taskbar reading.** `51% until Tue` with a slim meter, docked next to the
-  notification area. Hover lights it up like any taskbar button; click it to
-  open the flyout.
-- **Several services side by side.** Claude and Codex (ChatGPT plans) each get
-  a tab in the flyout, with their own plan colour. Choose which limits the
-  taskbar shows: one reads as a sentence, several sit next to each other as
-  mark, number and meter.
+- **Every service in one place.** Claude, Codex (ChatGPT plans), Cursor and
+  Google Antigravity each get a tab with their own logo, plan badge and
+  colour. A service appears as soon as you are signed in to it on this
+  computer; there is nothing to configure.
 
-  <img src="docs/images/flyout-tabs-dark.png" width="380" alt="The flyout with a Claude tab and a Codex tab; the Claude tab is open at 51%" />
-  <br />
-  <img src="docs/images/strip-pins-dark.png" height="64" alt="The taskbar showing three pinned limits: Claude weekly 51%, Codex weekly 23% and the Codex 5 hour session 61%" />
+  <img src="docs/images/services-dark.png" width="760" alt="Three flyouts side by side: Codex at 23% of its weekly limit with a five-hour session, Cursor at 34% of its monthly included usage running hot with a forecast, and Antigravity at 41% of the Gemini 3 Flash weekly quota with the other agent models" />
 
+- **The taskbar shows what you choose.** One limit reads as a sentence,
+  `51% until Tue`. Pin up to six limits from any services and they sit side
+  by side as logo, number and meter. The reading appears on the taskbar of
+  every monitor, and a click opens the flyout above the one you clicked.
+- **A forecast, not just a reading.** A tick on each meter marks how much of
+  the period has passed. Limvo projects your usage to the reset, labels it
+  _On track_, _Tight_, _Running hot_ or _Limit reached_, charts the period
+  against an even pace and says when the limit runs out at today's rate.
+
+  <img src="docs/images/flyout-forecast.png" width="380" alt="Claude running hot at 78%, with the chart above the even pace, the warning that the limit runs out on Monday, the split by product and 12.40 dollars of extra usage" />
+
+- **The whole picture per service.** Claude's weekly limit, its split between
+  Claude Code, chats and Cowork, model caps and extra usage; Codex's weekly
+  and five-hour windows; Cursor's monthly included usage with Auto and API;
+  Antigravity's weekly quota for every agent model.
 - **A counter with some craft.** The percentage rolls in on drum wheels like an
   old odometer: each digit drops in from above, and a wheel only moves on when
-  the one to its right passes nine. The tray icon is alive too: the foot of
-  its L is a meter that fills with your usage, so the icon itself shows how
-  much is left.
+  the one to its right passes nine.
 
   <img src="docs/images/counter-frames.png" width="640" alt="Four frames of the counter rolling up from 26% to 51%" />
 
-- **Your plan at a glance.** Limvo reads which plan the sign-in belongs to
-  and shows it as a badge: Free, Pro, Max 5×, Max 20×, Team and Enterprise.
-  With _Plan colours_ on, the whole widget takes the plan's accent: graphite,
-  terracotta, copper, rose, teal or indigo. Status colours keep their meaning.
-- **A forecast, not just a reading.** A small chart plots this week against an
-  even pace, with today's rate carried on to the reset. When that rate would
-  empty the limit early, Limvo says when.
+- **Live without polling all day.** While you work in Claude Code, Codex,
+  Cursor or Antigravity the readings update about once a minute; when you are
+  idle they slow down to every five minutes. Fixed intervals are one click
+  away.
+- **Windows notifications** at 80% and 95%, when a limit is reached and when a
+  busy period resets, each naming its service.
+- **Plan colours.** Limvo recognises the plan (Claude Free, Pro, Max 5×,
+  Max 20×, Team and Enterprise; ChatGPT, Cursor and Google AI plans) and tints
+  each service in its own colour. Status colours keep their meaning.
+- **Settings that respect your taskbar.** Choose the pinned limits, turn the
+  reading off on other monitors, pin a compact card to the desktop, change the
+  language or the update frequency.
 
-  <img src="docs/images/flyout-forecast.png" width="380" alt="The flyout running hot at 78%, with the week chart, the forecast that the limit runs out on Monday, and extra usage of 12.40 dollars" />
+  <img src="docs/images/settings-dark.png" width="300" alt="Settings: show in taskbar, on every monitor, and the list of limits to pin from Claude, Codex, Cursor and Antigravity" />
+  <img src="docs/images/card-dark.png" width="300" alt="The desktop card in the dark theme" />
 
-- **Extra usage.** When paid credits are turned on, what you spent this month
-  shows next to the other limits, in your currency.
 - **Keyboard shortcut.** Win+Shift+H opens the flyout from anywhere, or
   Ctrl+Alt+H when another app holds the first.
-- **Pace, not just a percentage.** The tick on the meter marks how much of the
-  week has passed. Limvo projects your usage to the reset and labels it
-  _On track_, _Tight_, _Running hot_ or _Limit reached_.
-- **The whole picture in one flyout.** Weekly limit, time to reset, the split
-  between Claude Code, chats and Cowork, and model-specific caps such as
-  _Fable · weekly_.
-- **Live without polling all day.** While you work in Claude Code or Codex the reading
-  updates about once a minute; when you are idle it slows down to every five
-  minutes. Fixed intervals are one click away.
-- **Windows notifications** at 80% and 95%, when a limit is reached and when a
-  busy week resets.
-- **Desktop card.** Pin a compact card to the desktop, drag it anywhere, and it
-  stays below your windows.
-
-  <img src="docs/images/card-dark.png" width="300" alt="The desktop card in the dark theme" />
 - **Native feel.** Mica material, Windows 11 motion and controls, light and
   dark themes (the strip follows the taskbar theme, the flyout follows the app
   theme), respects _Animation effects_ and high DPI.
@@ -90,8 +86,21 @@ service gets its own tab, and the taskbar can show several limits side by side.
 
   <img src="docs/images/flyout-polish-hot.png" width="300" alt="The flyout in Polish, dark theme, running hot at 78%" />
   <img src="docs/images/flyout-hebrew.png" width="300" alt="The flyout in Hebrew, laid out right to left" />
+
 - **Small and private.** A few megabytes, no telemetry, no account, no server
   of its own. See [Privacy and security](#privacy-and-security).
+
+## Supported services
+
+| Service         | Plans                                        | Limits shown                                                               | Sign-in Limvo reads                           |
+| --------------- | -------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
+| **Claude**      | Free, Pro, Max 5×, Max 20×, Team, Enterprise | Weekly limit, split by product, model caps, five-hour session, extra usage | Claude desktop app, or Claude Code (`claude`) |
+| **Codex**       | ChatGPT Plus, Pro, Business and others       | Weekly limit, five-hour session                                            | Codex CLI or app signed in with ChatGPT       |
+| **Cursor**      | Free, Pro, Pro+, Ultra, Business             | Monthly included usage, Auto, API                                          | Cursor editor                                 |
+| **Antigravity** | Free, Google AI plans                        | Weekly quota of each agent model                                           | Google Antigravity app                        |
+
+Each service is a small module behind one interface. Adding another one is
+described in [CONTRIBUTING.md](CONTRIBUTING.md#add-a-service).
 
 ## Install
 
@@ -100,8 +109,8 @@ service gets its own tab, and the taskbar can show several limits side by side.
 2. Run it. It installs for your user only, so no administrator prompt.
    Choose your language on the first screen.
 3. Limvo starts in the notification area and docks its reading in the
-   taskbar. Make sure you are signed in to the Claude desktop app or Claude
-   Code (see [Setups](#setups-and-scenarios)).
+   taskbar. Sign in to at least one of the services (see
+   [Setups](#setups-and-scenarios)).
 4. Windows tucks new tray icons behind the `^` arrow. To keep the L next to the
    clock, drag it out of the overflow, or turn it on under _Settings >
    Personalization > Taskbar > Other system tray icons_.
@@ -111,11 +120,12 @@ service gets its own tab, and the taskbar can show several limits side by side.
 </p>
 
 > **"Windows protected your PC"**
-> Free signing through SignPath Foundation is being set up (see
-> [docs/CODE-SIGNING.md](docs/CODE-SIGNING.md)). Until releases are
-> code-signed, Microsoft SmartScreen shows this warning for new downloads. Choose **More info**, check that the publisher and file name
-> match the release, then **Run anyway**. You can verify the download with the
-> SHA-256 checksum published next to each release.
+> Releases are not code-signed yet; free signing through SignPath Foundation
+> is being set up (see [docs/CODE-SIGNING.md](docs/CODE-SIGNING.md)). Until
+> then Microsoft SmartScreen shows this warning for new downloads. Choose
+> **More info**, check that the file name matches the release, then
+> **Run anyway**. You can verify the download with the SHA-256 checksum
+> published next to each release.
 
 **Updating:** download the newest installer and run it. It upgrades in place
 and keeps your settings.
@@ -129,91 +139,87 @@ afterwards.
 
 ## Using Limvo
 
-| Where           | What it does                                                                                                                                                                           |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Taskbar reading | Click to open or close the flyout.                                                                                                                                                     |
-| Tray icon       | Left click opens the flyout; right click offers _Refresh_ and _Quit_.                                                                                                                  |
-| Flyout          | Shows the limits. _Open usage page_ goes to the open service's usage page, _Refresh_ reads now, the language code switches language, the sliders icon opens settings. `Esc` closes it. |
-| Desktop card    | Drag it to move it; double click opens the flyout.                                                                                                                                     |
+| Where           | What it does                                                                                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Taskbar reading | Click to open or close the flyout above it. Hover to see every pinned limit by name.                                                                              |
+| Tray icon       | Left click opens the flyout; right click offers _Refresh_ and _Quit_. The tooltip lists the pinned limits.                                                        |
+| Flyout          | One tab per service (arrow keys switch). _Open usage page_ goes to the service's own page, _Refresh_ reads now, the sliders icon opens settings. `Esc` closes it. |
+| Desktop card    | Drag it to move it; double click opens the flyout.                                                                                                                |
 
 ### Settings
 
-| Setting            | Default  | Notes                                                                                             |
-| ------------------ | -------- | ------------------------------------------------------------------------------------------------- |
-| Language           | System   | Any of the eleven languages, or follow Windows.                                                   |
-| Start with Windows | Off      | Adds Limvo to your user's startup apps.                                                           |
-| Show in taskbar    | On       | Turn off to keep only the tray icon.                                                              |
-| Limits in taskbar  | Main     | With more than one limit available: pick up to six, in the order you turn them on.                |
-| Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                               |
-| Notifications      | On       | 80%, 95%, limit reached, and the reset after a week above 80%. Each one is shown once per window. |
-| Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.          |
-| Plan colours       | On       | Tints the widget with the colour of your plan.                                                    |
-| Update frequency   | Adaptive | Adaptive follows Claude Code and Codex activity. 2, 5 or 15 minutes are fixed schedules.          |
+| Setting            | Default  | Notes                                                                                          |
+| ------------------ | -------- | ---------------------------------------------------------------------------------------------- |
+| Language           | System   | Any of the eleven languages, or follow Windows.                                                |
+| Start with Windows | Off      | Adds Limvo to your user's startup apps.                                                        |
+| Show in taskbar    | On       | Turn off to keep only the tray icon.                                                           |
+| On every monitor   | On       | A reading on the taskbar of every display, not only the main one.                              |
+| Limits in taskbar  | Main     | Each service's main limit, or up to six you pick, in the order you turn them on.               |
+| Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                            |
+| Notifications      | On       | 80%, 95%, limit reached, and the reset after a busy period. Each one is shown once per period. |
+| Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.       |
+| Plan colours       | On       | Tints each service with the colour of its plan.                                                |
+| Update frequency   | Adaptive | Adaptive follows activity in the services' own tools. 2, 5 or 15 minutes are fixed schedules.  |
 
 ## How it works
 
-Limvo asks the same endpoint the Claude apps use to draw their usage
-screens, `api.anthropic.com/api/oauth/usage`, with the sign-in that is already
-on your computer. It does not have its own login.
+Limvo has no login of its own. It borrows the sign-in each service's own app
+already keeps on your computer, asks the same endpoint that service uses to
+draw its usage screen, and shows the answer.
 
-It looks for a sign-in in this order and uses the first one that works:
+| Service     | Sign-in                                                                                                                                                                             | Endpoint                                   |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Claude      | The Claude desktop app's `config.json`, encrypted with Windows DPAPI for your account (classic `%APPDATA%\Claude` and Microsoft Store versions), then `~/.claude/.credentials.json` | `api.anthropic.com/api/oauth/usage`        |
+| Codex       | `~/.codex/auth.json`, or `%CODEX_HOME%\auth.json`                                                                                                                                   | `chatgpt.com/backend-api/wham/usage`       |
+| Cursor      | The editor's settings database, `%APPDATA%\Cursor\User\globalStorage\state.vscdb`, opened read-only                                                                                 | `api2.cursor.sh` dashboard service         |
+| Antigravity | The Windows Credential Manager entry the app creates, `gemini:antigravity`                                                                                                          | `cloudcode-pa.googleapis.com` model quotas |
 
-1. **Claude desktop app.** The app keeps its sign-in in its `config.json`,
-   encrypted with Windows DPAPI for your user account. Limvo decrypts it in
-   memory, read-only, to borrow the access token. Both the classic installer
-   (`%APPDATA%\Claude`) and the Microsoft Store version
-   (`%LOCALAPPDATA%\Claude-Data`) are supported.
-2. **Claude Code CLI.** `~/.claude/.credentials.json`, or
-   `%CLAUDE_CONFIG_DIR%\.credentials.json` when that variable is set.
+**Read only, always.** Limvo never refreshes, writes, moves or copies a
+credential. A token is held in memory for one request and dropped. An expired
+sign-in is reported as _sign in again_ instead of being renewed behind your
+back, so Limvo can never sign you out of a service. Opening the service's own
+app renews it.
 
-**Codex.** With the Codex CLI signed in with a ChatGPT account, Limvo reads
-`~/.codex/auth.json` (or `%CODEX_HOME%uth.json`) and asks
-`chatgpt.com/backend-api/wham/usage`, the endpoint behind the Codex usage
-page. The weekly window becomes the main reading and the five-hour window sits
-among the other limits. Activity in `~/.codex/sessions` drives adaptive updates
-the same way.
+**Adaptive updates.** None of these endpoints can push changes, so Limvo
+watches the folders the services' tools write to while you use them
+(`~/.claude/projects`, `~/.codex/sessions`, Cursor's workspace storage and
+`~/.gemini/antigravity/conversations`). It only notices that files changed;
+it never opens them. A change means you are working, so the next reading
+comes within a minute. Requests go out one at a time, manual refreshes closer
+than ten seconds apart reuse the last answer, and rate limits from the server
+are honoured. One service failing never delays or blanks another.
 
-Limvo never refreshes, writes or copies a token. An expired sign-in is
-reported as _sign in again_ instead of being renewed behind your back, because
-refreshing would sign Claude Code out.
-
-**Adaptive updates.** The usage endpoint cannot push changes, so Limvo
-watches the folders where Claude Code and Codex write their transcripts
-(`~/.claude/projects`, `~/.codex/sessions`). It only notices that files changed; it never opens
-them. A change means you are working, so the next reading comes within a
-minute. Manual refreshes closer than ten seconds apart reuse the last answer,
-and rate limits from the server are honoured.
-
-> **This endpoint is undocumented.** Anthropic can change it at any time.
-> Limvo tolerates missing and new fields, keeps showing the last good
+> **These endpoints are undocumented.** Their owners can change them at any
+> time. Limvo tolerates missing and new fields, keeps showing the last good
 > reading when a refresh fails, and says so in the flyout, but a larger change
 > on the server side may need an update of the app.
 
 ## Setups and scenarios
 
-| Your setup                              | What happens                                                                                                                |
-| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Claude desktop app, signed in           | Works out of the box, including the Microsoft Store version.                                                                |
-| Claude Code CLI only                    | Works if you have signed in with `claude` at least once. Run `claude` and `/login` if the flyout says your sign-in expired. |
-| Both installed                          | Limvo picks the freshest sign-in that has the required scope.                                                               |
-| Codex CLI signed in with ChatGPT        | A Codex tab appears next to Claude. With only Codex signed in, Limvo shows Codex alone.                                     |
-| Codex with an API key only              | Not shown: API keys have no plan limits to read.                                                                            |
-| Signed out everywhere                   | The flyout asks you to sign in. Limvo checks again every two minutes, no restart needed.                                    |
-| Custom Claude Code folder               | Set `CLAUDE_CONFIG_DIR` before starting Limvo; it follows the same variable as Claude Code.                                 |
-| Several monitors                        | The reading docks on the main taskbar. Flyout and card open on the monitor you use them from.                               |
-| Auto-hide taskbar                       | The reading hides with the taskbar and returns with it.                                                                     |
-| Full-screen game, video or presentation | The reading steps aside on that monitor only. Live wallpapers and full-screen windows on other monitors do not hide it.     |
-| Vertical taskbar (Windows 10)           | The taskbar reading is not shown; tray icon, flyout and card work.                                                          |
-| Windows 10                              | No Mica, so the flyout uses a solid surface. Everything else is the same.                                                   |
-| No usage yet this week                  | The per-product section stays hidden until something is used.                                                               |
+| Your setup                              | What happens                                                                                                                  |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Claude desktop app, signed in           | Works out of the box, including the Microsoft Store version.                                                                  |
+| Claude Code CLI only                    | Works if you have signed in with `claude` at least once. Run `claude` and `/login` if the flyout says your sign-in expired.   |
+| Codex CLI or app signed in with ChatGPT | A Codex tab appears. API-key sign-ins have no plan limits and are not shown.                                                  |
+| Cursor signed in                        | A Cursor tab appears with the billing cycle's included usage.                                                                 |
+| Antigravity signed in                   | An Antigravity tab appears. Its sign-in lasts an hour; open Antigravity now and then and Limvo picks up the renewed one.      |
+| Only some services                      | Only those get a tab. With a single service, the tabs disappear and the flyout looks like a dedicated widget.                 |
+| Signed out everywhere                   | The flyout asks you to sign in. Limvo checks again every two minutes, no restart needed.                                      |
+| Custom tool folders                     | `CLAUDE_CONFIG_DIR` and `CODEX_HOME` are honoured the same way the CLIs honour them.                                          |
+| Several monitors                        | Each taskbar gets a reading (turn off _On every monitor_ to keep only the main one). Flyout and card open where you use them. |
+| Auto-hide taskbar                       | The reading hides with the taskbar and returns with it.                                                                       |
+| Full-screen game, video or presentation | The reading steps aside on that monitor only. Live wallpapers and full-screen windows on other monitors do not hide it.       |
+| Vertical taskbar (Windows 10)           | The taskbar reading is not shown; tray icon, flyout and card work.                                                            |
+| Windows 10                              | No Mica, so the flyout uses a solid surface. Everything else is the same.                                                     |
 
 ## Privacy and security
 
 - No telemetry, analytics or crash reporting. The only network requests are
-  the usage requests to `api.anthropic.com` and, with Codex signed in,
-  `chatgpt.com`.
-- Tokens stay in memory for the duration of one request and are never logged.
-  Logs record only which source was used and HTTP status codes.
+  the usage requests to the services you are signed in to, each with its own
+  token, over HTTPS.
+- Tokens stay in memory for the duration of one request and are never logged,
+  stored or shown. Logs record only which source was used and HTTP status
+  codes.
 - Everything that touches credentials, the network and the system lives in the
   Rust core (`src-tauri/src`). The interface runs with a strict content
   security policy and can only call the commands listed in
@@ -226,14 +232,14 @@ opening a public issue.
 
 ## Troubleshooting
 
-| Symptom                                        | Try this                                                                                             |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| _Sign in to the Claude app to see your limits_ | Sign in to the Claude desktop app, or run `claude` once in a terminal.                               |
-| _Your Claude sign-in expired_                  | Open the Claude desktop app or run `claude`; both renew the sign-in themselves.                      |
-| _Offline. Last reading ..._                    | No connection to `api.anthropic.com`, or the server asked to slow down. Limvo retries with back-off. |
-| The taskbar reading is missing                 | Check _Settings > Show in taskbar_, a full-screen window on the main monitor, or a vertical taskbar. |
-| Numbers look stale                             | _Refresh_ in the flyout. Adaptive mode slows down after five idle minutes.                           |
-| Something else                                 | Attach the newest file from the logs folder to an issue. It contains no tokens.                      |
+| Symptom                        | Try this                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| A service has no tab           | Sign in to that service's own app on this computer. Limvo checks again every two minutes.        |
+| _Your ... sign-in expired_     | Open that service's app (or run `claude` / `codex`); they renew the sign-in themselves.          |
+| _Offline. Last reading ..._    | No connection to the service, or it asked to slow down. Limvo retries with back-off.             |
+| The taskbar reading is missing | Check _Settings > Show in taskbar_, a full-screen window on that monitor, or a vertical taskbar. |
+| Numbers look stale             | _Refresh_ in the flyout. Adaptive mode slows down after five idle minutes.                       |
+| Something else                 | Attach the newest file from the logs folder to an issue. It contains no tokens.                  |
 
 ## Build from source
 
@@ -262,38 +268,40 @@ npm run tauri build    # installer in src-tauri/target/release/bundle/nsis
 
 `npm run dev` serves the interface with built-in scenarios, which is the
 quickest way to work on design: `?scenario=reference|fresh|tight|hot|reached|offline|auth|signedOut|error`,
+`&more` for all four services, `&codex=off`, `&pins=claude:weekly_all,codex:session`,
 `&locale=he`, `&theme=dark`, and `&now=<ISO time>` for reproducible screenshots.
 Open `/strip.html` and `/card.html` for the other windows.
 
-### Your own brand mark
+### Service logos
 
-Limvo ships with its own mark. To see a service's official logo in the app,
-put the SVG from the owner's brand or press page at `public/brand/<id>.svg`
-and rebuild. A logo drawn in dark ink can come with a light variant,
-`<id>-dark.svg`, which Limvo uses on dark surfaces (Cursor ships both). Brand
-files are ignored by git; please do not commit them to a public fork.
+The logos in [`public/brand`](public/brand) come from each owner's brand or
+press page. They are trademarks of their owners, are used only to show which
+service a reading belongs to, and are not covered by the MIT license (see
+[public/brand/README.md](public/brand/README.md)). A file named
+`<id>-dark.svg` is used on dark surfaces. Delete a file to see the Limvo mark
+in its place.
 
-| File                            | Logo        | Official source                                                                |
-| ------------------------------- | ----------- | ------------------------------------------------------------------------------ |
-| `claude.svg`                    | Claude      | [anthropic.com/press-kit](https://www.anthropic.com/press-kit)                 |
-| `codex.svg`, `codex-dark.svg`   | OpenAI      | [openai.com/brand](https://openai.com/brand/), after accepting its brand terms |
-| `cursor.svg`, `cursor-dark.svg` | Cursor cube | [cursor.com/brand](https://cursor.com/brand), _Download brand assets_          |
-| `antigravity.svg`               | Antigravity | [antigravity.google/press](https://antigravity.google/press), full-colour icon |
+| File                            | Logo        | Official source                                                |
+| ------------------------------- | ----------- | -------------------------------------------------------------- |
+| `claude.svg`                    | Claude      | [anthropic.com/press-kit](https://www.anthropic.com/press-kit) |
+| `codex.svg`, `codex-dark.svg`   | OpenAI      | [openai.com/brand](https://openai.com/brand/)                  |
+| `cursor.svg`, `cursor-dark.svg` | Cursor cube | [cursor.com/brand](https://cursor.com/brand)                   |
+| `antigravity.svg`               | Antigravity | [antigravity.google/press](https://antigravity.google/press)   |
 
 ## Project layout
 
 ```
 src/                 Interface (React 19, TypeScript)
-  core/              Pure logic: pace, alerts, the shared data model
+  core/              Pure logic: pace, alerts, pins, the shared data model
   i18n/              Translations and Intl formatting
   ui/                Flyout, taskbar strip, desktop card, controls
 src-tauri/src/       Core (Rust, Tauri 2)
-  providers/         One module per service; Claude today
-  poller.rs          Schedule, back-off, adaptive refresh
-  taskbar.rs         Docking next to the notification area
+  providers/         One module per service: claude, codex, cursor, antigravity
+  poller.rs          One slot per service: schedule, back-off, adaptive refresh
+  taskbar.rs         A reading on every taskbar, next to the notification area
   flyout.rs card.rs  Window placement and behaviour
-fixtures/            Shared contract fixtures for both sides
-docs/                Architecture notes and images
+fixtures/            Shared contract fixtures and anonymised API answers
+docs/                Architecture notes, code signing and images
 ```
 
 Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, and
@@ -303,17 +311,17 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, and
 
 - macOS menu bar version
 - In-app updates from GitHub Releases
-- Readings on secondary taskbars
 - Code-signed releases and `winget install Limvo`
-- More providers through the same provider interface
-- A Windows 11 Widgets board card
+- Several accounts of the same service
+- A Windows 11 Widgets board card (needs an MSIX package and a widget provider)
 
 ## Disclaimer
 
 Limvo is an independent open-source project. It is not affiliated with,
-endorsed by or sponsored by Anthropic. Claude is a trademark of Anthropic,
-PBC, used here only to describe what the app works with.
+endorsed by or sponsored by Anthropic, OpenAI, Anysphere (Cursor) or Google.
+Claude, ChatGPT, Codex, Cursor and Antigravity are trademarks of their
+respective owners, used here only to describe what the app works with.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). The service logos in `public/brand` are excluded; see above.

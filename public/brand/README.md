@@ -1,11 +1,14 @@
-# Provider marks
+# Service marks
 
-Limvo shows a service's own mark when you put the official file here, named
-after the provider id: `claude.svg`, `codex.svg`, `cursor.svg`,
-`antigravity.svg`. Without it the Limvo mark is used. A logo drawn in dark ink
-can come with a light variant for dark surfaces, `<id>-dark.svg`.
+The logos in this folder identify the services Limvo reads: `claude.svg`
+(Claude), `codex.svg` and `codex-dark.svg` (OpenAI), `cursor.svg` and
+`cursor-dark.svg` (Cursor) and `antigravity.svg` (Google Antigravity). A file
+named `<id>-dark.svg` is the variant for dark surfaces.
 
-These files are ignored by git on purpose. Logos belong to their owners, so
-download them from the owner's official brand or press page (see the README,
-"Your own brand mark") and keep them on your machine. Do not commit them to a
-public fork.
+They are trademarks of their owners, taken from the owners' brand and press
+pages (the OpenAI mark filled in plain black and in plain white), and are used only to show which service a reading belongs
+to. They are not covered by the MIT license of Limvo and do not imply any
+affiliation or endorsement.
+
+Remove a file to see the Limvo mark in its place. Forks that redistribute
+Limvo should check each owner's brand terms first.
