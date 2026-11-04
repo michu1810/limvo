@@ -14,6 +14,7 @@ import { LanguagePanel } from "./LanguagePanel";
 import { ProviderTabs } from "./ProviderTabs";
 import { SettingsPanel } from "./SettingsPanel";
 import { StateNotice } from "./StateNotice";
+import { UpdateBanner } from "./UpdateBanner";
 
 type View = "usage" | "settings" | "language";
 
@@ -148,6 +149,7 @@ export function Flyout({
             </header>
 
             <StateNotice report={report} now={now} onRetry={refresh} />
+            {(settings?.checkUpdates ?? true) && <UpdateBanner now={now} />}
 
             {snapshot?.headline && (
               <Headline

@@ -8,3 +8,11 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .vs/
+
+# Signing keys and secrets never belong in the repository
+*.key
+*.pfx
+*.p12
+*.pem
+.env
+.env.*

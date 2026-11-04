@@ -18,7 +18,7 @@ reproduce. You can expect a first answer within a week.
   the provider it belongs to.
 - Tokens appearing in logs, settings, crash output or the interface.
 - Ways for web content or another process to call Limvo's commands.
-- Installer or update integrity.
+- Installer or update integrity, including the update feed and its signatures.
 
 ## Design commitments
 
@@ -29,7 +29,13 @@ reproduce. You can expect a first answer within a week.
   under a strict content security policy.
 - The only network destinations are the usage APIs of the signed-in services
   (`api.anthropic.com`, `chatgpt.com`, `api2.cursor.sh`,
-  `cloudcode-pa.googleapis.com`), over HTTPS, each with its own token.
+  `cloudcode-pa.googleapis.com`), over HTTPS, each with its own token, and the
+  update feed on GitHub Releases (`github.com`, served from
+  `objects.githubusercontent.com`), which gets no token at all.
+- Updates install only when their minisign signature matches the public key
+  in `src-tauri/tauri.conf.json`. The private key lives only in the `release`
+  environment of this repository, which serves `v*` tag runs after the
+  maintainer approves them.
 - Other apps' stores are opened read-only: Cursor's settings database with
   SQLite's read-only flags, Antigravity's Credential Manager entry with
   `CredReadW`. Nothing is written back.

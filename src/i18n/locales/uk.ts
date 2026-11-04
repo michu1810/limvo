@@ -70,5 +70,12 @@ export const uk: LocaleDefinition = {
     services: "Сервіси",
     taskbarPins: "Ліміти на панелі завдань",
     taskbarPinsHint: "До {count} лімітів, у порядку ввімкнення",
+    checkUpdates: "Перевіряти оновлення",
+    checkUpdatesHint: "Двічі на день шукає нову версію на GitHub",
+    updateAvailable: "Доступний Limvo {version}",
+    updateInstall: "Оновити",
+    updateLater: "Пізніше",
+    updateInstalling: "Оновлення",
+    updateFailed: "Не вдалося оновити. Спробуйте пізніше.",
   },
 };

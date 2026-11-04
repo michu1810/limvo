@@ -7,13 +7,14 @@ import {
   sendNotification,
 } from "@tauri-apps/plugin-notification";
 import type { ProviderReport } from "../core/snapshot";
-import type { Bridge, HostInfo, Settings, Theme } from "./types";
+import type { AvailableUpdate, Bridge, HostInfo, Settings, Theme } from "./types";
 
 /** Event names shared with `src-tauri/src/events.rs`. */
 const REPORT_EVENT = "report-updated";
 const SETTINGS_EVENT = "settings-updated";
 const TASKBAR_THEME_EVENT = "taskbar-theme";
 const FLYOUT_SHOWN_EVENT = "flyout-shown";
+const UPDATE_EVENT = "update-available";
 
 export const tauriBridge: Bridge = {
   getReports: () => invoke<ProviderReport[]>("get_reports"),
@@ -38,6 +39,10 @@ export const tauriBridge: Bridge = {
     if (granted) sendNotification(toast);
   },
   onFlyoutShown: (listener) => listen(FLYOUT_SHOWN_EVENT, () => listener()),
+
+  getUpdate: () => invoke<AvailableUpdate | null>("get_update"),
+  onUpdate: (listener) => listen<AvailableUpdate>(UPDATE_EVENT, (event) => listener(event.payload)),
+  installUpdate: () => invoke("install_update"),
 
   openUsagePage: (providerId) => invoke("open_usage_page", { providerId }),
   fitFlyout: (height) => invoke("fit_flyout", { height }),

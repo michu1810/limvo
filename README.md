@@ -216,7 +216,13 @@ are honoured. One service failing never delays or blanks another.
 
 - No telemetry, analytics or crash reporting. The only network requests are
   the usage requests to the services you are signed in to, each with its own
-  token, over HTTPS.
+  token, over HTTPS, and the update check described below.
+- Updates: twice a day Limvo reads `latest.json` of the newest release on
+  GitHub (`github.com`, which serves the file from
+  `objects.githubusercontent.com`). The request carries no token and no data
+  about you. An update downloads only when you choose _Update_, and installs
+  only if its signature matches the public key built into Limvo. Turn it off
+  in _Settings > Check for updates_.
 - Tokens stay in memory for the duration of one request and are never logged,
   stored or shown. Logs record only which source was used and HTTP status
   codes.
@@ -266,6 +272,18 @@ cd src-tauri; cargo test; cargo clippy --all-targets
 npm run tauri build    # installer in src-tauri/target/release/bundle/nsis
 ```
 
+`npm run tauri build` also signs the update package, so it needs an updater
+key. Without the release key, make a local one and point the build at it. The
+installer works as usual and still accepts official updates; only the update
+package next to it carries your local signature, and nothing reads that:
+
+```powershell
+npx tauri signer generate -w "$env:USERPROFILE\.tauri\limvo-local.key"
+$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content "$env:USERPROFILE\.tauri\limvo-local.key" -Raw
+$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = "<the password you chose, or empty>"
+npm run tauri build
+```
+
 `npm run dev` serves the interface with built-in scenarios, which is the
 quickest way to work on design: `?scenario=reference|fresh|tight|hot|reached|offline|auth|signedOut|error`,
 `&more` for all four services, `&codex=off`, `&pins=claude:weekly_all,codex:session`,
@@ -310,7 +328,6 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, and
 ## Roadmap
 
 - macOS menu bar version
-- In-app updates from GitHub Releases
 - Code-signed releases and `winget install Limvo`
 - Several accounts of the same service
 - A Windows 11 Widgets board card (needs an MSIX package and a widget provider)

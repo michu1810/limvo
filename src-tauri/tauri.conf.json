@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Limvo",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "identifier": "io.github.michu1810.limvo",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -27,7 +27,9 @@
         "alwaysOnTop": true,
         "visible": false,
         "focus": false,
-        "windowEffects": { "effects": ["mica"] }
+        "windowEffects": {
+          "effects": ["mica"]
+        }
       },
       {
         "label": "strip",
@@ -62,7 +64,9 @@
         "alwaysOnTop": false,
         "visible": false,
         "focus": false,
-        "windowEffects": { "effects": ["acrylic"] }
+        "windowEffects": {
+          "effects": ["acrylic"]
+        }
       }
     ],
     "security": {
@@ -79,7 +83,10 @@
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
     "publisher": "Limvo contributors",
     "windows": {
-      "webviewInstallMode": { "type": "downloadBootstrapper", "silent": true },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
       "nsis": {
         "installMode": "currentUser",
         "installerIcon": "icons/icon.ico",
@@ -105,6 +112,16 @@
         },
         "compression": "lzma",
         "startMenuFolder": "Limvo"
+      }
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEU4OUFGRjIzMTlBMDg1MDgKUldRSWhhQVpJLythNkREdERzSGRKWGdvSnJCUkFDeHEvSHRvRUZkSDlqL2VJMTl6M2wrVGw4TU0K",
+      "endpoints": ["https://github.com/michu1810/limvo/releases/latest/download/latest.json"],
+      "windows": {
+        "installMode": "passive"
       }
     }
   }

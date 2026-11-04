@@ -54,6 +54,8 @@ pub struct Settings {
     pub plan_colors: bool,
     /// Limits shown in the taskbar, as `<provider>:<window>`. `None` shows each provider's main limit.
     pub pinned: Option<Vec<String>>,
+    /// Look for a newer Limvo on GitHub Releases now and then.
+    pub check_updates: bool,
     #[serde(flatten)]
     other: serde_json::Map<String, serde_json::Value>,
 }
@@ -71,6 +73,7 @@ impl Default for Settings {
             shortcut: true,
             plan_colors: true,
             pinned: None,
+            check_updates: true,
             other: serde_json::Map::new(),
         }
     }
@@ -95,6 +98,7 @@ pub struct SettingsPatch {
     pub plan_colors: Option<bool>,
     #[serde(default, deserialize_with = "present")]
     pub pinned: Option<Option<Vec<String>>>,
+    pub check_updates: Option<bool>,
 }
 
 /// Turns a field that is present into `Some`, even when its value is `null`.
@@ -135,6 +139,9 @@ impl Settings {
         }
         if let Some(plan_colors) = patch.plan_colors {
             self.plan_colors = plan_colors;
+        }
+        if let Some(check_updates) = patch.check_updates {
+            self.check_updates = check_updates;
         }
         if let Some(pinned) = patch.pinned {
             // A pin names a provider and a window; anything else is dropped.

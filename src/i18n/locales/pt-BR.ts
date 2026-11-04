@@ -70,5 +70,12 @@ export const ptBR: LocaleDefinition = {
     services: "Serviços",
     taskbarPins: "Limites na barra de tarefas",
     taskbarPinsHint: "Até {count} limites, na ordem em que você os ativar",
+    checkUpdates: "Procurar atualizações",
+    checkUpdatesHint: "Procura uma nova versão no GitHub duas vezes por dia",
+    updateAvailable: "O Limvo {version} está disponível",
+    updateInstall: "Atualizar",
+    updateLater: "Depois",
+    updateInstalling: "Atualizando",
+    updateFailed: "Não foi possível atualizar. Tente mais tarde.",
   },
 };

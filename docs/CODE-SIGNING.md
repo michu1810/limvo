@@ -19,6 +19,21 @@ certificate by [SignPath Foundation](https://signpath.org).
 - Privacy: Limvo sends no data anywhere except the usage requests described
   in the [README](../README.md#privacy-and-security).
 
+## Update signing (maintainers)
+
+In-app updates are verified with a separate minisign key, unrelated to the
+Authenticode certificate. The public key is in `src-tauri/tauri.conf.json`
+(`plugins.updater.pubkey`). The private key and its password are secrets of
+the `release` environment: `TAURI_SIGNING_PRIVATE_KEY` and
+`TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. Keep a backup of both outside this
+machine: without them no installed copy accepts another update, and a new key
+means every user reinstalls by hand.
+
+The Release workflow signs the update after Authenticode signing, because the
+signature has to cover the exact bytes people download, and writes
+`latest.json` itself. Installed copies only see a release once its draft is
+published.
+
 ## Turning it on (maintainers)
 
 1. Apply at [signpath.org/apply](https://signpath.org/apply) with the public

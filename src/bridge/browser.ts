@@ -6,7 +6,8 @@ import type { Bridge, Settings } from "./types";
  * Development host for `npm run dev` in a plain browser. Query parameters:
  * `scenario` (see `SCENARIOS`), `codex=off`, `more` (adds Cursor and
  * Antigravity), `pins`, `locale` (for example `he`) and
- * `now` (an ISO instant, for reproducible screenshots). Refresh cycles
+ * `now` (an ISO instant, for reproducible screenshots) and `update` (a
+ * version to offer, for example `0.2.0`). Refresh cycles
  * through a small change so motion can be checked without the app.
  */
 export function createBrowserBridge(): Bridge {
@@ -30,7 +31,10 @@ export function createBrowserBridge(): Bridge {
     shortcut: true,
     planColors: true,
     pinned: params.get("pins")?.split(",") ?? null,
+    checkUpdates: true,
   };
+  const offered = params.get("update");
+  const update = offered ? { version: offered, currentVersion: __APP_VERSION__ } : null;
   let launchAtLogin = true;
   let refreshes = 0;
   const reportListeners = new Set<(reports: ProviderReport[]) => void>();
@@ -96,6 +100,12 @@ export function createBrowserBridge(): Bridge {
       return Promise.resolve(() => {
         shownListeners.delete(listener);
       });
+    },
+
+    getUpdate: () => Promise.resolve(update),
+    onUpdate: () => Promise.resolve(() => {}),
+    async installUpdate() {
+      console.info("[update] would install", update?.version);
     },
 
     async openUsagePage(providerId) {

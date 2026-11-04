@@ -1,6 +1,6 @@
 [package]
 name = "limvo"
-version = "0.1.1"
+version = "0.2.0"
 description = "See how much of your AI plan is left, right in the Windows taskbar."
 authors = ["Limvo contributors"]
 license = "MIT"
@@ -44,6 +44,7 @@ tauri-plugin-log = "2.9.2"
 tauri-plugin-notification = "2.8.0"
 tauri-plugin-opener = "2.5.5"
 tauri-plugin-single-instance = "2.4.5"
+tauri-plugin-updater = "2.14.1"
 thiserror = "2.0.21"
 tokio = { version = "1.54.1", features = ["time", "sync", "macros", "rt"] }
 
@@ -53,4 +54,4 @@ tauri-build = { version = "2.6.3", features = [] }
 [target."cfg(windows)".dependencies]
 aes-gcm = "0.11.1"
 base64 = "0.23.1"
-windows = { version = "0.62.2", features = ["Win32_Foundation", "Win32_Security_Cryptography", "Win32_Security_Credentials", "Win32_UI_WindowsAndMessaging", "Win32_UI_HiDpi", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_System_Registry", "Win32_Globalization"] }
+windows = { version = "0.62.2", features = ["Win32_Foundation", "Win32_Security_Cryptography", "Win32_Security_Credentials", "Win32_UI_WindowsAndMessaging", "Win32_UI_Accessibility", "Win32_UI_HiDpi", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_System_Registry", "Win32_Globalization"] }
