@@ -1,3 +1,11 @@
+/* A long view (settings with several services) scrolls inside the window;
+   the host never makes the window taller than the screen allows. */
+html:has(.flyout:not(.card)) {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--fill-subtle-pressed) transparent;
+}
+
 .flyout {
   display: flex;
   flex-direction: column;

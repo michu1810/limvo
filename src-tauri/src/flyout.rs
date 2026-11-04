@@ -116,7 +116,15 @@ pub fn fit(app: &AppHandle, height: f64) {
     let Some(window) = app.get_webview_window(LABEL) else {
         return;
     };
-    let height = height.clamp(MIN_HEIGHT, MAX_HEIGHT);
+    // On a short screen the window stops at the work area and the view scrolls.
+    let room = window
+        .current_monitor()
+        .ok()
+        .flatten()
+        .map_or(MAX_HEIGHT, |monitor| {
+            f64::from(monitor.work_area().size.height) / monitor.scale_factor() - 2.0 * MARGIN
+        });
+    let height = height.clamp(MIN_HEIGHT, MAX_HEIGHT.min(room).max(MIN_HEIGHT));
     let _ = window.set_size(LogicalSize::new(WIDTH, height));
     if let Some(anchor) = with_state(app, |state| state.anchor) {
         place(&window, anchor);
