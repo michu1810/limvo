@@ -1,6 +1,51 @@
-//! The Claude plan a sign-in belongs to, as the apps record it next to the token.
+//! The Claude plan an account is on.
+//!
+//! The apps record the plan next to each token, but only as it was when the
+//! token was issued: an upgrade does not show there until the next sign-in.
+//! The account profile is current, so it wins whenever it can be read.
+
+use serde::Deserialize;
 
 use crate::snapshot::PlanBadge;
+
+/// The account profile, read with the same token as the usage.
+pub const PROFILE_URL: &str = "https://api.anthropic.com/api/oauth/profile";
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct Profile {
+    organization: Option<Organization>,
+}
+
+// The field names follow the API.
+#[allow(clippy::struct_field_names)]
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+struct Organization {
+    organization_type: Option<String>,
+    rate_limit_tier: Option<String>,
+    /// The name claude.ai shows, such as "Pro" or "Ultra".
+    plan_display_name: Option<String>,
+}
+
+/// The badge for the profile: the plan's own name, coloured by its limits tier.
+pub fn from_profile(profile: &Profile) -> Option<PlanBadge> {
+    let organization = profile.organization.as_ref()?;
+    let subscription = organization
+        .organization_type
+        .as_deref()
+        .map(|kind| kind.trim_start_matches("claude_"));
+    let mut badge = badge(subscription, organization.rate_limit_tier.as_deref())?;
+    if let Some(name) = organization
+        .plan_display_name
+        .as_deref()
+        .map(str::trim)
+        .filter(|name| !name.is_empty())
+    {
+        name.clone_into(&mut badge.label);
+    }
+    Some(badge)
+}
 
 /// Builds the badge from the `subscriptionType` and `rateLimitTier` fields.
 /// Unknown values are shown as they are rather than hidden, so a new plan
@@ -72,6 +117,35 @@ mod tests {
     #[test]
     fn keeps_plans_it_does_not_know() {
         assert_eq!(label(Some("studio"), None).as_deref(), Some("Studio"));
+    }
+
+    #[test]
+    fn the_profile_names_the_plan_and_its_tier_picks_the_colour() {
+        // The shape of a real answer: a Max 20x account that claude.ai calls Ultra.
+        let profile: Profile = serde_json::from_str(
+            r#"{"account": {"has_claude_max": true},
+                "organization": {"organization_type": "claude_max",
+                                 "rate_limit_tier": "default_claude_max_20x",
+                                 "plan_display_name": "Ultra",
+                                 "plan_display_label": "Ultra plan"}}"#,
+        )
+        .unwrap();
+        let plan = from_profile(&profile).unwrap();
+        assert_eq!(
+            (plan.id.as_str(), plan.label.as_str()),
+            ("max_20x", "Ultra")
+        );
+    }
+
+    #[test]
+    fn a_profile_without_a_display_name_keeps_the_tier_label() {
+        let profile: Profile = serde_json::from_str(
+            r#"{"organization": {"organization_type": "claude_pro", "rate_limit_tier": "default_claude_ai"}}"#,
+        )
+        .unwrap();
+        let plan = from_profile(&profile).unwrap();
+        assert_eq!((plan.id.as_str(), plan.label.as_str()), ("pro", "Pro"));
+        assert!(from_profile(&Profile::default()).is_none());
     }
 
     #[test]

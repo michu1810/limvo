@@ -7,26 +7,68 @@ mod plan;
 mod spend;
 
 use std::path::PathBuf;
-use std::time::Duration;
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
 
 use reqwest::StatusCode;
 use reqwest::header::{AUTHORIZATION, RETRY_AFTER};
 
 use super::{FetchFuture, ProviderError, UsageProvider};
-use crate::snapshot::UsageSnapshot;
+use crate::snapshot::{PlanBadge, UsageSnapshot};
 
 pub const PROVIDER_ID: &str = "claude";
 
 /// Sign-ins tried per refresh. More would only repeat the same rejection.
 const MAX_ATTEMPTS: usize = 3;
+/// Plans change rarely; the profile is read again after this long.
+const PROFILE_TTL: Duration = Duration::from_hours(6);
 
 #[derive(Debug, Default)]
-pub struct ClaudeProvider;
+pub struct ClaudeProvider {
+    /// The plan from the account profile, and when it was read.
+    profile_plan: Mutex<Option<(Instant, PlanBadge)>>,
+}
 
 impl ClaudeProvider {
     pub fn new() -> Self {
-        Self
+        Self::default()
     }
+
+    /// The current plan from the profile, read at most every few hours.
+    /// `None` when the profile cannot be read; the token's plan stands in then.
+    async fn current_plan(&self, http: &reqwest::Client, token: &str) -> Option<PlanBadge> {
+        let cached = self
+            .profile_plan
+            .lock()
+            .ok()
+            .and_then(|cache| cache.clone())
+            .filter(|(read_at, _)| read_at.elapsed() < PROFILE_TTL);
+        if let Some((_, plan)) = cached {
+            return Some(plan);
+        }
+        let plan = read_profile(http, token)
+            .await
+            .and_then(|profile| plan::from_profile(&profile))?;
+        if let Ok(mut cache) = self.profile_plan.lock() {
+            *cache = Some((Instant::now(), plan.clone()));
+        }
+        Some(plan)
+    }
+}
+
+async fn read_profile(http: &reqwest::Client, token: &str) -> Option<plan::Profile> {
+    let response = http
+        .get(plan::PROFILE_URL)
+        .header(AUTHORIZATION, format!("Bearer {token}"))
+        .header("anthropic-beta", api::OAUTH_BETA)
+        .send()
+        .await
+        .ok()?;
+    if !response.status().is_success() {
+        log::debug!("the profile was not readable ({})", response.status());
+        return None;
+    }
+    response.json().await.ok()
 }
 
 impl UsageProvider for ClaudeProvider {
@@ -39,7 +81,7 @@ impl UsageProvider for ClaudeProvider {
     }
 
     fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a> {
-        Box::pin(fetch(http))
+        Box::pin(fetch(self, http))
     }
 
     /// Claude Code appends to a transcript under `projects/` on every turn.
@@ -51,7 +93,10 @@ impl UsageProvider for ClaudeProvider {
     }
 }
 
-async fn fetch(http: &reqwest::Client) -> Result<UsageSnapshot, ProviderError> {
+async fn fetch(
+    provider: &ClaudeProvider,
+    http: &reqwest::Client,
+) -> Result<UsageSnapshot, ProviderError> {
     let now = jiff::Timestamp::now();
     let candidates = credentials::discover(now.as_millisecond());
     if candidates.usable.is_empty() {
@@ -67,7 +112,10 @@ async fn fetch(http: &reqwest::Client) -> Result<UsageSnapshot, ProviderError> {
             Ok(response) => {
                 log::debug!("usage read with a token from the {}", token.source);
                 let mut snapshot = api::to_snapshot(response, jiff::Timestamp::now().to_string());
-                snapshot.plan.clone_from(&token.plan);
+                snapshot.plan = match provider.current_plan(http, token.secret()).await {
+                    Some(plan) => Some(plan),
+                    None => token.plan.clone(),
+                };
                 return Ok(snapshot);
             }
             // A token without the profile scope or a revoked one: try the next sign-in.
