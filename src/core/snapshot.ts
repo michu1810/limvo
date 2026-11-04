@@ -7,7 +7,8 @@
  * are checked against `fixtures/report.sample.json`.
  */
 
-export type WindowKind = "session" | "weekly" | "scoped";
+/** `monthly` follows a billing cycle; `scoped` is a weekly cap of one model, named by `label`. */
+export type WindowKind = "session" | "weekly" | "monthly" | "scoped";
 
 export type Severity = "normal" | "warning" | "critical";
 

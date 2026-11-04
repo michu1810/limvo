@@ -40,6 +40,8 @@ pub struct Settings {
     pub locale: Option<String>,
     /// The reading docked in the taskbar.
     pub show_strip: bool,
+    /// A reading on the taskbar of every monitor, not only the main one.
+    pub strip_all_monitors: bool,
     /// Windows notifications when a limit gets close, is reached or resets.
     pub notifications: bool,
     pub refresh: RefreshMode,
@@ -61,6 +63,7 @@ impl Default for Settings {
         Self {
             locale: None,
             show_strip: true,
+            strip_all_monitors: true,
             notifications: true,
             refresh: RefreshMode::Adaptive,
             desktop_card: false,
@@ -82,6 +85,7 @@ pub struct SettingsPatch {
     #[serde(default, deserialize_with = "present")]
     pub locale: Option<Option<String>>,
     pub show_strip: Option<bool>,
+    pub strip_all_monitors: Option<bool>,
     pub notifications: Option<bool>,
     pub refresh: Option<RefreshMode>,
     pub desktop_card: Option<bool>,
@@ -110,6 +114,9 @@ impl Settings {
         }
         if let Some(show_strip) = patch.show_strip {
             self.show_strip = show_strip;
+        }
+        if let Some(all) = patch.strip_all_monitors {
+            self.strip_all_monitors = all;
         }
         if let Some(notifications) = patch.notifications {
             self.notifications = notifications;

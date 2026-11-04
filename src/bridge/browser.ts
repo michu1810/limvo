@@ -4,7 +4,8 @@ import type { Bridge, Settings } from "./types";
 
 /**
  * Development host for `npm run dev` in a plain browser. Query parameters:
- * `scenario` (see `SCENARIOS`), `codex=off`, `locale` (for example `he`) and
+ * `scenario` (see `SCENARIOS`), `codex=off`, `more` (adds Cursor and
+ * Antigravity), `pins`, `locale` (for example `he`) and
  * `now` (an ISO instant, for reproducible screenshots). Refresh cycles
  * through a small change so motion can be checked without the app.
  */
@@ -15,12 +16,14 @@ export function createBrowserBridge(): Bridge {
   const withCodex = params.get("codex") !== "off";
   const fixedNow = params.get("now");
   const now = () => (fixedNow ? new Date(fixedNow) : new Date());
-  const build = () => scenarioReports(name, now(), withCodex);
+  const withMore = params.has("more");
+  const build = () => scenarioReports(name, now(), withCodex, withMore);
 
   let reports: ProviderReport[] = build();
   let settings: Settings = {
     locale: params.get("locale"),
     showStrip: true,
+    stripAllMonitors: true,
     notifications: true,
     refresh: "adaptive",
     desktopCard: false,

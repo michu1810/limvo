@@ -39,6 +39,8 @@ export function ProviderTabs({
   return (
     <div
       className="tabs"
+      // Four services leave no room for names: marks and readings carry the tabs.
+      data-compact={reports.length > 3 || undefined}
       role="tablist"
       aria-label={t("services")}
       style={{ "--tabs": reports.length, "--tab": index } as CSSProperties}
@@ -56,6 +58,12 @@ export function ProviderTabs({
             className="tabs__tab"
             data-plan={planAttribute(report, settings)}
             aria-selected={active}
+            aria-label={
+              headline
+                ? `${report.providerName} ${format.percent(headline.percent)}`
+                : report.providerName
+            }
+            title={report.providerName}
             tabIndex={active ? 0 : -1}
             onClick={() => onSelect(report.providerId)}
           >

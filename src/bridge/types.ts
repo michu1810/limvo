@@ -7,6 +7,8 @@ export interface Settings {
   /** BCP 47 code chosen by the user, or `null` to follow the system language. */
   locale: string | null;
   showStrip: boolean;
+  /** A reading on the taskbar of every monitor. */
+  stripAllMonitors: boolean;
   notifications: boolean;
   refresh: RefreshMode;
   desktopCard: boolean;

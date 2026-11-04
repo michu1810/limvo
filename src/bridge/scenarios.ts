@@ -37,6 +37,8 @@ export function scenarioReports(
   name: ScenarioName,
   now: Date,
   withCodex: boolean,
+  /** Adds Cursor and Antigravity, for screenshots of every service together. */
+  withMore = false,
 ): ProviderReport[] {
   const reports: ProviderReport[] = [
     { providerId: "claude", providerName: "Claude", ...SCENARIOS[name](now) },
@@ -58,6 +60,15 @@ export function scenarioReports(
           detail: null,
         },
   );
+  for (const [providerId, providerName, snapshot] of [
+    ["cursor", "Cursor", cursor(now)],
+    ["antigravity", "Antigravity", antigravity(now)],
+  ] as const)
+    reports.push(
+      withMore
+        ? { providerId, providerName, state: "ok", snapshot, detail: null }
+        : { providerId, providerName, state: "no_credentials", snapshot: null, detail: null },
+    );
   return reports;
 }
 
@@ -123,6 +134,58 @@ function claude(now: Date, shape: Shape): UsageSnapshot {
             severity: shape.extraSpentCents >= 4000 ? "warning" : "normal",
           },
     usagePageUrl: "https://claude.ai/settings/usage",
+  };
+}
+
+const MONTH_SECONDS = 31 * 24 * 3600;
+
+function cursor(now: Date): UsageSnapshot {
+  const month = (id: string, label: string | null, percent: number) => ({
+    id,
+    kind: "monthly" as const,
+    label,
+    percent,
+    resetsAt: at(now, 22 * 24),
+    periodSeconds: MONTH_SECONDS,
+    severity: percent >= 80 ? ("warning" as const) : ("normal" as const),
+  });
+  return {
+    providerId: "cursor",
+    providerName: "Cursor",
+    plan: { id: "cursor_pro", label: "Pro" },
+    fetchedAt: at(now, -1 / 60),
+    headline: month("monthly_included", null, 34),
+    windows: [month("monthly:auto", "Auto", 27), month("monthly:api", "API", 48)],
+    breakdown: [],
+    extraUsage: null,
+    usagePageUrl: "https://cursor.com/dashboard?tab=usage",
+  };
+}
+
+function antigravity(now: Date): UsageSnapshot {
+  const model = (name: string, percent: number) => ({
+    id: `scoped:${name.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    kind: "scoped" as const,
+    label: name,
+    percent,
+    resetsAt: at(now, 96),
+    periodSeconds: WEEK_SECONDS,
+    severity: percent >= 80 ? ("warning" as const) : ("normal" as const),
+  });
+  return {
+    providerId: "antigravity",
+    providerName: "Antigravity",
+    plan: { id: "antigravity_g1_plus_tier", label: "Google AI Plus" },
+    fetchedAt: at(now, -3 / 60),
+    headline: model("Gemini 3 Flash", 41),
+    windows: [
+      model("Claude Sonnet 4.6 (Thinking)", 18),
+      model("Claude Opus 4.6 (Thinking)", 6),
+      model("GPT-OSS 120B (Medium)", 0),
+    ],
+    breakdown: [],
+    extraUsage: null,
+    usagePageUrl: null,
   };
 }
 

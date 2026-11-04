@@ -631,6 +631,10 @@
   white-space: nowrap;
 }
 
+.tabs[data-compact] .tabs__name {
+  display: none;
+}
+
 .tabs__value {
   font-variant-numeric: tabular-nums;
   font-weight: 600;

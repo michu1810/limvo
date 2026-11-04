@@ -5,6 +5,7 @@ import type { MessageKey } from "../i18n/resolve";
 
 export function headlineLabel(window: UsageWindow, { t }: I18n): string {
   if (window.kind === "session") return t("headlineSession");
+  if (window.kind === "monthly") return t("headlineMonthly");
   if (window.kind === "scoped" && window.label) return t("windowScoped", { name: window.label });
   return t("headlineWeekly");
 }
@@ -15,6 +16,8 @@ export function windowLabel(window: UsageWindow, { t }: I18n): string {
       return t("windowSession");
     case "weekly":
       return window.label ?? t("windowWeekly");
+    case "monthly":
+      return window.label ? t("windowMonthlyNamed", { name: window.label }) : t("windowMonthly");
     case "scoped":
       return t("windowScoped", { name: window.label ?? "" });
   }

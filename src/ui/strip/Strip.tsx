@@ -172,6 +172,7 @@ function CompactReading({
 /** A second limit of the same service gets a hint of which one it is. */
 function shortTag(window: Limit["window"]): string {
   if (window.kind === "session") return "5h";
+  if (window.kind === "monthly" && !window.label) return "";
   return (window.label ?? "").slice(0, 6);
 }
 

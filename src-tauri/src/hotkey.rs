@@ -31,7 +31,7 @@ pub fn plugin() -> TauriPlugin<Wry> {
     tauri_plugin_global_shortcut::Builder::new()
         .with_handler(|app, _shortcut, event| {
             if event.state() == ShortcutState::Pressed {
-                crate::flyout::toggle_from_strip(app);
+                crate::flyout::toggle_from_strip(app, crate::flyout::MAIN_STRIP);
             }
         })
         .build()

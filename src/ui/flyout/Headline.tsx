@@ -2,10 +2,19 @@ import type { WindowHistory } from "../../core/history";
 import { computePace, limitReachedAt } from "../../core/pace";
 import type { PlanBadge, UsageWindow } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
+import type { MessageKey } from "../../i18n/resolve";
 import { headlineLabel, PACE_MESSAGE } from "../labels";
 import { Meter } from "../Meter";
 import { RollingPercent } from "../RollingNumber";
 import { WeekChart } from "./WeekChart";
+
+/** The pace sentence names the period the window runs over. */
+const PACE_DETAIL: Record<UsageWindow["kind"], MessageKey> = {
+  session: "paceDetailSession",
+  weekly: "paceDetailWeekly",
+  monthly: "paceDetailMonthly",
+  scoped: "paceDetailWeekly",
+};
 
 export function Headline({
   window,
@@ -75,7 +84,7 @@ export function Headline({
           </span>
           {!compact && (
             <span className="pace__detail">
-              {t(window.kind === "session" ? "paceDetailSession" : "paceDetailWeekly", {
+              {t(PACE_DETAIL[window.kind], {
                 elapsed: format.percent(pace.elapsed * 100),
                 projected: format.percent(pace.projected),
               })}

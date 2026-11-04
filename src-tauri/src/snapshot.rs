@@ -10,6 +10,9 @@ use serde::{Deserialize, Serialize};
 pub enum WindowKind {
     Session,
     Weekly,
+    /// A monthly allowance that follows the billing cycle.
+    Monthly,
+    /// A weekly cap of one model or feature, named by `label`.
     Scoped,
 }
 

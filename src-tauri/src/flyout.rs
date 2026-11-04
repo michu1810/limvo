@@ -35,9 +35,20 @@ pub struct FlyoutState {
 pub type SharedFlyoutState = Mutex<FlyoutState>;
 
 /// Opens or closes the flyout above the taskbar strip, or above the notification area when the strip is hidden.
-pub fn toggle_from_strip(app: &AppHandle) {
+/// The strip on the main taskbar.
+pub const MAIN_STRIP: &str = "strip";
+
+/// `strip` is the label of the window that asked: each monitor has its own
+/// strip, and the flyout opens above the one that was clicked. Other windows
+/// (the desktop card) anchor to the main strip.
+pub fn toggle_from_strip(app: &AppHandle, strip: &str) {
+    let label = if strip.starts_with(MAIN_STRIP) {
+        strip
+    } else {
+        MAIN_STRIP
+    };
     let anchor = app
-        .get_webview_window("strip")
+        .get_webview_window(label)
         .filter(|strip| strip.is_visible().unwrap_or(false))
         .and_then(|strip| Some((strip.outer_position().ok()?, strip.outer_size().ok()?)))
         .map(|(position, size)| Anchor {

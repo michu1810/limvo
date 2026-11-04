@@ -81,6 +81,14 @@ export function SettingsPanel({
           checked={settings?.showStrip ?? true}
           onChange={(showStrip) => update({ showStrip })}
         />
+        {(settings?.showStrip ?? true) && (
+          <SwitchRow
+            label={t("stripAllMonitors")}
+            hint={t("stripAllMonitorsHint")}
+            checked={settings?.stripAllMonitors ?? true}
+            onChange={(stripAllMonitors) => update({ stripAllMonitors })}
+          />
+        )}
         {(settings?.showStrip ?? true) && <TaskbarPins reports={reports} settings={settings} />}
         <SwitchRow
           label={t("desktopCard")}

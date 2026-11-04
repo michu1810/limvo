@@ -1,0 +1,170 @@
+{
+  "defaultAgentModelId": "claude-sonnet-4-6",
+  "agentModelSorts": [
+    {
+      "displayName": "Recommended",
+      "groups": [
+        {
+          "modelIds": ["claude-sonnet-4-6", "claude-opus-4-6-thinking", "gpt-oss-120b-medium"]
+        }
+      ]
+    }
+  ],
+  "commandModelIds": ["gemini-3-flash"],
+  "tabModelIds": ["chat_20706", "chat_23310"],
+  "tieredModelIds": {
+    "flashLite": ["gemini-3.5-flash-lite"],
+    "flash": ["gemini-3.8-flash-tiered"],
+    "pro": ["gemini-3.8-flash-tiered"]
+  },
+  "models": {
+    "claude-opus-4-6-thinking": {
+      "displayName": "Claude Opus 4.6 (Thinking)",
+      "quotaInfo": {
+        "remainingFraction": 1,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_PLACEHOLDER_M26",
+      "modelProvider": "MODEL_PROVIDER_ANTHROPIC",
+      "recommended": true
+    },
+    "chat_20706": {
+      "quotaInfo": {
+        "remainingFraction": 1
+      },
+      "model": "MODEL_CHAT_20706",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "isInternal": true
+    },
+    "claude-sonnet-4-6": {
+      "displayName": "Claude Sonnet 4.6 (Thinking)",
+      "quotaInfo": {
+        "remainingFraction": 0.9,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_PLACEHOLDER_M35",
+      "modelProvider": "MODEL_PROVIDER_ANTHROPIC",
+      "recommended": true
+    },
+    "gemini-3.1-flash-image": {
+      "displayName": "Gemini 3.1 Flash Image",
+      "quotaInfo": {
+        "remainingFraction": 1,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_PLACEHOLDER_M21",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE"
+    },
+    "tab_flash_lite_preview": {
+      "quotaInfo": {
+        "remainingFraction": 1
+      },
+      "model": "MODEL_PLACEHOLDER_M19",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE"
+    },
+    "gemini-2.5-flash": {
+      "displayName": "Gemini 3.5 Flash Lite",
+      "quotaInfo": {
+        "remainingFraction": 1,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_GOOGLE_GEMINI_2_5_FLASH",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "recommended": true
+    },
+    "chat_23310": {
+      "quotaInfo": {
+        "remainingFraction": 1
+      },
+      "model": "MODEL_CHAT_23310",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "isInternal": true
+    },
+    "gemini-2.5-pro": {
+      "displayName": "Gemini 2.5 Pro",
+      "quotaInfo": {
+        "remainingFraction": 1,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_GOOGLE_GEMINI_2_5_PRO",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "recommended": true
+    },
+    "gemini-3.8-flash-tiered": {
+      "quotaInfo": {
+        "remainingFraction": 1,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_PLACEHOLDER_M322",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "recommended": true
+    },
+    "gemini-2.5-flash-thinking": {
+      "displayName": "Gemini 3.5 Flash Lite",
+      "quotaInfo": {
+        "remainingFraction": 1,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_GOOGLE_GEMINI_2_5_FLASH_THINKING",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "recommended": true
+    },
+    "gemini-3-flash": {
+      "displayName": "Gemini 3 Flash",
+      "quotaInfo": {
+        "remainingFraction": 0.36,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_PLACEHOLDER_M18",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "recommended": true
+    },
+    "gemini-3.5-flash-lite": {
+      "displayName": "Gemini 3.5 Flash Lite",
+      "quotaInfo": {
+        "remainingFraction": 0.75,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_PLACEHOLDER_M198",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "recommended": true
+    },
+    "tab_jump_flash_lite_preview": {
+      "quotaInfo": {
+        "remainingFraction": 1
+      },
+      "model": "MODEL_PLACEHOLDER_M28",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE"
+    },
+    "gpt-oss-120b-medium": {
+      "displayName": "GPT-OSS 120B (Medium)",
+      "quotaInfo": {
+        "remainingFraction": 1,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_OPENAI_GPT_OSS_120B_MEDIUM",
+      "modelProvider": "MODEL_PROVIDER_OPENAI",
+      "recommended": true
+    },
+    "gemini-3.1-flash-lite": {
+      "displayName": "Gemini 3.1 Flash Lite",
+      "quotaInfo": {
+        "remainingFraction": 1,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_PLACEHOLDER_M50",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "recommended": true
+    },
+    "gemini-2.5-flash-lite": {
+      "displayName": "Gemini 3.5 Flash Lite",
+      "quotaInfo": {
+        "remainingFraction": 0.9,
+        "resetTime": "2026-11-11T00:12:51Z"
+      },
+      "model": "MODEL_GOOGLE_GEMINI_2_5_FLASH_LITE",
+      "modelProvider": "MODEL_PROVIDER_GOOGLE",
+      "recommended": true
+    }
+  }
+}

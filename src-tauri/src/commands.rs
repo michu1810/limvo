@@ -67,6 +67,8 @@ pub fn apply_patch(app: &AppHandle, mut patch: SettingsPatch) -> Result<Settings
     }
     #[cfg(windows)]
     crate::taskbar::set_enabled(after.show_strip);
+    #[cfg(windows)]
+    crate::taskbar::set_all_taskbars(after.strip_all_monitors);
     if before.shortcut != after.shortcut {
         crate::hotkey::apply(app, after.shortcut);
     }
@@ -143,10 +145,10 @@ pub fn fit_strip(width: f64) {
     let _ = width;
 }
 
-/// Opens or closes the flyout above the taskbar strip.
+/// Opens or closes the flyout above the taskbar strip that was clicked.
 #[tauri::command]
-pub fn toggle_flyout(app: AppHandle) {
-    flyout::toggle_from_strip(&app);
+pub fn toggle_flyout(app: AppHandle, window: tauri::WebviewWindow) {
+    flyout::toggle_from_strip(&app, window.label());
 }
 
 /// The system-wide shortcut that is active, for the settings panel.

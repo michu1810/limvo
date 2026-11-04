@@ -100,9 +100,10 @@
 /*
  * Plan colours. With the setting on, the accent follows the account's plan:
  * Pro keeps the default terracotta, Free is a quiet graphite, Max is copper,
- * Max 20x a deep rose, Team teal and Enterprise indigo; every ChatGPT plan is
- * green. Set per element with data-plan, so two services in the taskbar can
- * each wear their own. Only the accent moves; status colours keep their meaning.
+ * Max 20x a deep rose, Team teal and Enterprise indigo. Other services keep one
+ * colour for all their plans: ChatGPT green, Cursor slate, Antigravity blue.
+ * Set per element with data-plan, so services side by side in the taskbar each
+ * wear their own. Only the accent moves; status colours keep their meaning.
  */
 [data-plan="free"] {
   --accent: #6b6f76;
@@ -137,6 +138,16 @@
 [data-plan^="chatgpt"] {
   --accent: #0f8a6c;
   --accent-soft: #1fa283;
+}
+
+[data-plan^="cursor"] {
+  --accent: #4a5568;
+  --accent-soft: #5f6b7d;
+}
+
+[data-plan^="antigravity"] {
+  --accent: #1a73e8;
+  --accent-soft: #3c87ec;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -174,6 +185,16 @@
     --accent: #3fc9a2;
     --accent-soft: #62d6b4;
   }
+
+  :root:not([data-theme="light"]) [data-plan^="cursor"] {
+    --accent: #a7b1c2;
+    --accent-soft: #bcc4d2;
+  }
+
+  :root:not([data-theme="light"]) [data-plan^="antigravity"] {
+    --accent: #8ab4f8;
+    --accent-soft: #a5c5fa;
+  }
 }
 
 :root[data-theme="dark"] [data-plan="free"] {
@@ -209,4 +230,14 @@
 :root[data-theme="dark"] [data-plan^="chatgpt"] {
   --accent: #3fc9a2;
   --accent-soft: #62d6b4;
+}
+
+:root[data-theme="dark"] [data-plan^="cursor"] {
+  --accent: #a7b1c2;
+  --accent-soft: #bcc4d2;
+}
+
+:root[data-theme="dark"] [data-plan^="antigravity"] {
+  --accent: #8ab4f8;
+  --accent-soft: #a5c5fa;
 }

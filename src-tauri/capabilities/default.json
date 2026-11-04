@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "What Limvo's windows may do. App commands are listed in src/commands.rs.",
-  "windows": ["flyout", "strip", "card"],
+  "windows": ["flyout", "strip", "strip-*", "card"],
   "permissions": [
     "core:event:default",
     "core:window:default",

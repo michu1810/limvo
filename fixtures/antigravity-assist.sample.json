@@ -1,0 +1,20 @@
+{
+  "currentTier": {
+    "id": "free-tier",
+    "name": "Antigravity",
+    "description": "Gemini-powered code suggestions and chat in multiple IDEs",
+    "upgradeSubscriptionUri": "https://codeassist.google.com/upgrade"
+  },
+  "allowedTiers": [
+    { "id": "free-tier", "name": "Antigravity", "isDefault": true },
+    { "id": "standard-tier", "name": "Antigravity", "userDefinedCloudaicompanionProject": true }
+  ],
+  "cloudaicompanionProject": "aicode-consumers",
+  "gcpManaged": false,
+  "paidTier": {
+    "id": "g1-plus-tier",
+    "name": "Google AI Plus",
+    "description": "Antigravity Starter Quota",
+    "upgradeSubscriptionUri": "https://antigravity.google/g1-upgrade"
+  }
+}

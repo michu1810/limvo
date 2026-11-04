@@ -5,15 +5,20 @@
 //! nothing in the UI or the poller changes. See
 //! `CONTRIBUTING.md` for a walkthrough.
 
+pub mod antigravity;
 pub mod claude;
 pub mod codex;
+pub mod cursor;
 
 use std::future::Future;
 use std::path::PathBuf;
 use std::pin::Pin;
 use std::time::Duration;
 
-use crate::snapshot::UsageSnapshot;
+use reqwest::StatusCode;
+use reqwest::header::RETRY_AFTER;
+
+use crate::snapshot::{Severity, UsageSnapshot};
 
 pub type FetchFuture<'a> =
     Pin<Box<dyn Future<Output = Result<UsageSnapshot, ProviderError>> + Send + 'a>>;
@@ -61,5 +66,46 @@ pub fn all() -> Vec<Box<dyn UsageProvider>> {
     vec![
         Box::new(claude::ClaudeProvider::new()),
         Box::new(codex::CodexProvider::new()),
+        Box::new(cursor::CursorProvider::new()),
+        Box::new(antigravity::AntigravityProvider::new()),
     ]
+}
+
+/// The error an unsuccessful answer stands for, or `None` for a success.
+pub(crate) fn status_error(response: &reqwest::Response) -> Option<ProviderError> {
+    match response.status() {
+        StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => Some(ProviderError::AuthRequired),
+        StatusCode::TOO_MANY_REQUESTS => Some(ProviderError::RateLimited {
+            retry_after: response
+                .headers()
+                .get(RETRY_AFTER)
+                .and_then(|value| value.to_str().ok()?.trim().parse().ok())
+                .map(Duration::from_secs),
+        }),
+        status if status.is_server_error() => {
+            Some(ProviderError::Unreachable(format!("HTTP {status}")))
+        }
+        status if !status.is_success() => Some(ProviderError::Unexpected(format!("HTTP {status}"))),
+        _ => None,
+    }
+}
+
+/// A reported share as a percentage the interface can draw: finite and within 0 to 100.
+pub(crate) fn clamp_percent(value: f64) -> f64 {
+    if value.is_finite() {
+        value.clamp(0.0, 100.0)
+    } else {
+        0.0
+    }
+}
+
+/// The colour a reading earns when the service does not grade it itself.
+pub(crate) fn severity_of(percent: f64) -> Severity {
+    if percent >= 100.0 {
+        Severity::Critical
+    } else if percent >= 80.0 {
+        Severity::Warning
+    } else {
+        Severity::Normal
+    }
 }

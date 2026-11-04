@@ -96,6 +96,8 @@ pub fn run() {
 
             #[cfg(windows)]
             taskbar::set_enabled(settings.show_strip);
+            #[cfg(windows)]
+            taskbar::set_all_taskbars(settings.strip_all_monitors);
             let (desktop_card, card_position) = (settings.desktop_card, settings.card_position);
             let shortcut = settings.shortcut;
             app.manage(AppState {

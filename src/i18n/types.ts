@@ -12,6 +12,7 @@ export interface Messages {
 
   headlineWeekly: string;
   headlineSession: string;
+  headlineMonthly: string;
   /** Placeholder `{duration}`, for example "1 day 16 hr". */
   resetsIn: string;
   resetsSoon: string;
@@ -23,6 +24,7 @@ export interface Messages {
   /** Placeholders `{elapsed}` and `{projected}` are formatted percentages. */
   paceDetailWeekly: string;
   paceDetailSession: string;
+  paceDetailMonthly: string;
 
   byProductWeekly: string;
   otherLimits: string;
@@ -30,6 +32,8 @@ export interface Messages {
   windowWeekly: string;
   /** Placeholder `{name}` is the model name, for example "Fable". */
   windowScoped: string;
+  windowMonthly: string;
+  windowMonthlyNamed: string;
 
   openUsagePage: string;
   refresh: string;
@@ -54,6 +58,8 @@ export interface Messages {
   settings: string;
   launchAtLogin: string;
   showStrip: string;
+  stripAllMonitors: string;
+  stripAllMonitorsHint: string;
   desktopCard: string;
   notifications: string;
   notificationsHint: string;
