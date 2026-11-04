@@ -51,8 +51,10 @@ impl From<&Update> for AvailableUpdate {
 }
 
 /// Starts the background checks. They skip a round while the setting is off.
+///
+/// [`PendingUpdate`] is managed on the builder, not here: the windows load
+/// before `setup` ends and may ask for the update straight away.
 pub fn start(app: AppHandle) {
-    app.manage(PendingUpdate::default());
     tauri::async_runtime::spawn(async move {
         tokio::time::sleep(FIRST_CHECK).await;
         loop {

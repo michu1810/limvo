@@ -47,6 +47,8 @@ pub struct AppState {
 
 pub fn run() {
     tauri::Builder::default()
+        // Managed before any window exists, since the flyout asks for it on load.
+        .manage(updater::PendingUpdate::default())
         // A second launch opens the running instance's flyout instead of a second tray icon.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             flyout::show(app, None);
