@@ -6,6 +6,8 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-04
+
 ### Fixed
 
 - "No connection" no longer shows when a service only asked Limvo to slow
