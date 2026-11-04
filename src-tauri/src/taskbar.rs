@@ -3,9 +3,12 @@
 //! The strips stay top-level windows instead of being re-parented into
 //! `Shell_TrayWnd`: a `WebView2` child of the taskbar loses its transparency,
 //! while a top-level tool window composes cleanly over the taskbar material.
-//! The cost is that Explorer can raise a taskbar above them, so a light
-//! watcher re-asserts position and z-order a few times a second, and steps
-//! aside for full-screen apps and an auto-hidden taskbar.
+//! The cost is that Explorer can raise a taskbar above them, and "minimise
+//! all" or screen tools can minimise them. A light watcher puts them back: it
+//! wakes on the system's window events (foreground, minimise, z-order), so a
+//! covered strip is back within a frame or two, and a few times a second
+//! anyway to follow the tray as icons come and go. It steps aside for
+//! full-screen apps and an auto-hidden taskbar.
 //!
 //! The main taskbar gets the `strip` window declared in `tauri.conf.json`.
 //! Each taskbar on another monitor gets a copy of it (`strip-1`, `strip-2`,
@@ -19,12 +22,16 @@ use windows::Win32::Foundation::{HWND, RECT};
 use windows::Win32::Graphics::Gdi::{
     GetMonitorInfoW, HMONITOR, MONITOR_DEFAULTTONEAREST, MONITORINFO, MonitorFromWindow,
 };
+use windows::Win32::UI::Accessibility::{HWINEVENTHOOK, SetWinEventHook};
 use windows::Win32::UI::HiDpi::GetDpiForWindow;
 use windows::Win32::UI::WindowsAndMessaging::{
-    FindWindowExW, FindWindowW, GWL_EXSTYLE, GetClassNameW, GetForegroundWindow, GetWindowLongPtrW,
-    GetWindowRect, HWND_TOPMOST, IsIconic, IsWindowVisible, SW_HIDE, SW_SHOWNOACTIVATE,
-    SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW, SetWindowLongPtrW, SetWindowPos,
-    ShowWindow, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW,
+    DispatchMessageW, EVENT_OBJECT_REORDER, EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_MINIMIZEEND,
+    EVENT_SYSTEM_MINIMIZESTART, FindWindowExW, FindWindowW, GW_HWNDPREV, GWL_EXSTYLE,
+    GetClassNameW, GetForegroundWindow, GetWindow, GetWindowLongPtrW, GetWindowRect, HWND_TOPMOST,
+    IsIconic, IsWindowVisible, MSG, MsgWaitForMultipleObjects, PM_REMOVE, PeekMessageW,
+    QS_ALLINPUT, SW_HIDE, SW_SHOWNOACTIVATE, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
+    SWP_SHOWWINDOW, SetWindowLongPtrW, SetWindowPos, ShowWindow, TranslateMessage,
+    WINEVENT_OUTOFCONTEXT, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW,
 };
 use windows::core::w;
 
@@ -32,7 +39,12 @@ use crate::events;
 use crate::system;
 
 pub const LABEL: &str = "strip";
+/// The longest the watcher sleeps when no window event wakes it.
 const TICK: Duration = Duration::from_millis(400);
+/// One click raises several window events; they are handled as one.
+const SETTLE: Duration = Duration::from_millis(16);
+/// How far up the z-order to look for the taskbar above a strip.
+const Z_ORDER_DEPTH: usize = 256;
 /// Space between the strip and the notification area, in logical pixels.
 const GAP: f64 = 6.0;
 /// What a secondary taskbar keeps at its right end for the clock and the
@@ -101,7 +113,8 @@ impl Dock {
         }
     }
 
-    fn apply(&mut self, app: &AppHandle, target: Option<Placement>) {
+    /// Puts the strip at `target` on its taskbar, or hides it without a target.
+    fn apply(&mut self, app: &AppHandle, target: Option<(Placement, HWND)>) {
         let Some(hwnd) = app
             .get_webview_window(&self.label)
             .and_then(|window| window.hwnd().ok())
@@ -117,6 +130,8 @@ impl Dock {
         // strip behind the watcher's back; put it back like a moved taskbar.
         // SAFETY: state queries on a window this process owns.
         let displaced = unsafe { IsIconic(hwnd).as_bool() || !IsWindowVisible(hwnd).as_bool() };
+        let bar = target.map(|(_, bar)| bar);
+        let target = target.map(|(placement, _)| placement);
         match (target, self.current) {
             (Some(target), previous) if previous != Some(target) || displaced => {
                 // SAFETY: plain window positioning on a window this process owns.
@@ -135,7 +150,16 @@ impl Dock {
                     )
                 };
             }
-            (Some(_), _) => raise_above_taskbar(hwnd),
+            // Explorer lifts a taskbar to the top when it is clicked, its tray
+            // overflow opens or Start closes. Only a strip that is actually
+            // covered moves, so nothing is re-ordered while all is well.
+            (Some(_), _) => {
+                if let Some(bar) = bar
+                    && covered_by(hwnd, bar)
+                {
+                    raise_above(hwnd, bar);
+                }
+            }
             (None, Some(_)) => {
                 // SAFETY: hiding a window this process owns.
                 let _ = unsafe { ShowWindow(hwnd, SW_HIDE) };
@@ -149,9 +173,10 @@ impl Dock {
 fn watch(app: &AppHandle) {
     let mut docks = vec![Dock::new(LABEL.to_owned())];
     let mut theme = system::taskbar_theme();
+    let _hooks = listen_for_window_events();
 
     loop {
-        std::thread::sleep(TICK);
+        wait_for_window_events(TICK);
         let bars = if ENABLED.load(Ordering::Relaxed) {
             taskbars(ALL_TASKBARS.load(Ordering::Relaxed))
         } else {
@@ -171,7 +196,7 @@ fn watch(app: &AppHandle) {
             let target = bars
                 .get(index)
                 .filter(|bar| !full_screen_app_active(bar.hwnd))
-                .and_then(|bar| placement(*bar));
+                .and_then(|bar| placement(*bar).map(|placement| (placement, bar.hwnd)));
             dock.apply(app, target);
         }
 
@@ -236,20 +261,94 @@ fn make_tool_window(hwnd: HWND) {
     }
 }
 
-/// Explorer brings a taskbar to the front of the topmost band when it is clicked.
-fn raise_above_taskbar(hwnd: HWND) {
-    // SAFETY: reading the foreground window and re-ordering a window this process owns.
+/// Whether `bar` lies above `strip` in the z-order, so it hides the strip.
+fn covered_by(strip: HWND, bar: HWND) -> bool {
+    let mut window = strip;
+    for _ in 0..Z_ORDER_DEPTH {
+        // SAFETY: a read-only z-order query.
+        match unsafe { GetWindow(window, GW_HWNDPREV) } {
+            Ok(above) if !above.is_invalid() => {
+                if above == bar {
+                    return true;
+                }
+                window = above;
+            }
+            _ => return false,
+        }
+    }
+    false
+}
+
+/// Moves the strip just above the taskbar, and no higher: menus, tooltips and
+/// the tray overflow that sit over the taskbar stay over the strip too.
+fn raise_above(strip: HWND, bar: HWND) {
+    // SAFETY: a z-order query on Explorer's window and re-ordering a window
+    // this process owns. Anything above a topmost taskbar is topmost itself.
     unsafe {
-        if is_taskbar(GetForegroundWindow()) {
-            let _ = SetWindowPos(
-                hwnd,
-                Some(HWND_TOPMOST),
-                0,
-                0,
-                0,
-                0,
-                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
-            );
+        let over_bar = GetWindow(bar, GW_HWNDPREV)
+            .ok()
+            .filter(|window| !window.is_invalid() && *window != strip);
+        let _ = SetWindowPos(
+            strip,
+            Some(over_bar.unwrap_or(HWND_TOPMOST)),
+            0,
+            0,
+            0,
+            0,
+            SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+        );
+    }
+}
+
+/// Window events that can leave a strip covered, minimised or out of place.
+/// The hooks only wake the watcher; it then looks at the windows itself.
+fn listen_for_window_events() -> Vec<HWINEVENTHOOK> {
+    unsafe extern "system" fn wake(
+        _: HWINEVENTHOOK,
+        _: u32,
+        _: HWND,
+        _: i32,
+        _: i32,
+        _: u32,
+        _: u32,
+    ) {
+    }
+
+    let ranges = [
+        (EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND),
+        (EVENT_SYSTEM_MINIMIZESTART, EVENT_SYSTEM_MINIMIZEEND),
+        (EVENT_OBJECT_REORDER, EVENT_OBJECT_REORDER),
+    ];
+    ranges
+        .iter()
+        .filter_map(|&(first, last)| {
+            // SAFETY: an out-of-context hook delivered to this thread's queue,
+            // with a callback that touches nothing.
+            let hook = unsafe {
+                SetWinEventHook(first, last, None, Some(wake), 0, 0, WINEVENT_OUTOFCONTEXT)
+            };
+            if hook.is_invalid() {
+                log::warn!("could not listen for window events {first:#x}..{last:#x}");
+                None
+            } else {
+                Some(hook)
+            }
+        })
+        .collect()
+}
+
+/// Sleeps until a window event arrives or `timeout` passes, then runs the
+/// event callbacks queued for this thread.
+fn wait_for_window_events(timeout: Duration) {
+    let milliseconds = u32::try_from(timeout.as_millis()).unwrap_or(u32::MAX);
+    // SAFETY: waiting on this thread's own message queue and draining it.
+    unsafe {
+        let _ = MsgWaitForMultipleObjects(None, false, milliseconds, QS_ALLINPUT);
+        std::thread::sleep(SETTLE);
+        let mut message = MSG::default();
+        while PeekMessageW(&raw mut message, None, 0, 0, PM_REMOVE).as_bool() {
+            let _ = TranslateMessage(&raw const message);
+            DispatchMessageW(&raw const message);
         }
     }
 }
@@ -341,7 +440,9 @@ fn full_screen_app_active(taskbar: HWND) -> bool {
 }
 
 fn class_name(hwnd: HWND) -> String {
-    let mut class = [0u16; 32];
+    // Long enough for Explorer's longest classes, such as
+    // `TopLevelWindowForOverflowXamlIsland`.
+    let mut class = [0u16; 64];
     // SAFETY: the buffer length is passed alongside the buffer.
     let length = unsafe { GetClassNameW(hwnd, &mut class) };
     String::from_utf16_lossy(&class[..usize::try_from(length).unwrap_or(0)])
@@ -355,6 +456,13 @@ fn is_taskbar(hwnd: HWND) -> bool {
 }
 
 /// The desktop and the taskbars span the monitor too, but they are not apps.
+/// Neither is the Windows 11 shell host behind Alt+Tab, Task View and the
+/// taskbar's window previews: it covers the whole monitor while it is up, and
+/// hiding the strip for it made the strip blink on every Alt+Tab.
 fn is_shell_window(hwnd: HWND) -> bool {
-    is_taskbar(hwnd) || matches!(class_name(hwnd).as_str(), "Progman" | "WorkerW")
+    is_taskbar(hwnd)
+        || matches!(
+            class_name(hwnd).as_str(),
+            "Progman" | "WorkerW" | "XamlExplorerHostIslandWindow"
+        )
 }
