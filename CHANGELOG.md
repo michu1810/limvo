@@ -6,6 +6,14 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-04
+
+### Fixed
+
+- The Claude plan is read from the account profile, so an upgrade shows at
+  once with the plan's own name (for example Ultra) instead of the plan the
+  sign-in had when it was created.
+
 ## [0.1.0] - 2026-11-04
 
 ### Added
