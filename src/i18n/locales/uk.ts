@@ -40,6 +40,8 @@ export const uk: LocaleDefinition = {
     stateAuthRequired: "Вхід у {provider} закінчився. Увійдіть знову в застосунку {provider}.",
     stateNoCredentials: "Увійдіть у застосунок {provider}, щоб бачити ліміти.",
     stateError: "Не вдалося зчитати ліміти.",
+    stateRateLimited:
+      "{provider} попросив Limvo оновлювати повільніше. Limvo спробує знову за кілька хвилин.",
     retry: "Спробувати ще",
     settings: "Налаштування",
     launchAtLogin: "Запускати з Windows",

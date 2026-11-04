@@ -76,6 +76,7 @@ export type ReportState =
   | "loading"
   | "ok"
   | "offline"
+  | "rate_limited"
   | "auth_required"
   | "no_credentials"
   | "error";

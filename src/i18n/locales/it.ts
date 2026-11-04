@@ -40,6 +40,7 @@ export const it: LocaleDefinition = {
     stateAuthRequired: "L’accesso a {provider} è scaduto. Accedi di nuovo nell’app {provider}.",
     stateNoCredentials: "Accedi all’app {provider} per vedere i tuoi limiti.",
     stateError: "Impossibile leggere i limiti.",
+    stateRateLimited: "{provider} ha chiesto a Limvo di rallentare. Riproverà tra qualche minuto.",
     retry: "Riprova",
     settings: "Impostazioni",
     launchAtLogin: "Avvia con Windows",

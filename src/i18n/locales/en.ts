@@ -40,6 +40,7 @@ export const en: LocaleDefinition = {
     stateAuthRequired: "Your {provider} sign-in expired. Sign in again in the {provider} app.",
     stateNoCredentials: "Sign in to the {provider} app to see your limits.",
     stateError: "Couldn't read your limits.",
+    stateRateLimited: "{provider} asked Limvo to slow down. It tries again in a few minutes.",
     retry: "Try again",
     settings: "Settings",
     launchAtLogin: "Start with Windows",

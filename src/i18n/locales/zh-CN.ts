@@ -40,6 +40,7 @@ export const zhCN: LocaleDefinition = {
     stateAuthRequired: "{provider} 登录已过期。请在 {provider} 应用中重新登录。",
     stateNoCredentials: "登录 {provider} 应用即可查看限额。",
     stateError: "无法读取限额。",
+    stateRateLimited: "{provider} 要求 Limvo 降低查询频率。几分钟后将重试。",
     retry: "重试",
     settings: "设置",
     launchAtLogin: "开机启动",

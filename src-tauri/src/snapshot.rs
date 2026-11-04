@@ -97,6 +97,8 @@ pub enum ReportState {
     Loading,
     Ok,
     Offline,
+    /// The service asked to slow down before a first reading came in.
+    RateLimited,
     AuthRequired,
     NoCredentials,
     Error,

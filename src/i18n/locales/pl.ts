@@ -41,6 +41,8 @@ export const pl: LocaleDefinition = {
       "Logowanie do {provider} wygasło. Zaloguj się ponownie w aplikacji {provider}.",
     stateNoCredentials: "Zaloguj się w aplikacji {provider}, żeby zobaczyć limity.",
     stateError: "Nie udało się odczytać limitów.",
+    stateRateLimited:
+      "{provider} poprosił o wolniejsze odświeżanie. Limvo spróbuje ponownie za kilka minut.",
     retry: "Spróbuj ponownie",
     settings: "Ustawienia",
     launchAtLogin: "Uruchamiaj z Windows",

@@ -41,6 +41,8 @@ export const fr: LocaleDefinition = {
       "Votre connexion à {provider} a expiré. Reconnectez-vous dans l’app {provider}.",
     stateNoCredentials: "Connectez-vous à l’app {provider} pour voir vos limites.",
     stateError: "Impossible de lire vos limites.",
+    stateRateLimited:
+      "{provider} a demandé à Limvo de ralentir. Nouvel essai dans quelques minutes.",
     retry: "Réessayer",
     settings: "Paramètres",
     launchAtLogin: "Lancer avec Windows",

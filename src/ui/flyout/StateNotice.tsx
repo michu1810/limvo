@@ -26,6 +26,8 @@ export function StateNotice({
               time: format.relativeTime(new Date(report.snapshot.fetchedAt), now),
             })
           : t("stateError");
+      case "rate_limited":
+        return t("stateRateLimited", { provider });
       case "auth_required":
         return t("stateAuthRequired", { provider });
       case "no_credentials":
@@ -36,7 +38,8 @@ export function StateNotice({
   })();
 
   if (message === null) return null;
-  const canRetry = report.state !== "loading";
+  // Retrying a rate limit early would only renew it; the host tries again itself.
+  const canRetry = report.state !== "loading" && report.state !== "rate_limited";
 
   return (
     <div className="notice" data-state={report.state} role="status" aria-live="polite">

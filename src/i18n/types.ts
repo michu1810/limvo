@@ -53,6 +53,8 @@ export interface Messages {
   /** Placeholder `{provider}`. */
   stateNoCredentials: string;
   stateError: string;
+  /** The service asked to slow down before a first reading. Placeholder `{provider}`. */
+  stateRateLimited: string;
   retry: string;
 
   settings: string;

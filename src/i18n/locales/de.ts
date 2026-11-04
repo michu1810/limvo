@@ -41,6 +41,8 @@ export const de: LocaleDefinition = {
       "Deine {provider}-Anmeldung ist abgelaufen. Melde dich in der {provider}-App erneut an.",
     stateNoCredentials: "Melde dich in der {provider}-App an, um deine Limits zu sehen.",
     stateError: "Limits konnten nicht gelesen werden.",
+    stateRateLimited:
+      "{provider} bittet Limvo, langsamer abzufragen. Limvo versucht es in ein paar Minuten erneut.",
     retry: "Erneut versuchen",
     settings: "Einstellungen",
     launchAtLogin: "Mit Windows starten",
