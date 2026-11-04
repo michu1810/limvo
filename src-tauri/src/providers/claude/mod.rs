@@ -13,7 +13,7 @@ use std::time::{Duration, Instant};
 use reqwest::StatusCode;
 use reqwest::header::{AUTHORIZATION, RETRY_AFTER};
 
-use super::{FetchFuture, ProviderError, UsageProvider};
+use super::{AccountSource, FetchFuture, ProviderError, UsageProvider};
 use crate::snapshot::{PlanBadge, UsageSnapshot};
 
 pub const PROVIDER_ID: &str = "claude";
@@ -23,15 +23,39 @@ const MAX_ATTEMPTS: usize = 3;
 /// Plans change rarely; the profile is read again after this long.
 const PROFILE_TTL: Duration = Duration::from_hours(6);
 
+/// The default account reads every sign-in on the machine (the desktop app
+/// and Claude Code). An extra account reads only the Claude Code sign-in in
+/// its own folder: falling back to the desktop app would show the default
+/// account's numbers under the extra account's name.
 #[derive(Debug, Default)]
 pub struct ClaudeProvider {
+    account: Option<AccountSource>,
     /// The plan from the account profile, and when it was read.
     profile_plan: Mutex<Option<(Instant, PlanBadge)>>,
+}
+
+/// Claude Code's own folder: `CLAUDE_CONFIG_DIR` when set, otherwise `~/.claude`.
+pub fn default_folder() -> Option<PathBuf> {
+    credentials::claude_config_dir()
 }
 
 impl ClaudeProvider {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn for_account(account: &crate::accounts::Account) -> Self {
+        Self {
+            account: Some(account.into()),
+            ..Self::default()
+        }
+    }
+
+    fn folder(&self) -> Option<PathBuf> {
+        match &self.account {
+            Some(account) => Some(account.folder.clone()),
+            None => credentials::claude_config_dir(),
+        }
     }
 
     /// The current plan from the profile, read at most every few hours.
@@ -72,12 +96,20 @@ async fn read_profile(http: &reqwest::Client, token: &str) -> Option<plan::Profi
 }
 
 impl UsageProvider for ClaudeProvider {
-    fn id(&self) -> &'static str {
+    fn service(&self) -> &'static str {
         PROVIDER_ID
     }
 
-    fn name(&self) -> &'static str {
-        "Claude"
+    fn id(&self) -> &str {
+        self.account
+            .as_ref()
+            .map_or(PROVIDER_ID, |account| &account.id)
+    }
+
+    fn name(&self) -> &str {
+        self.account
+            .as_ref()
+            .map_or("Claude", |account| &account.name)
     }
 
     fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a> {
@@ -86,7 +118,7 @@ impl UsageProvider for ClaudeProvider {
 
     /// Claude Code appends to a transcript under `projects/` on every turn.
     fn activity_paths(&self) -> Vec<PathBuf> {
-        credentials::claude_config_dir()
+        self.folder()
             .map(|dir| dir.join("projects"))
             .into_iter()
             .collect()
@@ -98,7 +130,10 @@ async fn fetch(
     http: &reqwest::Client,
 ) -> Result<UsageSnapshot, ProviderError> {
     let now = jiff::Timestamp::now();
-    let candidates = credentials::discover(now.as_millisecond());
+    let candidates = match &provider.account {
+        Some(account) => credentials::discover_in(&account.folder, now.as_millisecond()),
+        None => credentials::discover(now.as_millisecond()),
+    };
     if candidates.usable.is_empty() {
         return Err(if candidates.found_any {
             ProviderError::AuthRequired

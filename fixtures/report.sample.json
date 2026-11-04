@@ -1,5 +1,6 @@
 {
   "providerId": "claude",
+  "serviceId": "claude",
   "providerName": "Claude",
   "state": "ok",
   "snapshot": {

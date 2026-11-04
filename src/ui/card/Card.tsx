@@ -41,7 +41,7 @@ export function Card({
     >
       <header className="flyout__header">
         <ProviderMark
-          providerId={report?.providerId ?? "claude"}
+          providerId={report?.serviceId ?? "claude"}
           size={16}
           level={snapshot?.headline?.percent ?? null}
         />

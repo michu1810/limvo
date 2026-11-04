@@ -4,6 +4,7 @@ import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { Segmented, SwitchRow } from "../controls";
 import { BackIcon, ChevronIcon } from "../icons";
+import { AccountsPanel } from "./AccountsPanel";
 import { TaskbarPins } from "./TaskbarPins";
 
 const MINUTES: Record<Exclude<RefreshMode, "adaptive">, number> = { "2m": 2, "5m": 5, "15m": 15 };
@@ -57,6 +58,10 @@ export function SettingsPanel({
           <BackIcon />
         </button>
         <h1 className="flyout__title">{t("settings")}</h1>
+        {/* The running version, in view without scrolling, to compare with an update. */}
+        <span className="flyout__updated" dir="ltr">
+          Limvo {__APP_VERSION__}
+        </span>
       </header>
 
       <div className="settings">
@@ -90,6 +95,7 @@ export function SettingsPanel({
           />
         )}
         {(settings?.showStrip ?? true) && <TaskbarPins reports={reports} settings={settings} />}
+        <AccountsPanel settings={settings} />
         <SwitchRow
           label={t("desktopCard")}
           checked={settings?.desktopCard ?? false}
@@ -143,7 +149,6 @@ export function SettingsPanel({
           />
         </div>
       </div>
-      <p className="settings__version">Limvo {__APP_VERSION__}</p>
     </>
   );
 }

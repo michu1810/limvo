@@ -753,11 +753,71 @@ button.setting:active:not(:disabled) {
   color: var(--text-secondary);
 }
 
-.settings__version {
-  margin: 18px 0 4px;
+/* Extra accounts ------------------------------------------------------------------ */
+
+/* The letter beside a service's mark that tells its extra account apart. */
+.account-tag {
+  display: inline-grid;
+  place-items: center;
+  min-width: 14px;
+  height: 14px;
+  padding-inline: 3px;
+  margin-inline-start: -3px;
+  border-radius: 4px;
+  background: var(--fill-subtle-hover);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.account {
+  gap: 10px;
+}
+
+/* The name and folder take the row; the mark and the remove button keep their size. */
+.account .setting__text {
+  flex: 1;
+}
+
+.account__folder {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-form {
+  gap: 8px;
+}
+
+.account-form__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.account-form__name {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-control);
+  background: var(--fill-subtle-hover);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.account-form__name:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.account-form__error {
+  margin: 0;
   font-size: 12px;
-  color: var(--text-tertiary);
-  text-align: center;
+  color: var(--text-secondary);
 }
 
 /* Switch: the knob grows under the pointer and slides with a soft settle, as in Windows 11. */

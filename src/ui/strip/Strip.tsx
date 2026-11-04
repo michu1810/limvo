@@ -1,10 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
 import { bridge, type Settings } from "../../bridge";
+import { accountLabel } from "../../core/accounts";
 import { computePace } from "../../core/pace";
 import { type Limit, pinnedLimits, visibleReports } from "../../core/pins";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { splitTemplate } from "../../i18n/resolve";
+import { AccountTag } from "../AccountTag";
 import { planAttribute, useNow } from "../hooks";
 import { headlineLabel, windowLabel } from "../labels";
 import { Meter } from "../Meter";
@@ -90,10 +92,11 @@ function SingleReading({
       data-stale={report?.state !== "ok" || undefined}
     >
       <ProviderMark
-        providerId={report?.providerId ?? "claude"}
+        providerId={report?.serviceId ?? "claude"}
         size={18}
         level={window?.percent ?? null}
       />
+      <AccountTag label={report ? accountLabel(settings?.accounts, report.providerId) : null} />
       <span className="strip__body">
         <span className="strip__text">
           {parts.map((part, index) => {
@@ -151,7 +154,8 @@ function CompactReading({
       data-plan={planAttribute(report, settings)}
       data-stale={report.state !== "ok" || undefined}
     >
-      <ProviderMark providerId={report.providerId} size={16} level={window.percent} />
+      <ProviderMark providerId={report.serviceId} size={16} level={window.percent} />
+      <AccountTag label={accountLabel(settings?.accounts, report.providerId)} />
       <span className="strip__body">
         <span className="strip__text">
           <RollingPercent className="strip__value" value={window.percent} />

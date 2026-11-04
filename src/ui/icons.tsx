@@ -48,6 +48,20 @@ export function CheckIcon() {
   );
 }
 
+export function RemoveIcon() {
+  return (
+    <svg
+      className="icon icon--remove"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+    >
+      <path className="icon__part" d="m4.5 4.5 7 7m0-7-7 7" {...stroke} />
+    </svg>
+  );
+}
+
 /** Three sliders: the knobs slide along their tracks on hover. */
 export function SettingsIcon() {
   return (

@@ -6,6 +6,21 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-04
+
+### Added
+
+- Extra accounts: up to four more Claude Code or Codex accounts, each signed
+  in from its own folder, added in _Settings > Extra accounts_. Each gets its
+  own tab and taskbar limits, with a letter beside the service's mark to tell
+  them apart. An extra Claude account reads only its folder, never the
+  desktop app.
+
+### Changed
+
+- The running version shows in the settings header, without scrolling, and
+  in the tray icon's tooltip.
+
 ## [0.2.0] - 2026-11-04
 
 ### Added

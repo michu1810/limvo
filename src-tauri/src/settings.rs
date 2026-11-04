@@ -9,6 +9,8 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Deserializer, Serialize};
 
+use crate::accounts::Account;
+
 /// How often the provider is read.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RefreshMode {
@@ -56,6 +58,9 @@ pub struct Settings {
     pub pinned: Option<Vec<String>>,
     /// Look for a newer Limvo on GitHub Releases now and then.
     pub check_updates: bool,
+    /// Extra accounts, each signed in from its own folder. Changed only by
+    /// the account commands, which pick the folder in the system dialog.
+    pub accounts: Vec<Account>,
     #[serde(flatten)]
     other: serde_json::Map<String, serde_json::Value>,
 }
@@ -74,6 +79,7 @@ impl Default for Settings {
             plan_colors: true,
             pinned: None,
             check_updates: true,
+            accounts: Vec::new(),
             other: serde_json::Map::new(),
         }
     }

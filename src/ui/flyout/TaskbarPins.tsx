@@ -54,7 +54,7 @@ export function TaskbarPins({
           >
             <span className="pins__provider">
               <ProviderMark
-                providerId={providerId}
+                providerId={own[0]?.report.serviceId ?? providerId}
                 size={14}
                 level={own[0]?.window.percent ?? null}
               />

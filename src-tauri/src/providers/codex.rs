@@ -12,7 +12,7 @@ use reqwest::StatusCode;
 use reqwest::header::{AUTHORIZATION, RETRY_AFTER, USER_AGENT};
 use serde::Deserialize;
 
-use super::{FetchFuture, ProviderError, UsageProvider};
+use super::{AccountSource, FetchFuture, ProviderError, UsageProvider};
 use crate::snapshot::{PlanBadge, Severity, UsageSnapshot, UsageWindow, WindowKind};
 
 pub const PROVIDER_ID: &str = "codex";
@@ -21,31 +21,56 @@ const USAGE_PAGE_URL: &str = "https://chatgpt.com/codex/settings/usage";
 /// A window of a day or more is a weekly allowance; Codex sends 604800 and 18000 today.
 const WEEKLY_THRESHOLD_SECONDS: u64 = 86_400;
 
+/// The default account reads `CODEX_HOME` (or `~/.codex`); an extra account
+/// reads only the folder it was added with.
 #[derive(Debug, Default)]
-pub struct CodexProvider;
+pub struct CodexProvider {
+    account: Option<AccountSource>,
+}
 
 impl CodexProvider {
     pub fn new() -> Self {
-        Self
+        Self::default()
+    }
+
+    pub fn for_account(account: &crate::accounts::Account) -> Self {
+        Self {
+            account: Some(account.into()),
+        }
+    }
+
+    fn home(&self) -> Option<PathBuf> {
+        match &self.account {
+            Some(account) => Some(account.folder.clone()),
+            None => default_folder(),
+        }
     }
 }
 
 impl UsageProvider for CodexProvider {
-    fn id(&self) -> &'static str {
+    fn service(&self) -> &'static str {
         PROVIDER_ID
     }
 
-    fn name(&self) -> &'static str {
-        "Codex"
+    fn id(&self) -> &str {
+        self.account
+            .as_ref()
+            .map_or(PROVIDER_ID, |account| &account.id)
+    }
+
+    fn name(&self) -> &str {
+        self.account
+            .as_ref()
+            .map_or("Codex", |account| &account.name)
     }
 
     fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a> {
-        Box::pin(fetch(http))
+        Box::pin(fetch(http, self.home()))
     }
 
     /// The CLI and the app write a session log for every conversation.
     fn activity_paths(&self) -> Vec<PathBuf> {
-        codex_home()
+        self.home()
             .map(|home| home.join("sessions"))
             .into_iter()
             .collect()
@@ -53,7 +78,7 @@ impl UsageProvider for CodexProvider {
 }
 
 /// `CODEX_HOME` when set, otherwise `~/.codex`, as the Codex CLI resolves it.
-fn codex_home() -> Option<PathBuf> {
+pub fn default_folder() -> Option<PathBuf> {
     std::env::var_os("CODEX_HOME")
         .filter(|value| !value.is_empty())
         .map(PathBuf::from)
@@ -84,8 +109,8 @@ impl std::fmt::Debug for SignIn {
     }
 }
 
-fn read_sign_in() -> Option<SignIn> {
-    let text = std::fs::read_to_string(codex_home()?.join("auth.json")).ok()?;
+fn read_sign_in(home: Option<PathBuf>) -> Option<SignIn> {
+    let text = std::fs::read_to_string(home?.join("auth.json")).ok()?;
     let tokens = serde_json::from_str::<AuthFile>(&text).ok()?.tokens?;
     let token = tokens.access_token.filter(|token| !token.is_empty())?;
     Some(SignIn {
@@ -94,8 +119,11 @@ fn read_sign_in() -> Option<SignIn> {
     })
 }
 
-async fn fetch(http: &reqwest::Client) -> Result<UsageSnapshot, ProviderError> {
-    let sign_in = read_sign_in().ok_or(ProviderError::NoCredentials)?;
+async fn fetch(
+    http: &reqwest::Client,
+    home: Option<PathBuf>,
+) -> Result<UsageSnapshot, ProviderError> {
+    let sign_in = read_sign_in(home).ok_or(ProviderError::NoCredentials)?;
     let mut request = http
         .get(USAGE_URL)
         .header(AUTHORIZATION, format!("Bearer {}", sign_in.token))

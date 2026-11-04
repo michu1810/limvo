@@ -2,6 +2,22 @@ import type { ProviderReport } from "../core/snapshot";
 
 export type RefreshMode = "adaptive" | "2m" | "5m" | "15m";
 
+/** A service that can have extra accounts, each signed in from its own folder. */
+export type AccountService = "claude" | "codex";
+
+/** Mirrors `Account` in `src-tauri/src/accounts.rs`. */
+export interface Account {
+  /** `<service>~<n>`, the account's provider id. */
+  id: string;
+  service: AccountService;
+  /** Shown so the user recognises the account; the interface never sends a path. */
+  folder: string;
+  label: string;
+}
+
+/** Why the host refused a folder; `cancelled` means the dialog was closed. */
+export type AccountError = "cancelled" | "too_many" | "default_folder" | "duplicate" | "no_sign_in";
+
 /** Mirrors `Settings` in `src-tauri/src/settings.rs`. */
 export interface Settings {
   /** BCP 47 code chosen by the user, or `null` to follow the system language. */
@@ -20,10 +36,12 @@ export interface Settings {
   pinned: string[] | null;
   /** Look for a newer Limvo on GitHub Releases now and then. */
   checkUpdates: boolean;
+  /** Extra accounts. Changed only through the account calls below. */
+  accounts: Account[];
 }
 
 /** Only the fields named in a patch change; the host keeps everything else. */
-export type SettingsPatch = Partial<Settings>;
+export type SettingsPatch = Partial<Omit<Settings, "accounts">>;
 
 export type Theme = "light" | "dark";
 
@@ -81,6 +99,14 @@ export interface Bridge {
   notify(toast: Toast): Promise<void>;
   /** Fires each time the flyout is brought on screen, so it can play its entrance. */
   onFlyoutShown(listener: () => void): Promise<Unsubscribe>;
+
+  /**
+   * Opens the system folder dialog titled `title` and adds the account signed
+   * in there. Rejects with an `AccountError` code.
+   */
+  addAccount(service: AccountService, label: string, title: string): Promise<Settings>;
+  removeAccount(id: string): Promise<Settings>;
+  renameAccount(id: string, label: string): Promise<Settings>;
 
   /** The newer version found by the host's last check, or `null`. */
   getUpdate(): Promise<AvailableUpdate | null>;

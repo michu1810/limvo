@@ -5,7 +5,14 @@ import { findLocale, resolveLocale } from "../i18n/resolve";
 import type { LocaleDefinition } from "../i18n/types";
 
 const LOADING: ProviderReport[] = [
-  { providerId: "claude", providerName: "Claude", state: "loading", snapshot: null, detail: null },
+  {
+    providerId: "claude",
+    serviceId: "claude",
+    providerName: "Claude",
+    state: "loading",
+    snapshot: null,
+    detail: null,
+  },
 ];
 
 /** The latest report of every provider, kept current through the host's events. */

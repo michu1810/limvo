@@ -6,8 +6,9 @@ import type { Bridge, Settings } from "./types";
  * Development host for `npm run dev` in a plain browser. Query parameters:
  * `scenario` (see `SCENARIOS`), `codex=off`, `more` (adds Cursor and
  * Antigravity), `pins`, `locale` (for example `he`) and
- * `now` (an ISO instant, for reproducible screenshots) and `update` (a
- * version to offer, for example `0.2.0`). Refresh cycles
+ * `now` (an ISO instant, for reproducible screenshots), `update` (a
+ * version to offer, for example `0.2.0`) and `accounts` (adds a second
+ * Claude account, "Praca"). Refresh cycles
  * through a small change so motion can be checked without the app.
  */
 export function createBrowserBridge(): Bridge {
@@ -18,7 +19,8 @@ export function createBrowserBridge(): Bridge {
   const fixedNow = params.get("now");
   const now = () => (fixedNow ? new Date(fixedNow) : new Date());
   const withMore = params.has("more");
-  const build = () => scenarioReports(name, now(), withCodex, withMore);
+  const withAccount = params.has("accounts");
+  const build = () => scenarioReports(name, now(), withCodex, withMore, withAccount);
 
   let reports: ProviderReport[] = build();
   let settings: Settings = {
@@ -32,6 +34,9 @@ export function createBrowserBridge(): Bridge {
     planColors: true,
     pinned: params.get("pins")?.split(",") ?? null,
     checkUpdates: true,
+    accounts: withAccount
+      ? [{ id: "claude~2", service: "claude", folder: "D:\\claude-praca", label: "Praca" }]
+      : [],
   };
   const offered = params.get("update");
   const update = offered ? { version: offered, currentVersion: __APP_VERSION__ } : null;
@@ -100,6 +105,31 @@ export function createBrowserBridge(): Bridge {
       return Promise.resolve(() => {
         shownListeners.delete(listener);
       });
+    },
+
+    async addAccount(service, label) {
+      // The browser has no folder dialog; pretend one was picked.
+      const id = `${service}~${settings.accounts.length + 2}`;
+      const folder = `D:\\${service}-${settings.accounts.length + 2}`;
+      settings = {
+        ...settings,
+        accounts: [...settings.accounts, { id, service, folder, label: label.trim() || id }],
+      };
+      for (const listener of settingsListeners) listener(settings);
+      return settings;
+    },
+    async removeAccount(id) {
+      settings = { ...settings, accounts: settings.accounts.filter((a) => a.id !== id) };
+      for (const listener of settingsListeners) listener(settings);
+      return settings;
+    },
+    async renameAccount(id, label) {
+      settings = {
+        ...settings,
+        accounts: settings.accounts.map((a) => (a.id === id ? { ...a, label } : a)),
+      };
+      for (const listener of settingsListeners) listener(settings);
+      return settings;
     },
 
     getUpdate: () => Promise.resolve(update),

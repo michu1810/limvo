@@ -124,7 +124,7 @@ export function Flyout({
             )}
             <header className="flyout__header">
               <ProviderMark
-                providerId={report.providerId}
+                providerId={report.serviceId}
                 size={20}
                 level={snapshot?.headline?.percent ?? null}
               />
@@ -225,7 +225,7 @@ function useTrayTexts(reports: ProviderReport[], settings: Settings | null, now:
         : format.percent(window.percent);
     return `${report.providerName}: ${reading}`;
   });
-  const tooltip = fitTooltip(["Limvo", ...lines]);
+  const tooltip = fitTooltip([`Limvo ${__APP_VERSION__}`, ...lines]);
   const refresh = t("refresh");
   const quit = t("quit");
 

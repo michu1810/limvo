@@ -62,9 +62,11 @@ neutral `UsageSnapshot` the interface already knows how to draw.
 
    ```rust
    impl UsageProvider for MyProvider {
-       // Stable id: used in pins (`<id>:<window>`), brand files and plan colours.
-       fn id(&self) -> &'static str { "my_service" }
-       fn name(&self) -> &'static str { "My Service" }
+       // The service: names the brand file and the plan colours. It is also
+       // the report id, used in pins (`<id>:<window>`), unless `id` is
+       // overridden, as the extra accounts of Claude and Codex do (`claude~2`).
+       fn service(&self) -> &'static str { "my_service" }
+       fn name(&self) -> &str { "My Service" }
 
        fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a> {
            Box::pin(async move {

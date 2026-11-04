@@ -160,6 +160,24 @@ afterwards.
 | Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.       |
 | Plan colours       | On       | Tints each service with the colour of its plan.                                                |
 | Update frequency   | Adaptive | Adaptive follows activity in the services' own tools. 2, 5 or 15 minutes are fixed schedules.  |
+| Check for updates  | On       | Twice a day, against GitHub Releases. An update installs only when you choose _Update_.        |
+| Extra accounts     | None     | Up to four more Claude Code or Codex accounts, each signed in from its own folder.             |
+
+### Several accounts
+
+A second Claude Code or Codex account lives in its own folder: sign in once
+with that folder set (`CLAUDE_CONFIG_DIR` for Claude Code, `CODEX_HOME` for
+Codex), then add it in _Settings > Extra accounts_. Pick the service, give it
+a name such as _Work_, and choose the folder in the dialog. It gets its own
+tab, its own limits in _Limits in the taskbar_, and a small letter beside the
+service's mark wherever only the mark fits.
+
+- An extra Claude account reads only the Claude Code sign-in in its folder,
+  never the Claude desktop app, which stays with the main account.
+- Removing an account only makes Limvo forget it. The folder and the sign-in
+  stay as they are.
+- Limvo refuses the main account's folder, a folder added twice and a folder
+  with no sign-in in it.
 
 ## How it works
 
@@ -206,6 +224,7 @@ are honoured. One service failing never delays or blanks another.
 | Only some services                      | Only those get a tab. With a single service, the tabs disappear and the flyout looks like a dedicated widget.                 |
 | Signed out everywhere                   | The flyout asks you to sign in. Limvo checks again every two minutes, no restart needed.                                      |
 | Custom tool folders                     | `CLAUDE_CONFIG_DIR` and `CODEX_HOME` are honoured the same way the CLIs honour them.                                          |
+| Two Claude Code or Codex accounts       | Add the second one's folder in _Settings > Extra accounts_. See [Several accounts](#several-accounts).                        |
 | Several monitors                        | Each taskbar gets a reading (turn off _On every monitor_ to keep only the main one). Flyout and card open where you use them. |
 | Auto-hide taskbar                       | The reading hides with the taskbar and returns with it.                                                                       |
 | Full-screen game, video or presentation | The reading steps aside on that monitor only. Live wallpapers and full-screen windows on other monitors do not hide it.       |
@@ -329,7 +348,6 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, and
 
 - macOS menu bar version
 - Code-signed releases and `winget install Limvo`
-- Several accounts of the same service
 - A Windows 11 Widgets board card (needs an MSIX package and a widget provider)
 
 ## Disclaimer

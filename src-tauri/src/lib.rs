@@ -4,6 +4,7 @@
 //! network, windows and the tray. The UI in `src/` only renders reports and
 //! asks for actions through the commands in [`commands`].
 
+mod accounts;
 mod activity;
 mod brand;
 mod card;
@@ -42,7 +43,23 @@ pub struct AppState {
     flyout: SharedFlyoutState,
     card: CardState,
     tray: TrayMenu,
-    _activity: ActivityWatch,
+    /// Replaced when accounts change, so it follows their folders.
+    activity: Mutex<ActivityWatch>,
+}
+
+/// Puts a new list of extra accounts into effect while the app runs.
+pub fn apply_accounts(app: &tauri::AppHandle, accounts: &[accounts::Account]) {
+    let state = app.state::<AppState>();
+    let providers = providers::all(accounts);
+    let paths = providers
+        .iter()
+        .flat_map(|provider| provider.activity_paths())
+        .collect();
+    *state
+        .activity
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner) = activity::watch(paths, &state.poller);
+    state.poller.set_providers(providers);
 }
 
 pub fn run() {
@@ -59,6 +76,7 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(hotkey::plugin())
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -82,6 +100,9 @@ pub fn run() {
             commands::shortcut_label,
             commands::hide_flyout,
             commands::localize_tray,
+            commands::add_account,
+            commands::remove_account,
+            commands::rename_account,
             commands::get_update,
             commands::install_update,
             commands::quit,
@@ -92,7 +113,7 @@ pub fn run() {
             let tray = tray::build(app)?;
             tray::use_brand(app.handle(), "claude");
 
-            let providers = providers::all();
+            let providers = providers::all(&settings.accounts);
             let activity_paths = providers
                 .iter()
                 .flat_map(|provider| provider.activity_paths())
@@ -113,7 +134,7 @@ pub fn run() {
                 flyout: SharedFlyoutState::default(),
                 card: CardState::default(),
                 tray,
-                _activity: activity,
+                activity: Mutex::new(activity),
             });
             #[cfg(windows)]
             taskbar::start(app.handle().clone());
@@ -126,7 +147,7 @@ pub fn run() {
             let app = window.app_handle();
             match (window.label(), event) {
                 // Like every Windows flyout, it closes when the user clicks elsewhere.
-                (flyout::LABEL, WindowEvent::Focused(false)) => flyout::hide(app),
+                (flyout::LABEL, WindowEvent::Focused(false)) => flyout::on_blur(app),
                 // Tells the UI to play its entrance; hidden webviews throttle their own clocks.
                 (flyout::LABEL, WindowEvent::Focused(true)) => {
                     let _ = app.emit_to(flyout::LABEL, events::FLYOUT_SHOWN, ());

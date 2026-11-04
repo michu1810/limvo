@@ -9,6 +9,7 @@ use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_autostart::ManagerExt as _;
 use tauri_plugin_opener::OpenerExt;
 
+use crate::accounts::{self, Account, AccountError, Service};
 use crate::flyout;
 use crate::settings::{Settings, SettingsPatch};
 use crate::snapshot::ProviderReport;
@@ -172,6 +173,115 @@ pub fn localize_tray(
     quit: String,
 ) {
     tray::localize(&app, &state.tray, &tooltip, &refresh, &quit);
+}
+
+/// Adds an account of `service` signed in from a folder the user picks in
+/// the system dialog. The interface never sees or sends the path: it gets
+/// the saved settings, or an error code (`cancelled`, `too_many`,
+/// `default_folder`, `duplicate`, `no_sign_in`) to explain.
+#[tauri::command]
+pub async fn add_account(
+    app: AppHandle,
+    service: Service,
+    label: String,
+    title: String,
+) -> Result<Settings, String> {
+    let title: String = title.chars().take(80).collect();
+    let Some(folder) = pick_folder(&app, title).await else {
+        return Err("cancelled".into());
+    };
+    let folder = accounts::canonical(&folder).ok_or_else(|| AccountError::NoSignIn.to_string())?;
+    let default_folder = service
+        .default_folder()
+        .and_then(|dir| accounts::canonical(&dir));
+    let has_sign_in = folder.join(service.sign_in_file()).is_file();
+    let state = app.state::<AppState>();
+    let existing = state
+        .settings
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner)
+        .accounts
+        .clone();
+    accounts::check_new(
+        &existing,
+        service,
+        &folder,
+        default_folder.as_deref(),
+        has_sign_in,
+    )
+    .map_err(|error| error.to_string())?;
+
+    let id = accounts::next_id(&existing, service);
+    let account = Account {
+        label: accounts::clean_label(&label, &id),
+        id,
+        service,
+        folder,
+    };
+    log::info!("adding {} as {}", account.service.name(), account.id);
+    change_accounts(&app, |accounts| accounts.push(account))
+}
+
+/// Forgets an extra account. Its folder and sign-in stay as they are.
+#[tauri::command]
+pub fn remove_account(app: AppHandle, id: String) -> Result<Settings, String> {
+    change_accounts(&app, |accounts| accounts.retain(|account| account.id != id))
+}
+
+#[tauri::command]
+pub fn rename_account(app: AppHandle, id: String, label: String) -> Result<Settings, String> {
+    change_accounts(&app, |accounts| {
+        if let Some(account) = accounts.iter_mut().find(|account| account.id == id) {
+            account.label = accounts::clean_label(&label, &id);
+        }
+    })
+}
+
+/// Saves a change to the accounts and puts it into effect: the poller reads
+/// the new list, the activity watch follows its folders, every window hears.
+fn change_accounts(
+    app: &AppHandle,
+    change: impl FnOnce(&mut Vec<Account>),
+) -> Result<Settings, String> {
+    let state = app.state::<AppState>();
+    let after = {
+        let mut settings = state
+            .settings
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner);
+        change(&mut settings.accounts);
+        settings.clone()
+    };
+    state
+        .store
+        .save(&after)
+        .map_err(|error| error.to_string())?;
+    crate::apply_accounts(app, &after.accounts);
+    app.emit(events::SETTINGS_UPDATED, &after)
+        .map_err(|error| error.to_string())?;
+    Ok(after)
+}
+
+async fn pick_folder(app: &AppHandle, title: String) -> Option<std::path::PathBuf> {
+    use tauri_plugin_dialog::DialogExt;
+
+    let (sender, receiver) = tokio::sync::oneshot::channel();
+    // The dialog belongs to the flyout, which stays open behind it, so the
+    // new account or the reason it was refused shows where the user asked.
+    flyout::hold_open(true);
+    let mut dialog = app.dialog().file().set_title(title);
+    if let Some(window) = app.get_webview_window(flyout::LABEL) {
+        dialog = dialog.set_parent(&window);
+    }
+    dialog.pick_folder(move |folder| {
+        let _ = sender.send(folder);
+    });
+    let picked = receiver.await.ok().flatten();
+    flyout::hold_open(false);
+    if let Some(window) = app.get_webview_window(flyout::LABEL) {
+        let _ = window.set_focus();
+    }
+    picked?.into_path().ok()
 }
 
 /// The newer version found by the last check, if any.
