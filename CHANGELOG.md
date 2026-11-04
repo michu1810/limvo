@@ -6,6 +6,8 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-04
+
 ### Added
 
 - Extra accounts: up to four more Claude Code or Codex accounts, each signed
