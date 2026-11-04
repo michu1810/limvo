@@ -6,6 +6,7 @@ import type { BreakdownRow, ProviderReport, UsageSnapshot, UsageWindow } from ".
 // fail to compile when a field is added or renamed in `snapshot.ts`.
 const reportKeys = {
   providerId: true,
+  serviceId: true,
   providerName: true,
   state: true,
   snapshot: true,

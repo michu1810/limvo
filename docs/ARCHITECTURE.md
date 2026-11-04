@@ -61,6 +61,14 @@ restart.
 | Cursor      | `state.vscdb` of the editor, SQLite opened read-only           | `api2.cursor.sh` dashboard service   | Cursor `workspaceStorage`             |
 | Antigravity | Credential Manager entry `gemini:antigravity`                  | `cloudcode-pa.googleapis.com` quotas | `~/.gemini/antigravity/conversations` |
 
+A service whose sign-in lives in a folder (Claude Code, Codex) can have
+extra accounts (`accounts.rs`): each is the same provider bound to another
+folder, with the report id `<service>~<n>` and `serviceId` naming the service
+for its mark. The folder is chosen in the system dialog the core opens
+(`add_account`); the interface never sends a path. Adding or removing one
+hands the poller a new provider list (`PollerHandle::set_providers`), which
+keeps the schedule and last reading of every provider that stays.
+
 Windows come in four kinds: `session` (five hours), `weekly`, `monthly`
 (a billing cycle, Cursor) and `scoped` (a weekly cap of one model, named by
 its label: Claude model caps and Antigravity's per-model quotas). The kind

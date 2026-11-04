@@ -30,7 +30,7 @@ impl CursorProvider {
 }
 
 impl UsageProvider for CursorProvider {
-    fn id(&self) -> &'static str {
+    fn service(&self) -> &'static str {
         PROVIDER_ID
     }
 

@@ -1,7 +1,9 @@
 import type { CSSProperties, KeyboardEvent } from "react";
 import type { Settings } from "../../bridge";
+import { accountLabel } from "../../core/accounts";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
+import { AccountTag } from "../AccountTag";
 import { planAttribute } from "../hooks";
 import { ProviderMark } from "../ProviderMark";
 
@@ -68,10 +70,11 @@ export function ProviderTabs({
             onClick={() => onSelect(report.providerId)}
           >
             <ProviderMark
-              providerId={report.providerId}
+              providerId={report.serviceId}
               size={16}
               level={headline?.percent ?? null}
             />
+            <AccountTag label={accountLabel(settings?.accounts, report.providerId)} />
             <span className="tabs__name">{report.providerName}</span>
             {headline && <span className="tabs__value">{format.percent(headline.percent)}</span>}
           </button>

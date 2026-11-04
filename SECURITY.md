@@ -27,6 +27,10 @@ reproduce. You can expect a first answer within a week.
 - The interface has no direct access to the file system, the network or the
   credentials. It can only call the commands in `src-tauri/src/commands.rs`,
   under a strict content security policy.
+- The folder of an extra account is picked in the system folder dialog,
+  opened by the core. The interface names only the service and a label; no
+  command accepts a path from it. The core checks that the folder holds the
+  service's sign-in file without returning its contents.
 - The only network destinations are the usage APIs of the signed-in services
   (`api.anthropic.com`, `chatgpt.com`, `api2.cursor.sh`,
   `cloudcode-pa.googleapis.com`), over HTTPS, each with its own token, and the

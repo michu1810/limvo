@@ -78,5 +78,17 @@ export const de: LocaleDefinition = {
     updateLater: "Später",
     updateInstalling: "Wird aktualisiert",
     updateFailed: "Update fehlgeschlagen. Versuche es später erneut.",
+    accounts: "Weitere Konten",
+    accountsHint: "Claude Code oder Codex, in einem anderen Ordner angemeldet",
+    addAccount: "Konto hinzufügen",
+    accountName: "Name, zum Beispiel Arbeit",
+    chooseFolder: "Ordner wählen",
+    accountFolderTitle: "Ordner mit der {service}-Anmeldung wählen",
+    removeAccount: "{name} entfernen",
+    accountErrorTooMany: "Höchstens {count} weitere Konten.",
+    accountErrorDefault: "Das ist der Ordner des Hauptkontos.",
+    accountErrorDuplicate: "Dieses Konto ist schon hinzugefügt.",
+    accountErrorNoSignIn:
+      "In diesem Ordner ist keine {service}-Anmeldung. Melde dich dort zuerst an.",
   },
 };

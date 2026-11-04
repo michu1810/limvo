@@ -29,11 +29,23 @@ const MAX_RETRY: Duration = Duration::from_mins(15);
 /// Requests to one provider closer together than this reuse the last answer.
 const MIN_GAP: Duration = Duration::from_secs(10);
 
-#[derive(Debug, Clone)]
+/// The provider list waiting for the poller to take over.
+type Pending = Arc<Mutex<Option<Vec<Box<dyn UsageProvider>>>>>;
+
+#[derive(Clone)]
 pub struct PollerHandle {
     reports: Arc<Mutex<Vec<ProviderReport>>>,
     wake: Arc<Notify>,
     schedule: Arc<Schedule>,
+    pending: Pending,
+}
+
+impl std::fmt::Debug for PollerHandle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("PollerHandle")
+            .field("reports", &self.reports().len())
+            .finish_non_exhaustive()
+    }
 }
 
 /// Lock-free state shared between the poller and whoever nudges it.
@@ -61,6 +73,13 @@ impl PollerHandle {
     }
 
     pub fn refresh_now(&self) {
+        self.wake.notify_one();
+    }
+
+    /// Replaces the providers, for an account added or removed. Providers
+    /// that stay keep their schedule and last reading; new ones are read now.
+    pub fn set_providers(&self, providers: Vec<Box<dyn UsageProvider>>) {
+        *self.pending.lock().unwrap_or_else(PoisonError::into_inner) = Some(providers);
         self.wake.notify_one();
     }
 
@@ -123,10 +142,11 @@ pub fn start(
 ) -> PollerHandle {
     let reports = providers
         .iter()
-        .map(|provider| ProviderReport::loading(provider.id(), provider.name()))
+        .map(|provider| loading(provider.as_ref()))
         .collect();
     let handle = PollerHandle {
         reports: Arc::new(Mutex::new(reports)),
+        pending: Arc::new(Mutex::new(None)),
         wake: Arc::new(Notify::new()),
         schedule: Arc::new(Schedule {
             mode: AtomicU8::new(mode_to_u8(mode)),
@@ -159,6 +179,14 @@ async fn run(app: AppHandle, providers: Vec<Box<dyn UsageProvider>>, handle: Pol
         .collect();
 
     loop {
+        let replacement = handle
+            .pending
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .take();
+        if let Some(providers) = replacement {
+            slots = replace_slots(&handle, slots, providers);
+        }
         let now = Instant::now();
         for (index, slot) in slots.iter_mut().enumerate() {
             let too_soon = slot.last_fetch.is_some_and(|at| at.elapsed() < MIN_GAP);
@@ -195,6 +223,56 @@ async fn run(app: AppHandle, providers: Vec<Box<dyn UsageProvider>>, handle: Pol
             }
         }
     }
+}
+
+fn loading(provider: &dyn UsageProvider) -> ProviderReport {
+    ProviderReport::loading(provider.id(), provider.service(), provider.name())
+}
+
+/// The slots and reports for a new provider list, reusing those of providers
+/// that stay so their schedule and last reading carry over.
+fn replace_slots(
+    handle: &PollerHandle,
+    mut old: Vec<Slot>,
+    providers: Vec<Box<dyn UsageProvider>>,
+) -> Vec<Slot> {
+    let mut reports = handle
+        .reports
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner);
+    let mut next_reports = Vec::with_capacity(providers.len());
+    let mut next_slots = Vec::with_capacity(providers.len());
+    for provider in providers {
+        let kept = old
+            .iter()
+            .position(|slot| slot.provider.id() == provider.id())
+            .map(|index| old.swap_remove(index));
+        let report = reports
+            .iter()
+            .find(|report| report.provider_id == provider.id())
+            .filter(|_| kept.is_some())
+            .cloned()
+            .map_or_else(
+                || loading(provider.as_ref()),
+                |mut report| {
+                    // A renamed account keeps its readings under its new name.
+                    provider.name().clone_into(&mut report.provider_name);
+                    report
+                },
+            );
+        next_reports.push(report);
+        next_slots.push(match kept {
+            Some(slot) => Slot { provider, ..slot },
+            None => Slot {
+                provider,
+                due: Instant::now(),
+                failures: 0,
+                last_fetch: None,
+            },
+        });
+    }
+    *reports = next_reports;
+    next_slots
 }
 
 /// Waits for `wait`, or less when someone asks for a fresh reading; returns whether they did.
@@ -236,6 +314,7 @@ fn merge(
     match outcome {
         Ok(snapshot) => ProviderReport {
             provider_id: previous.provider_id.clone(),
+            service_id: previous.service_id.clone(),
             provider_name: previous.provider_name.clone(),
             state: ReportState::Ok,
             snapshot: Some(snapshot),
@@ -255,6 +334,7 @@ fn merge(
             }
             ProviderReport {
                 provider_id: previous.provider_id.clone(),
+                service_id: previous.service_id.clone(),
                 provider_name: previous.provider_name.clone(),
                 state,
                 snapshot: previous.snapshot.clone(),
@@ -343,7 +423,10 @@ mod tests {
 
     #[test]
     fn a_failure_keeps_the_last_good_snapshot() {
-        let good = merge(&ProviderReport::loading("claude", "Claude"), Ok(snapshot()));
+        let good = merge(
+            &ProviderReport::loading("claude", "claude", "Claude"),
+            Ok(snapshot()),
+        );
         let offline = merge(&good, Err(ProviderError::Unreachable("timeout".into())));
         assert_eq!(offline.state, ReportState::Offline);
         assert_eq!(offline.snapshot, good.snapshot);
@@ -352,7 +435,7 @@ mod tests {
     #[test]
     fn rejected_credentials_ask_the_user_to_sign_in() {
         let report = merge(
-            &ProviderReport::loading("claude", "Claude"),
+            &ProviderReport::loading("claude", "claude", "Claude"),
             Err(ProviderError::AuthRequired),
         );
         assert_eq!(report.state, ReportState::AuthRequired);
@@ -399,5 +482,113 @@ mod tests {
             retry_after: Some(Duration::from_secs(3)),
         };
         assert_eq!(retry_delay(&limited, 1), FIRST_RETRY);
+    }
+
+    struct Fake(&'static str, &'static str);
+
+    impl UsageProvider for Fake {
+        fn service(&self) -> &'static str {
+            "claude"
+        }
+        fn id(&self) -> &str {
+            self.0
+        }
+        fn name(&self) -> &str {
+            self.1
+        }
+        fn fetch<'a>(&'a self, _: &'a reqwest::Client) -> crate::providers::FetchFuture<'a> {
+            Box::pin(async { Err(ProviderError::NoCredentials) })
+        }
+    }
+
+    fn fake(id: &'static str, name: &'static str) -> Box<dyn UsageProvider> {
+        Box::new(Fake(id, name))
+    }
+
+    #[test]
+    fn a_new_account_list_keeps_readings_and_schedules_of_the_accounts_that_stay() {
+        let handle = PollerHandle {
+            reports: Arc::new(Mutex::new(vec![
+                merge(
+                    &ProviderReport::loading("claude", "claude", "Claude"),
+                    Ok(snapshot()),
+                ),
+                ProviderReport::loading("claude~2", "claude", "Claude · Old"),
+            ])),
+            wake: Arc::new(Notify::new()),
+            schedule: Arc::new(schedule(RefreshMode::Adaptive, 0)),
+            pending: Arc::new(Mutex::new(None)),
+        };
+        let later = Instant::now() + Duration::from_mins(10);
+        let old = vec![
+            Slot {
+                provider: fake("claude", "Claude"),
+                due: later,
+                failures: 2,
+                last_fetch: None,
+            },
+            Slot {
+                provider: fake("claude~2", "Claude · Old"),
+                due: later,
+                failures: 0,
+                last_fetch: None,
+            },
+        ];
+
+        // claude~2 is renamed, claude~3 is new, nothing else changes.
+        let slots = replace_slots(
+            &handle,
+            old,
+            vec![
+                fake("claude", "Claude"),
+                fake("claude~2", "Claude · Work"),
+                fake("claude~3", "Claude · Home"),
+            ],
+        );
+
+        let ids: Vec<_> = slots
+            .iter()
+            .map(|slot| slot.provider.id().to_owned())
+            .collect();
+        assert_eq!(ids, ["claude", "claude~2", "claude~3"]);
+        assert_eq!((slots[0].due, slots[0].failures), (later, 2));
+        assert!(slots[2].due <= Instant::now());
+
+        let reports = handle.reports();
+        assert_eq!(reports[0].state, ReportState::Ok);
+        assert_eq!(reports[1].provider_name, "Claude · Work");
+        assert_eq!(reports[2].state, ReportState::Loading);
+        assert_eq!(reports[2].service_id, "claude");
+    }
+
+    #[test]
+    fn a_removed_account_leaves_no_report_behind() {
+        let handle = PollerHandle {
+            reports: Arc::new(Mutex::new(vec![
+                ProviderReport::loading("claude", "claude", "Claude"),
+                ProviderReport::loading("codex~2", "codex", "Codex · Work"),
+            ])),
+            wake: Arc::new(Notify::new()),
+            schedule: Arc::new(schedule(RefreshMode::Adaptive, 0)),
+            pending: Arc::new(Mutex::new(None)),
+        };
+        let now = Instant::now();
+        let old = vec![
+            Slot {
+                provider: fake("claude", "Claude"),
+                due: now,
+                failures: 0,
+                last_fetch: None,
+            },
+            Slot {
+                provider: fake("codex~2", "Codex · Work"),
+                due: now,
+                failures: 0,
+                last_fetch: None,
+            },
+        ];
+        let slots = replace_slots(&handle, old, vec![fake("claude", "Claude")]);
+        assert_eq!(slots.len(), 1);
+        assert_eq!(handle.reports().len(), 1);
     }
 }

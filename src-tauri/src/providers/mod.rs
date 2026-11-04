@@ -18,6 +18,7 @@ use std::time::Duration;
 use reqwest::StatusCode;
 use reqwest::header::RETRY_AFTER;
 
+use crate::accounts::{Account, Service};
 use crate::snapshot::{Severity, UsageSnapshot};
 
 pub type FetchFuture<'a> =
@@ -25,11 +26,17 @@ pub type FetchFuture<'a> =
 
 /// A source of usage readings. Implementations must never log or return credentials.
 pub trait UsageProvider: Send + Sync {
-    /// Stable identifier, also the name of the optional brand mark file.
-    fn id(&self) -> &'static str;
+    /// The service: names the optional brand mark file and the plan colours.
+    fn service(&self) -> &'static str;
 
-    /// Name of the service as the interface shows it.
-    fn name(&self) -> &'static str;
+    /// Stable identifier of this account's reports, pins and history: the
+    /// service id for the default account, `<service>~<n>` for an extra one.
+    fn id(&self) -> &str {
+        self.service()
+    }
+
+    /// Name of the account as the interface shows it.
+    fn name(&self) -> &str;
 
     /// Reads the current usage. Called by the poller, never concurrently.
     fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a>;
@@ -61,14 +68,41 @@ pub enum ProviderError {
     Unexpected(String),
 }
 
-/// Every provider, in the order the interface lists them.
-pub fn all() -> Vec<Box<dyn UsageProvider>> {
-    vec![
-        Box::new(claude::ClaudeProvider::new()),
-        Box::new(codex::CodexProvider::new()),
-        Box::new(cursor::CursorProvider::new()),
-        Box::new(antigravity::AntigravityProvider::new()),
-    ]
+/// Every provider, in the order the interface lists them: each service's
+/// default account, then its extra accounts in the order they were added.
+pub fn all(accounts: &[Account]) -> Vec<Box<dyn UsageProvider>> {
+    let extra = |service: Service| accounts.iter().filter(move |a| a.service == service);
+    let mut providers: Vec<Box<dyn UsageProvider>> = vec![Box::new(claude::ClaudeProvider::new())];
+    providers.extend(
+        extra(Service::Claude)
+            .map(|a| Box::new(claude::ClaudeProvider::for_account(a)) as Box<dyn UsageProvider>),
+    );
+    providers.push(Box::new(codex::CodexProvider::new()));
+    providers.extend(
+        extra(Service::Codex)
+            .map(|a| Box::new(codex::CodexProvider::for_account(a)) as Box<dyn UsageProvider>),
+    );
+    providers.push(Box::new(cursor::CursorProvider::new()));
+    providers.push(Box::new(antigravity::AntigravityProvider::new()));
+    providers
+}
+
+/// The identity of an extra account inside its provider.
+#[derive(Debug, Clone)]
+pub(crate) struct AccountSource {
+    pub id: String,
+    pub name: String,
+    pub folder: PathBuf,
+}
+
+impl From<&Account> for AccountSource {
+    fn from(account: &Account) -> Self {
+        Self {
+            id: account.id.clone(),
+            name: account.display_name(),
+            folder: account.folder.clone(),
+        }
+    }
 }
 
 /// The error an unsuccessful answer stands for, or `None` for a success.

@@ -124,7 +124,7 @@ export function Flyout({
             )}
             <header className="flyout__header">
               <ProviderMark
-                providerId={report.providerId}
+                providerId={report.serviceId}
                 size={20}
                 level={snapshot?.headline?.percent ?? null}
               />

@@ -1,5 +1,6 @@
 //! The flyout window: where it opens, when it hides, how tall it is.
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, PoisonError};
 use std::time::{Duration, Instant};
 
@@ -33,6 +34,23 @@ pub struct FlyoutState {
 }
 
 pub type SharedFlyoutState = Mutex<FlyoutState>;
+
+/// Set while a dialog the flyout opened is up: the dialog takes the focus,
+/// and the flyout must stay so the user returns to where they were.
+static HELD_OPEN: AtomicBool = AtomicBool::new(false);
+
+/// Keeps the flyout open when it loses the focus, until released.
+pub fn hold_open(held: bool) {
+    HELD_OPEN.store(held, Ordering::Relaxed);
+}
+
+/// Like every Windows flyout, it closes when the user clicks elsewhere,
+/// except to a dialog it opened itself.
+pub fn on_blur(app: &AppHandle) {
+    if !HELD_OPEN.load(Ordering::Relaxed) {
+        hide(app);
+    }
+}
 
 /// Opens or closes the flyout above the taskbar strip, or above the notification area when the strip is hidden.
 /// The strip on the main taskbar.

@@ -105,6 +105,22 @@ export interface Messages {
   updateLater: string;
   updateInstalling: string;
   updateFailed: string;
+
+  accounts: string;
+  accountsHint: string;
+  addAccount: string;
+  accountName: string;
+  chooseFolder: string;
+  /** Title of the system folder dialog. Placeholder `{service}`, "Claude" or "Codex". */
+  accountFolderTitle: string;
+  /** Placeholder `{name}`, for example "Claude · Work". */
+  removeAccount: string;
+  /** Placeholder `{count}`. */
+  accountErrorTooMany: string;
+  accountErrorDefault: string;
+  accountErrorDuplicate: string;
+  /** Placeholder `{service}`. */
+  accountErrorNoSignIn: string;
 }
 
 export interface LocaleDefinition {

@@ -40,6 +40,10 @@ export const tauriBridge: Bridge = {
   },
   onFlyoutShown: (listener) => listen(FLYOUT_SHOWN_EVENT, () => listener()),
 
+  addAccount: (service, label, title) => invoke<Settings>("add_account", { service, label, title }),
+  removeAccount: (id) => invoke<Settings>("remove_account", { id }),
+  renameAccount: (id, label) => invoke<Settings>("rename_account", { id, label }),
+
   getUpdate: () => invoke<AvailableUpdate | null>("get_update"),
   onUpdate: (listener) => listen<AvailableUpdate>(UPDATE_EVENT, (event) => listener(event.payload)),
   installUpdate: () => invoke("install_update"),

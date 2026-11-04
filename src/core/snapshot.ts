@@ -81,8 +81,13 @@ export type ReportState =
   | "error";
 
 export interface ProviderReport {
-  /** Which provider this is about, known even before the first reading. */
+  /**
+   * Which account this is about, known even before the first reading: the
+   * service id for the default account, `<service>~<n>` for an extra one.
+   */
   providerId: string;
+  /** The service, for its mark. */
+  serviceId: string;
   providerName: string;
   state: ReportState;
   /** The last good reading. Kept when a later refresh fails, so the UI can show it as stale. */

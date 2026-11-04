@@ -6,7 +6,7 @@
 //! reported as "sign in again" instead.
 
 use std::fmt;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
@@ -74,9 +74,16 @@ pub struct Candidates {
 
 /// Every sign-in on this machine, ordered so the most likely to work comes first.
 pub fn discover(now_ms: i64) -> Candidates {
-    let mut all = cli_tokens();
+    let mut all = claude_config_dir()
+        .map(|dir| cli_tokens(&dir))
+        .unwrap_or_default();
     all.extend(super::desktop::tokens());
     rank(all, now_ms)
+}
+
+/// The Claude Code sign-in in one folder, and nothing else.
+pub fn discover_in(folder: &Path, now_ms: i64) -> Candidates {
+    rank(cli_tokens(folder), now_ms)
 }
 
 fn rank(all: Vec<Token>, now_ms: i64) -> Candidates {
@@ -97,19 +104,12 @@ fn rank(all: Vec<Token>, now_ms: i64) -> Candidates {
     Candidates { usable, found_any }
 }
 
-/// Token written by the Claude Code CLI login, in `CLAUDE_CONFIG_DIR` or `~/.claude`.
-fn cli_tokens() -> Vec<Token> {
-    let Some(path) = cli_credentials_path() else {
-        return Vec::new();
-    };
-    let Ok(text) = std::fs::read_to_string(&path) else {
+/// Token written by the Claude Code CLI login in `folder`.
+fn cli_tokens(folder: &Path) -> Vec<Token> {
+    let Ok(text) = std::fs::read_to_string(folder.join(".credentials.json")) else {
         return Vec::new();
     };
     parse_cli_credentials(&text).into_iter().collect()
-}
-
-fn cli_credentials_path() -> Option<PathBuf> {
-    Some(claude_config_dir()?.join(".credentials.json"))
 }
 
 /// Claude Code's own folder: `CLAUDE_CONFIG_DIR` when set, otherwise `~/.claude`.
@@ -209,5 +209,25 @@ mod tests {
         let printed = format!("{:?}", token(None, None, "test"));
         assert!(printed.contains("<redacted>"));
         assert!(!printed.contains("\"x\""));
+    }
+
+    /// An extra account must see only its own folder: the desktop app's
+    /// sign-in belongs to the default account.
+    #[test]
+    fn an_account_folder_yields_only_its_own_sign_in() {
+        let dir = std::env::temp_dir().join(format!("limvo-claude-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let empty = discover_in(&dir, 0);
+        assert!(empty.usable.is_empty() && !empty.found_any);
+
+        std::fs::write(
+            dir.join(".credentials.json"),
+            r#"{"claudeAiOauth": {"accessToken": "dummy", "scopes": ["user:profile"]}}"#,
+        )
+        .unwrap();
+        let found = discover_in(&dir, 0);
+        let sources: Vec<_> = found.usable.iter().map(|token| token.source).collect();
+        assert_eq!(sources, ["Claude Code CLI"]);
+        let _ = std::fs::remove_dir_all(dir);
     }
 }

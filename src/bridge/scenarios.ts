@@ -4,7 +4,7 @@ const HOUR = 3600_000;
 const WEEK_SECONDS = 7 * 24 * 3600;
 const SESSION_SECONDS = 5 * 3600;
 
-type ClaudeReport = Omit<ProviderReport, "providerId" | "providerName">;
+type ClaudeReport = Omit<ProviderReport, "providerId" | "serviceId" | "providerName">;
 
 /**
  * Claude readings for development and screenshots, relative to `now` so they
@@ -39,14 +39,24 @@ export function scenarioReports(
   withCodex: boolean,
   /** Adds Cursor and Antigravity, for screenshots of every service together. */
   withMore = false,
+  /** Adds a second Claude account, signed in from another folder. */
+  withAccount = false,
 ): ProviderReport[] {
   const reports: ProviderReport[] = [
-    { providerId: "claude", providerName: "Claude", ...SCENARIOS[name](now) },
+    { providerId: "claude", serviceId: "claude", providerName: "Claude", ...SCENARIOS[name](now) },
   ];
+  if (withAccount)
+    reports.push({
+      providerId: "claude~2",
+      serviceId: "claude",
+      providerName: "Claude · Praca",
+      ...SCENARIOS.tight(now),
+    });
   reports.push(
     withCodex
       ? {
           providerId: "codex",
+          serviceId: "codex",
           providerName: "Codex",
           state: "ok",
           snapshot: codex(now),
@@ -54,6 +64,7 @@ export function scenarioReports(
         }
       : {
           providerId: "codex",
+          serviceId: "codex",
           providerName: "Codex",
           state: "no_credentials",
           snapshot: null,
@@ -66,8 +77,15 @@ export function scenarioReports(
   ] as const)
     reports.push(
       withMore
-        ? { providerId, providerName, state: "ok", snapshot, detail: null }
-        : { providerId, providerName, state: "no_credentials", snapshot: null, detail: null },
+        ? { providerId, serviceId: providerId, providerName, state: "ok", snapshot, detail: null }
+        : {
+            providerId,
+            serviceId: providerId,
+            providerName,
+            state: "no_credentials",
+            snapshot: null,
+            detail: null,
+          },
     );
   return reports;
 }

@@ -4,6 +4,7 @@ import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { Segmented, SwitchRow } from "../controls";
 import { BackIcon, ChevronIcon } from "../icons";
+import { AccountsPanel } from "./AccountsPanel";
 import { TaskbarPins } from "./TaskbarPins";
 
 const MINUTES: Record<Exclude<RefreshMode, "adaptive">, number> = { "2m": 2, "5m": 5, "15m": 15 };
@@ -90,6 +91,7 @@ export function SettingsPanel({
           />
         )}
         {(settings?.showStrip ?? true) && <TaskbarPins reports={reports} settings={settings} />}
+        <AccountsPanel settings={settings} />
         <SwitchRow
           label={t("desktopCard")}
           checked={settings?.desktopCard ?? false}

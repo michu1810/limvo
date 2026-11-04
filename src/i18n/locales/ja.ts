@@ -78,5 +78,17 @@ export const ja: LocaleDefinition = {
     updateLater: "後で",
     updateInstalling: "アップデート中",
     updateFailed: "アップデートできませんでした。後でもう一度お試しください。",
+    accounts: "追加のアカウント",
+    accountsHint: "別のフォルダーでサインインした Claude Code または Codex",
+    addAccount: "アカウントを追加",
+    accountName: "名前 (例: 仕事)",
+    chooseFolder: "フォルダーを選択",
+    accountFolderTitle: "{service} のサインインがあるフォルダーを選択",
+    removeAccount: "{name} を削除",
+    accountErrorTooMany: "追加できるのは {count} 件までです。",
+    accountErrorDefault: "メインアカウントのフォルダーです。",
+    accountErrorDuplicate: "このアカウントはすでに追加されています。",
+    accountErrorNoSignIn:
+      "このフォルダーに {service} のサインインがありません。先にサインインしてください。",
   },
 };
