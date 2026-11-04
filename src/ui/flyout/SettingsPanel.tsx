@@ -58,6 +58,10 @@ export function SettingsPanel({
           <BackIcon />
         </button>
         <h1 className="flyout__title">{t("settings")}</h1>
+        {/* The running version, in view without scrolling, to compare with an update. */}
+        <span className="flyout__updated" dir="ltr">
+          Limvo {__APP_VERSION__}
+        </span>
       </header>
 
       <div className="settings">
@@ -145,7 +149,6 @@ export function SettingsPanel({
           />
         </div>
       </div>
-      <p className="settings__version">Limvo {__APP_VERSION__}</p>
     </>
   );
 }

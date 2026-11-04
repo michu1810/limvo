@@ -820,13 +820,6 @@ button.setting:active:not(:disabled) {
   color: var(--text-secondary);
 }
 
-.settings__version {
-  margin: 18px 0 4px;
-  font-size: 12px;
-  color: var(--text-tertiary);
-  text-align: center;
-}
-
 /* Switch: the knob grows under the pointer and slides with a soft settle, as in Windows 11. */
 .switch {
   position: relative;

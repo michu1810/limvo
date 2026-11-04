@@ -14,6 +14,11 @@ All notable changes to Limvo are listed here. The format follows
   them apart. An extra Claude account reads only its folder, never the
   desktop app.
 
+### Changed
+
+- The running version shows in the settings header, without scrolling, and
+  in the tray icon's tooltip.
+
 ## [0.2.0] - 2026-11-04
 
 ### Added
