@@ -49,6 +49,12 @@ Get-AppxPackage Limvo.Local | Remove-AppxPackage   # remove it again
    artifact of the run. Download it and upload the `.msix` in a new Store
    submission.
 
+The listing texts are in [STORE-LISTING.md](STORE-LISTING.md). The six
+screenshots are composed from the real interface in
+[`store/scenes.html`](store/scenes.html); with `npm run dev` running,
+`node docs/store/render.mjs <path to chrome.exe>` renders them at 3840×2160
+into `src-tauri/target/store-screenshots`.
+
 The first submission also needs the listing, screenshots, the privacy policy
 URL (`https://github.com/michu1810/limvo#privacy-and-security`), the age
 rating questionnaire and a reason for the `runFullTrust` capability:
