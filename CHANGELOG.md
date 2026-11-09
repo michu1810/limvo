@@ -6,6 +6,20 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-10
+
+### Added
+
+- A Microsoft Store package. Installed from the Store, Limvo gets its
+  updates from the Store, so _Check for updates_ is not shown, and _Launch
+  at login_ uses the Windows startup apps list. Settings are shared with the
+  installer version.
+
+### Changed
+
+- Once code signing is turned on, the app inside the installer is signed as
+  well as the installer itself.
+
 ## [0.3.1] - 2026-11-04
 
 ### Fixed

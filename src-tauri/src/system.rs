@@ -23,6 +23,8 @@ pub enum Material {
 pub struct HostInfo {
     pub material: Material,
     pub taskbar_theme: Theme,
+    /// Installed from the Microsoft Store, which delivers the updates.
+    pub store: bool,
 }
 
 pub fn host_info() -> HostInfo {
@@ -33,6 +35,7 @@ pub fn host_info() -> HostInfo {
             Material::None
         },
         taskbar_theme: taskbar_theme(),
+        store: crate::package::is_packaged(),
     }
 }
 
