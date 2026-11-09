@@ -65,8 +65,12 @@ button {
   --cell: 1.12em;
 }
 
+/* A number reads left to right in every language: a right-to-left flex row
+   would put the wheels, and the sign, in reverse. `Intl` already orders the
+   parts the way the locale writes them. */
 .rolling__face {
   display: inline-flex;
+  direction: ltr;
   align-items: flex-end;
   line-height: var(--cell);
 }

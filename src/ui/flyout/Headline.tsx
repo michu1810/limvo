@@ -48,7 +48,8 @@ export function Headline({
       <div className="headline__label">
         <p className="eyebrow">{label}</p>
         {plan && (
-          <span className="plan" data-plan={plan.id}>
+          // `auto`: a Latin plan name such as "Max 20×" keeps its order in a right-to-left layout.
+          <span className="plan" data-plan={plan.id} dir="auto">
             {plan.label}
           </span>
         )}
