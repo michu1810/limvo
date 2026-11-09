@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Microsoft Store package. scripts/pack-msix.ps1 fills in the values in
+  double braces: the identity comes from Partner Center (Product identity),
+  the version from tauri.conf.json.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap desktop rescap">
+
+  <Identity
+    Name="{{IDENTITY_NAME}}"
+    Publisher="{{PUBLISHER}}"
+    Version="{{VERSION}}"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Limvo</DisplayName>
+    <PublisherDisplayName>{{PUBLISHER_DISPLAY_NAME}}</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>See how much of your AI plan is left, right in the Windows taskbar.</Description>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+    <Resource Language="pl-pl" />
+    <Resource Language="de-de" />
+    <Resource Language="es-es" />
+    <Resource Language="fr-fr" />
+    <Resource Language="it-it" />
+    <Resource Language="pt-br" />
+    <Resource Language="uk-ua" />
+    <Resource Language="he-il" />
+    <Resource Language="ja-jp" />
+    <Resource Language="zh-hans" />
+  </Resources>
+
+  <Applications>
+    <Application Id="Limvo" Executable="limvo.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Limvo"
+        Description="See how much of your AI plan is left, right in the Windows taskbar."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png" />
+      <Extensions>
+        <!-- Start at sign-in. Off until the user turns on Launch at login. -->
+        <desktop:Extension Category="windows.startupTask" Executable="limvo.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="LimvoStartup" Enabled="false" DisplayName="Limvo" />
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

@@ -50,6 +50,8 @@ export interface HostInfo {
   material: "mica" | "none";
   /** The taskbar follows the Windows mode, which can differ from the app mode. */
   taskbarTheme: Theme;
+  /** Installed from the Microsoft Store, which delivers the updates itself. */
+  store: boolean;
 }
 
 export interface TrayTexts {

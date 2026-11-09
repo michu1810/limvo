@@ -13,6 +13,7 @@ mod events;
 mod flyout;
 mod hotkey;
 mod mark;
+mod package;
 mod poller;
 mod providers;
 mod settings;

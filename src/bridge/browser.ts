@@ -94,6 +94,7 @@ export function createBrowserBridge(): Bridge {
       Promise.resolve({
         material: "none",
         taskbarTheme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+        store: new URLSearchParams(window.location.search).has("store"),
       }),
     onTaskbarTheme: () => Promise.resolve(() => {}),
     localizeTray: () => Promise.resolve(),

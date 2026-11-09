@@ -23,9 +23,12 @@ export function SettingsPanel({
   const { t, locale } = useI18n();
   const [launchAtLogin, setLaunchAtLogin] = useState<boolean | null>(null);
   const [shortcutKeys, setShortcutKeys] = useState<string | null>(null);
+  // The Store delivers its own updates, so the Store build has no update switch.
+  const [store, setStore] = useState(false);
 
   useEffect(() => {
     bridge.getLaunchAtLogin().then(setLaunchAtLogin);
+    bridge.hostInfo().then((host) => setStore(host.store));
   }, []);
 
   // The host registers the shortcut when the setting changes; ask which one took.
@@ -125,12 +128,14 @@ export function SettingsPanel({
           checked={settings?.planColors ?? true}
           onChange={(planColors) => update({ planColors })}
         />
-        <SwitchRow
-          label={t("checkUpdates")}
-          hint={t("checkUpdatesHint")}
-          checked={settings?.checkUpdates ?? true}
-          onChange={(checkUpdates) => update({ checkUpdates })}
-        />
+        {!store && (
+          <SwitchRow
+            label={t("checkUpdates")}
+            hint={t("checkUpdatesHint")}
+            checked={settings?.checkUpdates ?? true}
+            onChange={(checkUpdates) => update({ checkUpdates })}
+          />
+        )}
 
         <div className="setting setting--stacked">
           <span className="setting__text">

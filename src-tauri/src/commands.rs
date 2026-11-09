@@ -11,6 +11,8 @@ use tauri_plugin_opener::OpenerExt;
 
 use crate::accounts::{self, Account, AccountError, Service};
 use crate::flyout;
+#[cfg(windows)]
+use crate::package;
 use crate::settings::{Settings, SettingsPatch};
 use crate::snapshot::ProviderReport;
 use crate::system::{self, HostInfo};
@@ -82,13 +84,25 @@ pub fn apply_patch(app: &AppHandle, mut patch: SettingsPatch) -> Result<Settings
     Ok(after)
 }
 
+// Async, so the Store build's startup task is awaited off the main thread.
 #[tauri::command]
-pub fn get_launch_at_login(app: AppHandle) -> bool {
+pub async fn get_launch_at_login(app: AppHandle) -> bool {
+    #[cfg(windows)]
+    if package::is_packaged() {
+        return package::launch_at_login().await.unwrap_or_else(|error| {
+            log::warn!("reading the startup task failed: {error}");
+            false
+        });
+    }
     app.autolaunch().is_enabled().unwrap_or(false)
 }
 
 #[tauri::command]
-pub fn set_launch_at_login(app: AppHandle, enabled: bool) -> Result<bool, String> {
+pub async fn set_launch_at_login(app: AppHandle, enabled: bool) -> Result<bool, String> {
+    #[cfg(windows)]
+    if package::is_packaged() {
+        return package::set_launch_at_login(enabled).await;
+    }
     let autolaunch = app.autolaunch();
     let result = if enabled {
         autolaunch.enable()

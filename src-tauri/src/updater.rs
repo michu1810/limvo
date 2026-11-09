@@ -54,7 +54,14 @@ impl From<&Update> for AvailableUpdate {
 ///
 /// [`PendingUpdate`] is managed on the builder, not here: the windows load
 /// before `setup` ends and may ask for the update straight away.
+///
+/// The Store build never checks: the Store delivers its updates, and with no
+/// check nothing is ever pending, so [`available`] and [`install`] stay inert.
 pub fn start(app: AppHandle) {
+    if crate::package::is_packaged() {
+        log::info!("running from the Store package; updates come from the Store");
+        return;
+    }
     tauri::async_runtime::spawn(async move {
         tokio::time::sleep(FIRST_CHECK).await;
         loop {
