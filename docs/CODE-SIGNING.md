@@ -40,7 +40,21 @@ published.
    repository URL. SignPath reviews the project, its license and this policy.
 2. After approval, in SignPath: create the project, a signing policy (for
    example `release-signing`) and connect the GitHub repository as a trusted
-   build system.
+   build system. GitHub hands every artifact over as a ZIP, so the project's
+   default artifact configuration needs a `<zip-file>` root. One
+   configuration serves both requests of a release, the app and the
+   installer:
+
+   ```xml
+   <?xml version="1.0" encoding="utf-8"?>
+   <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+     <zip-file>
+       <pe-file path="*.exe">
+         <authenticode-sign />
+       </pe-file>
+     </zip-file>
+   </artifact-configuration>
+   ```
 3. In GitHub, _Settings > Environments > release_ (not the repository-wide
    secrets: the `release` environment only serves runs from `v*` tags and
    waits for a maintainer's approval, so no branch or pull request can read
@@ -49,9 +63,19 @@ published.
      submit to the project;
    - variables `SIGNPATH_ORGANIZATION_ID`, `SIGNPATH_PROJECT_SLUG` and
      `SIGNPATH_SIGNING_POLICY_SLUG`.
-4. Push a tag. The Release workflow builds the installer, submits it, waits for
-   the approval, checks the Authenticode signature, replaces the draft asset
-   with the signed one and publishes the checksums of the signed file.
+4. Push a tag. The Release workflow builds the app, submits `limvo.exe`,
+   waits for the approval and checks its signature. It then builds the
+   installer around the signed app, submits the installer, waits for a second
+   approval and checks that signature too. Only then does it sign the update,
+   write the checksums of the signed file and draft the release with all of
+   them. Each release therefore asks for two approvals in SignPath.
+
+The app is signed before the installer is built because the installer is a
+compressed archive: signing it covers only the outer file, never the app it
+unpacks. The bundler would normally write the bundle type into the app while
+packaging it, which breaks a signature, so the workflow writes it before
+signing and packages with `--no-binary-patching`. The uninstaller that NSIS
+generates stays unsigned.
 
 Without the variables the signing steps are skipped, so forks and test tags
 still produce an unsigned draft.
