@@ -31,8 +31,9 @@ means every user reinstalls by hand.
 
 The Release workflow signs the update after Authenticode signing, because the
 signature has to cover the exact bytes people download, and writes
-`latest.json` itself. Installed copies only see a release once its draft is
-published.
+`latest.json` itself. The release is published as soon as everything is
+signed, so installed copies see it right after the maintainer approved the
+run.
 
 ## Turning it on (maintainers)
 
@@ -67,8 +68,8 @@ published.
    waits for the approval and checks its signature. It then builds the
    installer around the signed app, submits the installer, waits for a second
    approval and checks that signature too. Only then does it sign the update,
-   write the checksums of the signed file and draft the release with all of
-   them. Each release therefore asks for two approvals in SignPath.
+   write the checksums of the signed file and publish the release with all
+   of them. Each release therefore asks for two approvals in SignPath.
 
 The app is signed before the installer is built because the installer is a
 compressed archive: signing it covers only the outer file, never the app it
@@ -78,4 +79,4 @@ signing and packages with `--no-binary-patching`. The uninstaller that NSIS
 generates stays unsigned.
 
 Without the variables the signing steps are skipped, so forks and test tags
-still produce an unsigned draft.
+still produce an unsigned release.

@@ -46,8 +46,32 @@ Get-AppxPackage Limvo.Local | Remove-AppxPackage   # remove it again
    (Package/Identity/Name), `MSSTORE_PUBLISHER` (Package/Identity/Publisher,
    starts with `CN=`) and `MSSTORE_PUBLISHER_DISPLAY_NAME`.
 3. Push a tag. The Release workflow keeps the package as the `limvo-msix`
-   artifact of the run. Download it and upload the `.msix` in a new Store
-   submission.
+   artifact of the run. For the very first release, download it and upload
+   the `.msix` in a new Store submission by hand: the Store API can only
+   update a product that is already live.
+
+### Automatic Store updates
+
+Once Limvo is live in the Store, every approved tag also goes to the Store
+by itself: the `store` job of the Release workflow submits the same package
+with the [Microsoft Store Developer CLI](https://learn.microsoft.com/windows/apps/publish/msstore-dev-cli/github-actions),
+keeps the live listing and commits the submission for certification. Set it
+up once:
+
+1. In Partner Center, _Account settings > Tenants_: create a new Microsoft
+   Entra ID tenant (free), or associate one you already have.
+2. _Account settings > User management > Microsoft Entra applications_:
+   create an application, give it the **Manager** role and add a key. Note
+   its client ID and the key; the key is shown only once.
+3. Note the tenant ID (_Account settings > Tenants_) and the seller ID
+   (_Account settings > Legal info_ or _Identifiers_).
+4. In GitHub, _Settings > Environments > store_ (only `v*` tags may use it),
+   add the secrets `PARTNER_CENTER_TENANT_ID`, `PARTNER_CENTER_CLIENT_ID`,
+   `PARTNER_CENTER_CLIENT_SECRET` and `PARTNER_CENTER_SELLER_ID`.
+5. Set the repository variable `MSSTORE_AUTOSUBMIT` to `true`.
+
+The key expires (at most after two years in Partner Center); add a new one
+and replace `PARTNER_CENTER_CLIENT_SECRET` before it does.
 
 The listing texts are in [STORE-LISTING.md](STORE-LISTING.md). The six
 screenshots are composed from the real interface in
