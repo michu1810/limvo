@@ -22,6 +22,16 @@ jobs:
         with:
           persist-credentials: false
 
+      # Checked first, so a mistyped tag fails before anyone approves a
+      # signing request.
+      - name: Check the tag against the version
+        shell: pwsh
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          $version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          if ("v$version" -ne $env:TAG) { throw "tag $env:TAG does not match version $version" }
+
       # No build caches here: a release is built from a clean state, so a
       # cache written by another run can never end up in a signed installer.
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
@@ -38,30 +48,75 @@ jobs:
       - name: Check
         run: npm run check
 
-      - name: Build and draft the release
-        uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # The updater key. Its signature is redone below over the final,
-          # Authenticode-signed installer, so the feed is written there too.
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        with:
-          tagName: ${{ github.ref_name }}
-          releaseName: Limvo ${{ github.ref_name }}
-          releaseBody: See CHANGELOG.md for what changed in this version.
-          releaseDraft: true
-          prerelease: false
-          includeUpdaterJson: false
+      # The app and its installer are built in two steps, so limvo.exe can be
+      # signed in between: the installer then carries the signed app.
+      - name: Build the app
+        run: npx tauri build --no-bundle --ci
 
-      # Code signing through SignPath Foundation. Skipped until the repository
-      # variables in docs/CODE-SIGNING.md are set, so forks build unsigned.
-      - name: Collect the installer for signing
+      # The bundler normally writes the bundle type into the app, which the
+      # updater reads. Writing it into a signed file would break the
+      # signature, so it is written here, before signing, and the bundle step
+      # below runs with --no-binary-patching.
+      - name: Mark the app as an NSIS install
+        shell: pwsh
+        run: |
+          $path = "src-tauri/target/release/limvo.exe"
+          $bytes = [IO.File]::ReadAllBytes($path)
+          # ISO-8859-1 maps every byte to one character, so the string index
+          # is the byte offset.
+          $text = [Text.Encoding]::GetEncoding(28591).GetString($bytes)
+          $index = $text.IndexOf("__TAURI_BUNDLE_TYPE_VAR_UNK", [StringComparison]::Ordinal)
+          if ($index -lt 0) { throw "bundle type marker not found in $path" }
+          $nsis = [Text.Encoding]::ASCII.GetBytes("__TAURI_BUNDLE_TYPE_VAR_NSS")
+          [Array]::Copy($nsis, 0, $bytes, $index, $nsis.Length)
+          [IO.File]::WriteAllBytes($path, $bytes)
+
+      # Code signing through SignPath Foundation. Skipped until the variables
+      # in docs/CODE-SIGNING.md are set, so forks build unsigned. Each release
+      # sends two requests, the app and then the installer, because the
+      # installer can only be built once the app inside it is signed.
+      - name: Collect the app for signing
         if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
-        id: unsigned
+        id: unsigned-app
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: limvo-unsigned
+          name: limvo-app-unsigned
+          path: src-tauri/target/release/limvo.exe
+          if-no-files-found: error
+
+      - name: Sign the app
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        uses: signpath/github-action-submit-signing-request@ced31329c0317e779dad2eec2a7c3bb46ea1343e # v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          github-artifact-id: ${{ steps.unsigned-app.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: src-tauri/target/release
+
+      - name: Check the app's signature
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        shell: pwsh
+        run: |
+          $signature = Get-AuthenticodeSignature src-tauri/target/release/limvo.exe
+          if ($signature.Status -ne "Valid") { throw "limvo.exe is not signed: $($signature.Status)" }
+
+      # The updater key must be present because createUpdaterArtifacts is on.
+      # The signature made here is redone below over the final installer.
+      - name: Build the installer
+        run: npx tauri bundle --bundles nsis --no-binary-patching --ci
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Collect the installer for signing
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        id: unsigned-installer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: limvo-installer-unsigned
           path: src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: error
 
@@ -73,36 +128,30 @@ jobs:
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
           project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
           signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
-          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          github-artifact-id: ${{ steps.unsigned-installer.outputs.artifact-id }}
           wait-for-completion: true
           output-artifact-directory: src-tauri/target/release/bundle/nsis
 
-      - name: Replace the draft installer with the signed one
+      - name: Check the installer's signature
         if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           foreach ($installer in Get-ChildItem src-tauri/target/release/bundle/nsis/*.exe) {
             $signature = Get-AuthenticodeSignature $installer
             if ($signature.Status -ne "Valid") { throw "$($installer.Name) is not signed: $($signature.Status)" }
-            gh release upload "${{ github.ref_name }}" $installer.FullName --clobber
           }
 
       # Installed copies check latest.json of the newest published release and
       # verify the installer against the public key in tauri.conf.json. The
       # signature must cover the exact file people download, so it is made
       # here, after Authenticode signing changed the installer's bytes.
-      - name: Sign the update and publish the feed
+      - name: Sign the update and write the feed
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           TAG: ${{ github.ref_name }}
         run: |
-          $version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
-          if ("v$version" -ne $env:TAG) { throw "tag $env:TAG does not match version $version" }
           $installer = @(Get-ChildItem src-tauri/target/release/bundle/nsis/*-setup.exe)
           if ($installer.Count -ne 1) { throw "expected one installer, found $($installer.Count)" }
           $installer = $installer[0]
@@ -121,16 +170,28 @@ jobs:
             }
           }
           $feed | ConvertTo-Json -Depth 4 | Set-Content -Path latest.json -Encoding utf8NoBOM
-          gh release upload $env:TAG "$($installer.FullName).sig" latest.json --clobber
 
-      - name: Publish checksums
+      - name: Write checksums
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $installers = Get-ChildItem src-tauri/target/release/bundle/nsis/*.exe
           $lines = $installers | ForEach-Object {
             "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLower())  $($_.Name)"
           }
           Set-Content -Path SHA256SUMS.txt -Value $lines -Encoding ascii
-          gh release upload "${{ github.ref_name }}" SHA256SUMS.txt --clobber
+
+      # The draft is created last, with every file at once, so a failed or
+      # rejected signing request leaves no half-finished release behind.
+      - name: Draft the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $installer = (Get-ChildItem src-tauri/target/release/bundle/nsis/*-setup.exe)[0].FullName
+          gh release create $env:TAG --draft --verify-tag `
+            --repo "${{ github.repository }}" `
+            --title "Limvo $env:TAG" `
+            --notes "See CHANGELOG.md for what changed in this version." `
+            $installer "$installer.sig" latest.json SHA256SUMS.txt
+          if ($LASTEXITCODE -ne 0) { throw "creating the draft release failed" }
