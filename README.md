@@ -6,7 +6,7 @@
 
 **Your AI plan limits in the Windows taskbar: Claude, Codex, Cursor and Antigravity, with the pace you are using them at.**
 
-[Download](#install) · [Features](#features) · [Services](#supported-services) · [How it works](#how-it-works) · [Setups](#setups-and-scenarios) · [Build from source](#build-from-source) · [Contributing](CONTRIBUTING.md)
+[Download](#install) · [Features](#features) · [Services](#supported-services) · [How it works](#how-it-works) · [Setups](#setups-and-scenarios) · [Build from source](#build-from-source) · [Code signing policy](#code-signing-policy) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -121,7 +121,7 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md#add-a-service).
 
 > **"Windows protected your PC"**
 > Releases are not code-signed yet; free signing through SignPath Foundation
-> is being set up (see [docs/CODE-SIGNING.md](docs/CODE-SIGNING.md)). Until
+> is being set up (see the [code signing policy](#code-signing-policy)). Until
 > then Microsoft SmartScreen shows this warning for new downloads. Choose
 > **More info**, check that the file name matches the release, then
 > **Run anyway**. You can verify the download with the SHA-256 checksum
@@ -254,6 +254,25 @@ are honoured. One service failing never delays or blanks another.
 
 Found a security problem? Please follow [SECURITY.md](SECURITY.md) instead of
 opening a public issue.
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate
+by [SignPath Foundation](https://signpath.org). Signing starts with the first
+release after the project is approved; earlier releases stay unsigned.
+
+- Only installers built by the
+  [Release workflow](.github/workflows/release.yml) from a tag in this
+  repository are signed, the app inside them included. Nothing built on a
+  personal machine is ever submitted.
+- Committers and reviewers: [@michu1810](https://github.com/michu1810).
+- Approvers: [@michu1810](https://github.com/michu1810). Each signing request
+  is approved by hand.
+- Privacy policy: Limvo sends no data anywhere except the usage requests to
+  the services you are signed in to and the update check, as described in
+  [Privacy and security](#privacy-and-security).
+
+Details for maintainers are in [docs/CODE-SIGNING.md](docs/CODE-SIGNING.md).
 
 ## Troubleshooting
 

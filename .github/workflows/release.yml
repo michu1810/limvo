@@ -192,6 +192,6 @@ jobs:
           gh release create $env:TAG --draft --verify-tag `
             --repo "${{ github.repository }}" `
             --title "Limvo $env:TAG" `
-            --notes "See CHANGELOG.md for what changed in this version." `
+            --notes "See CHANGELOG.md for what changed in this version.`n`nCode signing policy: https://github.com/${{ github.repository }}#code-signing-policy" `
             $installer "$installer.sig" latest.json SHA256SUMS.txt
           if ($LASTEXITCODE -ne 0) { throw "creating the draft release failed" }
