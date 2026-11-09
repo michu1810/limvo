@@ -6,6 +6,14 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-10
+
+### Fixed
+
+- In Hebrew and other right-to-left languages, the large percentage showed
+  its digits in reverse (51% read as 15%), and a plan badge such as Max 20×
+  put its sign first.
+
 ## [0.4.0] - 2026-11-10
 
 ### Added
