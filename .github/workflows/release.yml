@@ -206,18 +206,72 @@ jobs:
           }
           Set-Content -Path SHA256SUMS.txt -Value $lines -Encoding ascii
 
-      # The draft is created last, with every file at once, so a failed or
-      # rejected signing request leaves no half-finished release behind.
-      - name: Draft the release
+      # Published last, with every file at once, so a failed or rejected
+      # signing request leaves no half-finished release behind. Publishing is
+      # what installed copies see: the maintainer's approval of this run is
+      # the release decision. The notes are the version's CHANGELOG section.
+      - name: Publish the release
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.ref_name }}
         run: |
+          $version = $env:TAG.TrimStart("v")
+          $changelog = (Get-Content CHANGELOG.md -Raw) -replace "`r`n", "`n"
+          $section = [regex]::Match($changelog, "(?ms)^## \[$([regex]::Escape($version))\][^\n]*\n(.*?)(?=^## \[|\z)")
+          if (-not $section.Success) { throw "CHANGELOG.md has no section for $version" }
+          $notes = $section.Groups[1].Value.Trim() + "`n`n---`n`nCode signing policy: https://github.com/${{ github.repository }}#code-signing-policy"
+          Set-Content -Path release-notes.md -Value $notes -Encoding utf8NoBOM
           $installer = (Get-ChildItem src-tauri/target/release/bundle/nsis/*-setup.exe)[0].FullName
-          gh release create $env:TAG --draft --verify-tag `
+          gh release create $env:TAG --verify-tag --latest `
             --repo "${{ github.repository }}" `
             --title "Limvo $env:TAG" `
-            --notes "See CHANGELOG.md for what changed in this version.`n`nCode signing policy: https://github.com/${{ github.repository }}#code-signing-policy" `
+            --notes-file release-notes.md `
             $installer "$installer.sig" latest.json SHA256SUMS.txt
-          if ($LASTEXITCODE -ne 0) { throw "creating the draft release failed" }
+          if ($LASTEXITCODE -ne 0) { throw "publishing the release failed" }
+
+  # Sends the same package to the Microsoft Store, where it goes through
+  # certification and then out to Store installs on its own. The Store API
+  # can only update a product that is already live, so this stays off until
+  # the repository variable MSSTORE_AUTOSUBMIT is "true" and the `store`
+  # environment holds the Partner Center API credentials
+  # (docs/MICROSOFT-STORE.md).
+  store:
+    name: Microsoft Store
+    needs: windows
+    if: ${{ vars.MSSTORE_AUTOSUBMIT == 'true' }}
+    runs-on: windows-latest
+    # Only v* tags may use this environment, and this job only runs after the
+    # approved release job, so it needs no approval of its own.
+    environment: store
+    permissions: {}
+    steps:
+      - name: Download the Store package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: limvo-msix
+          path: msix
+
+      - name: Set up the Microsoft Store CLI
+        uses: microsoft/microsoft-store-apppublisher@cc9910a8d59f2eb55cbb83df0a3800cf3b5300e0 # v1.4
+        with:
+          version: v0.4.3
+
+      - name: Submit the package
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.PARTNER_CENTER_TENANT_ID }}
+          SELLER_ID: ${{ secrets.PARTNER_CENTER_SELLER_ID }}
+          CLIENT_ID: ${{ secrets.PARTNER_CENTER_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.PARTNER_CENTER_CLIENT_SECRET }}
+          # Limvo's Store product ID, public on its Store page.
+          PRODUCT_ID: 9MZ7HN8V6GX5
+        run: |
+          msstore reconfigure --tenantId $env:TENANT_ID --sellerId $env:SELLER_ID --clientId $env:CLIENT_ID --clientSecret $env:CLIENT_SECRET
+          if ($LASTEXITCODE -ne 0) { throw "configuring the Store CLI failed" }
+          $package = @(Get-ChildItem msix/*.msix)
+          if ($package.Count -ne 1) { throw "expected one package, found $($package.Count)" }
+          # Starts a new submission from the live one, so the listing stays as
+          # it is, swaps in this package and commits it for certification.
+          msstore publish $package[0].DirectoryName --inputFile $package[0].FullName --appId $env:PRODUCT_ID
+          if ($LASTEXITCODE -ne 0) { throw "submitting to the Store failed" }

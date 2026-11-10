@@ -6,6 +6,8 @@
 
 **Your AI plan limits in the Windows taskbar: Claude, Codex, Cursor and Antigravity, with the pace you are using them at.**
 
+<a href="https://apps.microsoft.com/detail/9MZ7HN8V6GX5?mode=direct"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="180" alt="Get it from Microsoft" /></a>
+
 [Download](#install) · [Features](#features) · [Services](#supported-services) · [How it works](#how-it-works) · [Setups](#setups-and-scenarios) · [Build from source](#build-from-source) · [Code signing policy](#code-signing-policy) · [Contributing](CONTRIBUTING.md)
 
 </div>
@@ -104,34 +106,57 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md#add-a-service).
 
 ## Install
 
+### Microsoft Store (recommended)
+
+<a href="https://apps.microsoft.com/detail/9MZ7HN8V6GX5?mode=direct"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft" /></a>
+
+The Store package is signed by Microsoft, so there is no SmartScreen warning,
+and the Store keeps it up to date. From a terminal:
+
+```powershell
+winget install --id 9MZ7HN8V6GX5 --source msstore
+```
+
+### Installer from GitHub
+
 1. Download `Limvo_<version>_x64-setup.exe` from the
    [latest release](../../releases/latest).
 2. Run it. It installs for your user only, so no administrator prompt.
    Choose your language on the first screen.
-3. Limvo starts in the notification area and docks its reading in the
-   taskbar. Sign in to at least one of the services (see
-   [Setups](#setups-and-scenarios)).
-4. Windows tucks new tray icons behind the `^` arrow. To keep the L next to the
-   clock, drag it out of the overflow, or turn it on under _Settings >
-   Personalization > Taskbar > Other system tray icons_.
 
 <p align="center">
   <img src="docs/images/installer-welcome.png" width="420" alt="The Limvo installer welcome page with the language already matched to Windows" />
 </p>
 
 > **"Windows protected your PC"**
-> Releases are not code-signed yet; free signing through SignPath Foundation
-> is being set up (see the [code signing policy](#code-signing-policy)). Until
-> then Microsoft SmartScreen shows this warning for new downloads. Choose
-> **More info**, check that the file name matches the release, then
+> The installer is not code-signed yet; free signing through SignPath
+> Foundation is being set up (see the [code signing policy](#code-signing-policy)).
+> Until then Microsoft SmartScreen shows this warning for new downloads.
+> Choose **More info**, check that the file name matches the release, then
 > **Run anyway**. You can verify the download with the SHA-256 checksum
-> published next to each release.
+> published next to each release, or install from the Microsoft Store instead.
 
-**Updating:** download the newest installer and run it. It upgrades in place
-and keeps your settings.
+### After installing
 
-**Requirements:** Windows 10 or Windows 11, 64-bit. The WebView2 runtime ships
-with Windows 11; on Windows 10 the installer fetches it if it is missing.
+1. Limvo starts in the notification area and docks its reading in the
+   taskbar. Sign in to at least one of the services (see
+   [Setups](#setups-and-scenarios)).
+2. Windows tucks new tray icons behind the `^` arrow. To keep the L next to the
+   clock, drag it out of the overflow, or turn it on under _Settings >
+   Personalization > Taskbar > Other system tray icons_.
+
+**Updating:** the Store version updates through the Store. The installer
+version checks GitHub twice a day and offers a newer version in the flyout; it
+installs only when you choose _Update_ and only if it is signed with the
+release key.
+
+**One or the other:** both versions share their settings, and only one copy of
+Limvo runs at a time. To switch, uninstall the one you have, then install the
+other.
+
+**Requirements:** Windows 10 version 2004 or later, or Windows 11, 64-bit. The
+WebView2 runtime ships with Windows 11; on Windows 10 the installer fetches it
+if it is missing.
 
 **Uninstall:** _Settings > Apps > Installed apps > Limvo > Uninstall_. Your
 preferences live in `%APPDATA%\io.github.michu1810.limvo` and can be deleted
@@ -148,20 +173,20 @@ afterwards.
 
 ### Settings
 
-| Setting            | Default  | Notes                                                                                          |
-| ------------------ | -------- | ---------------------------------------------------------------------------------------------- |
-| Language           | System   | Any of the eleven languages, or follow Windows.                                                |
-| Start with Windows | Off      | Adds Limvo to your user's startup apps.                                                        |
-| Show in taskbar    | On       | Turn off to keep only the tray icon.                                                           |
-| On every monitor   | On       | A reading on the taskbar of every display, not only the main one.                              |
-| Limits in taskbar  | Main     | Each service's main limit, or up to six you pick, in the order you turn them on.               |
-| Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                            |
-| Notifications      | On       | 80%, 95%, limit reached, and the reset after a busy period. Each one is shown once per period. |
-| Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.       |
-| Plan colours       | On       | Tints each service with the colour of its plan.                                                |
-| Update frequency   | Adaptive | Adaptive follows activity in the services' own tools. 2, 5 or 15 minutes are fixed schedules.  |
-| Check for updates  | On       | Twice a day, against GitHub Releases. An update installs only when you choose _Update_.        |
-| Extra accounts     | None     | Up to four more Claude Code or Codex accounts, each signed in from its own folder.             |
+| Setting            | Default  | Notes                                                                                            |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------ |
+| Language           | System   | Any of the eleven languages, or follow Windows.                                                  |
+| Start with Windows | Off      | Adds Limvo to your user's startup apps.                                                          |
+| Show in taskbar    | On       | Turn off to keep only the tray icon.                                                             |
+| On every monitor   | On       | A reading on the taskbar of every display, not only the main one.                                |
+| Limits in taskbar  | Main     | Each service's main limit, or up to six you pick, in the order you turn them on.                 |
+| Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                              |
+| Notifications      | On       | 80%, 95%, limit reached, and the reset after a busy period. Each one is shown once per period.   |
+| Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.         |
+| Plan colours       | On       | Tints each service with the colour of its plan.                                                  |
+| Update frequency   | Adaptive | Adaptive follows activity in the services' own tools. 2, 5 or 15 minutes are fixed schedules.    |
+| Check for updates  | On       | Installer version only: twice a day, against GitHub Releases; installs when you choose _Update_. |
+| Extra accounts     | None     | Up to four more Claude Code or Codex accounts, each signed in from its own folder.               |
 
 ### Several accounts
 
@@ -236,8 +261,9 @@ are honoured. One service failing never delays or blanks another.
 - No telemetry, analytics or crash reporting. The only network requests are
   the usage requests to the services you are signed in to, each with its own
   token, over HTTPS, and the update check described below.
-- Updates: twice a day Limvo reads `latest.json` of the newest release on
-  GitHub (`github.com`, which serves the file from
+- Updates: the Store version has no update check of its own; the Store
+  delivers its updates. The installer version reads, twice a day,
+  `latest.json` of the newest release on GitHub (`github.com`, which serves the file from
   `objects.githubusercontent.com`). The request carries no token and no data
   about you. An update downloads only when you choose _Update_, and installs
   only if its signature matches the public key built into Limvo. Turn it off
@@ -366,8 +392,8 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, and
 ## Roadmap
 
 - macOS menu bar version
-- Code-signed releases and `winget install Limvo`
-- A Windows 11 Widgets board card (needs an MSIX package and a widget provider)
+- Code-signed GitHub installers through SignPath Foundation
+- A Windows 11 Widgets board card (needs a widget provider in the MSIX package)
 
 ## Disclaimer
 
