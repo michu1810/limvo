@@ -88,12 +88,40 @@
 <script type="module">
 // Everything below builds static markup from constants in this file; nothing comes from outside.
 const params = new URLSearchParams(location.search);
-const scene = Number(params.get("s") ?? 1);
+const scene = params.get("s") ?? "1";
+/** `?lang=pl` renders the Polish set: copy, interface, taskbar and clock. */
+const lang = params.get("lang") === "pl" ? "pl" : "en";
+const T = {
+  en: {
+    search: "Search",
+    settings: "Settings",
+    clock: "2:32 PM<br>11/10/2026",
+    s1: ["Your AI limits, <em>right next to the clock.</em>", "Claude, Codex, Cursor and Antigravity in the Windows taskbar, with the pace you are using them at.", "Free and open source. No account, no telemetry."],
+    s2: ["Know when a limit runs out. <em>Before it does.</em>", "Limvo projects your usage to the reset and tells you whether you are on track, tight or running hot."],
+    s3: ["Up to six limits, <em>on every taskbar.</em>", "Pin the limits you care about. They sit next to the clock on every monitor, and a click opens the details."],
+    s4: ["Every plan. <em>One glance.</em>", "Each service gets its own tab, logo, plan badge and colour."],
+    s5: ["Make it <em>yours.</em>", "Pin the limits you want in the taskbar, keep a card on the desktop, pick the language and how often Limvo refreshes."],
+    s6: ["Speaks <em>eleven languages.</em>", "Including right-to-left Hebrew. It follows your Windows language."],
+    others: ["pl", "he", "ja"],
+  },
+  pl: {
+    search: "Wyszukaj",
+    settings: "Ustawienia",
+    clock: "14:32<br>10.11.2026",
+    s1: ["Limity AI <em>tuż obok zegara.</em>", "Claude, Codex, Cursor i Antigravity na pasku zadań Windows, razem z tempem, w jakim zużywasz limity.", "Darmowe i open source. Bez konta, bez telemetrii."],
+    s2: ["Wiesz, kiedy limit się skończy. <em>Zanim to nastąpi.</em>", "Limvo przewiduje zużycie do resetu i mówi, czy jesteś w normie, na styk, czy zużywasz za szybko."],
+    s3: ["Do sześciu limitów <em>na każdym pasku zadań.</em>", "Przypnij limity, które są dla Ciebie ważne. Są obok zegara na każdym monitorze, a kliknięcie pokazuje szczegóły."],
+    s4: ["Każdy plan. <em>Jedno spojrzenie.</em>", "Każda usługa ma swoją kartę, logo, plakietkę planu i kolor."],
+    s5: ["Dopasuj <em>do siebie.</em>", "Przypnij limity na pasku zadań, zostaw kartę na pulpicie, wybierz język i to, jak często Limvo się odświeża."],
+    s6: ["Mówi <em>jedenastoma językami.</em>", "W tym po hebrajsku, od prawej do lewej. Dopasowuje się do języka Windows."],
+    others: ["en", "he", "ja"],
+  },
+}[lang];
 const NOW = "2026-11-10T14:32:00";
 const LOGO = `<svg viewBox="64 64 896 896" aria-hidden="true"><defs><linearGradient id="t" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34302d"/><stop offset="1" stop-color="#1b1918"/></linearGradient><linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e07a5f"/><stop offset="1" stop-color="#c24f37"/></linearGradient><linearGradient id="f" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c24f37"/><stop offset="1" stop-color="#f08d71"/></linearGradient></defs><rect x="64" y="64" width="896" height="896" rx="208" fill="url(#t)"/><rect x="66" y="66" width="892" height="892" rx="206" fill="none" stroke="#fff" stroke-opacity=".1" stroke-width="4"/><rect x="292" y="232" width="136" height="560" rx="68" fill="url(#p)"/><rect x="292" y="656" width="440" height="136" rx="68" fill="#fff" fill-opacity=".16"/><rect x="292" y="656" width="300" height="136" rx="68" fill="url(#f)"/><rect x="640" y="616" width="22" height="216" rx="11" fill="#fff" fill-opacity=".92"/></svg>`;
 
 const url = (page, extra = {}) => {
-  const q = new URLSearchParams({ scenario: "hot", theme: "dark", locale: "en", now: NOW, ...extra });
+  const q = new URLSearchParams({ scenario: "hot", theme: "dark", locale: lang, now: NOW, ...extra });
   return `/${page}.html?${q}&more`;
 };
 
@@ -117,7 +145,7 @@ async function embed(parent, src, { left, top, right, bottom, height = 900, widt
   for (let i = 0; i < 100 && !doc.querySelector(select); i++) await sleep(50);
   await sleep(300);
   if (tab !== undefined) { doc.querySelectorAll('[role="tab"]')[tab]?.click(); await sleep(400); }
-  if (settings) { doc.querySelector('button[aria-label="Settings"]')?.click(); await sleep(600); }
+  if (settings) { doc.querySelector(`button[aria-label="${T.settings}"]`)?.click(); await sleep(600); }
   const target = doc.querySelector(select);
   iframe.style.colorScheme = getComputedStyle(doc.documentElement).colorScheme || "normal";
   const box = target.getBoundingClientRect();
@@ -151,10 +179,10 @@ const ICONS = {
 const PINNED = [["explorer", "run"], ["terminal", "active"], ["notepad", ""], ["settings", "run"], ["calculator", ""]];
 
 const tray = () =>
-  `<div class="tb-tray"><div class="tb-pill">${ICONS.chev}</div><div class="strip-slot"></div><div class="tb-pill">${ICONS.wifi}${ICONS.sound}${ICONS.battery}</div><div class="tb-clock">2:32 PM<br>11/10/2026</div><div class="tb-pill">${ICONS.bell}</div></div>`;
+  `<div class="tb-tray"><div class="tb-pill">${ICONS.chev}</div><div class="strip-slot"></div><div class="tb-pill">${ICONS.wifi}${ICONS.sound}${ICONS.battery}</div><div class="tb-clock">${T.clock}</div><div class="tb-pill">${ICONS.bell}</div></div>`;
 
 const taskbarMarkup = () =>
-  `<div class="taskbar"><div class="tb-center"><div class="tb-btn">${ICONS.start}</div><div class="tb-search">${ICONS.search}Search</div><div class="tb-btn">${ICONS.taskView}</div>${PINNED.map(([icon, state]) => `<div class="tb-btn ${state}">${ICONS[icon]}</div>`).join("")}</div>${tray()}</div>`;
+  `<div class="taskbar"><div class="tb-center"><div class="tb-btn">${ICONS.start}</div><div class="tb-search">${ICONS.search}${T.search}</div><div class="tb-btn">${ICONS.taskView}</div>${PINNED.map(([icon, state]) => `<div class="tb-btn ${state}">${ICONS[icon]}</div>`).join("")}</div>${tray()}</div>`;
 
 function taskbar(stage) {
   const bar = el(taskbarMarkup());
@@ -184,15 +212,24 @@ const SCENES = {
   // The hero: the reading next to the clock and the flyout above it.
   async 1() {
     const stage = desktop("dark");
-    copy({ title: "Your AI limits, <em>right next to the clock.</em>", sub: "Claude, Codex, Cursor and Antigravity in the Windows taskbar, with the pace you are using them at.", note: "Free and open source. No account, no telemetry." });
+    copy({ title: T.s1[0], sub: T.s1[1], note: T.s1[2] });
     const bar = taskbar(stage);
     await stripInto(bar.querySelector(".strip-slot"));
     await embed(stage, url("index"), { select: ".flyout", tab: 0, right: 12, bottom: 60 });
   },
+  // The 16:9 hero art at the top of the Store page. The Store lays the title
+  // and the install button over its left side, so it carries no text.
+  async hero() {
+    const stage = desktop("dark");
+    const bar = taskbar(stage);
+    await stripInto(bar.querySelector(".strip-slot"));
+    await embed(stage, url("index"), { select: ".flyout", tab: 0, right: 12, bottom: 60 });
+    await embed(stage, url("card", { scenario: "reference" }), { select: "#root > *", right: 430, bottom: 96, width: 340, height: 220 });
+  },
   // The forecast, in the light theme.
   async 2() {
     const stage = desktop("light");
-    copy({ title: "Know when a limit runs out. <em>Before it does.</em>", sub: "Limvo projects your usage to the reset and tells you whether you are on track, tight or running hot." });
+    copy({ title: T.s2[0], sub: T.s2[1] });
     const bar = taskbar(stage);
     await stripInto(bar.querySelector(".strip-slot"), { theme: "light" });
     await embed(stage, url("index", { theme: "light" }), { select: ".flyout", tab: 0, right: 12, bottom: 60 });
@@ -200,7 +237,7 @@ const SCENES = {
   // The taskbar reading, up close: the right end of a real taskbar, magnified.
   async 3() {
     desktop("dark");
-    copy({ center: true, title: "Up to six limits, <em>on every taskbar.</em>", sub: "Pin the limits you care about. They sit next to the clock on every monitor, and a click opens the details." });
+    copy({ center: true, title: T.s3[0], sub: T.s3[1] });
     const band = el(`<div class="closeup">${taskbarMarkup()}</div>`);
     document.body.append(band);
     await stripInto(band.querySelector(".strip-slot"));
@@ -208,7 +245,7 @@ const SCENES = {
   // Every service side by side.
   async 4() {
     desktop("dark");
-    copy({ center: true, title: "Every plan. <em>One glance.</em>", sub: "Each service gets its own tab, logo, plan badge and colour." });
+    copy({ center: true, title: T.s4[0], sub: T.s4[1] });
     const row = el(`<div style="position:absolute;left:0;right:0;top:390px;height:700px"></div>`);
     document.body.append(row);
     const lefts = [96, 538, 980, 1422];
@@ -217,7 +254,7 @@ const SCENES = {
   // Settings and the desktop card.
   async 5() {
     const stage = desktop("dark");
-    copy({ title: "Make it <em>yours.</em>", sub: "Pin the limits you want in the taskbar, keep a card on the desktop, pick the language and how often Limvo refreshes." });
+    copy({ title: T.s5[0], sub: T.s5[1] });
     const bar = taskbar(stage);
     await stripInto(bar.querySelector(".strip-slot"));
     await embed(stage, url("index", { scenario: "reference" }), { select: ".flyout", tab: 0, right: 12, bottom: 60, settings: true, height: 1600, clip: 690 });
@@ -226,13 +263,13 @@ const SCENES = {
   // Languages.
   async 6() {
     desktop("light");
-    copy({ center: true, title: "Speaks <em>eleven languages.</em>", sub: "Including right-to-left Hebrew. It follows your Windows language." });
+    copy({ center: true, title: T.s6[0], sub: T.s6[1] });
     const row = el(`<div style="position:absolute;left:0;right:0;top:340px;height:740px"></div>`);
     document.body.append(row);
     await Promise.all([
-      embed(row, url("index", { locale: "pl", theme: "light" }), { select: ".flyout", tab: 0, left: 300, top: 0 }),
-      embed(row, url("index", { locale: "he", theme: "dark", scenario: "reference" }), { select: ".flyout", tab: 0, left: 770, top: 0 }),
-      embed(row, url("index", { locale: "ja", theme: "light", scenario: "tight" }), { select: ".flyout", tab: 0, left: 1240, top: 0 }),
+      embed(row, url("index", { locale: T.others[0], theme: "light" }), { select: ".flyout", tab: 0, left: 300, top: 0 }),
+      embed(row, url("index", { locale: T.others[1], theme: "dark", scenario: "reference" }), { select: ".flyout", tab: 0, left: 770, top: 0 }),
+      embed(row, url("index", { locale: T.others[2], theme: "light", scenario: "tight" }), { select: ".flyout", tab: 0, left: 1240, top: 0 }),
     ]);
   },
 };

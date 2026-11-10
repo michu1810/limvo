@@ -1,0 +1,45 @@
+<!doctype html>
+<!--
+  Microsoft Store logos: the 1:1 box art (?a=box, 1080x1080) and the 2:3
+  poster art (?a=poster, 720x1080). docs/store/render.mjs renders them at 2x.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Limvo Store art</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; overflow: hidden; background: #0d0b0a; }
+  body { font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; color: #f4f1ee; -webkit-font-smoothing: antialiased; }
+  .wall { position: absolute; inset: 0; overflow: hidden; background: radial-gradient(120% 90% at 80% 110%, #2c1813 0%, #130f0e 55%, #0b0a0a 100%); }
+  .wall::before, .wall::after { content: ""; position: absolute; border-radius: 50%; filter: blur(110px); }
+  .wall::before { width: 900px; height: 800px; right: -300px; bottom: -380px; background: radial-gradient(circle, rgba(224, 122, 95, 0.6), rgba(194, 79, 55, 0) 70%); }
+  .wall::after { width: 800px; height: 640px; left: -320px; top: -300px; background: radial-gradient(circle, rgba(88, 101, 242, 0.3), rgba(88, 101, 242, 0) 70%); }
+  .art { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .logo { filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 80px rgba(224, 122, 95, 0.18)); }
+  .name { font-weight: 600; letter-spacing: -0.03em; }
+  .tag { font: 400 34px/1.35 "Segoe UI Variable Text", "Segoe UI", sans-serif; color: rgba(244, 241, 238, 0.7); }
+  .tag em { font-style: normal; background: linear-gradient(100deg, #f4a184, #e07a5f 45%, #c24f37); -webkit-background-clip: text; background-clip: text; color: transparent; }
+</style>
+</head>
+<body>
+<div class="wall"></div>
+<script type="module">
+// Static markup from constants in this file; nothing comes from outside.
+const LOGO = (size) => `<svg class="logo" width="${size}" height="${size}" viewBox="64 64 896 896" aria-hidden="true"><defs><linearGradient id="t" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3531"/><stop offset="1" stop-color="#1b1918"/></linearGradient><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e07a5f"/><stop offset="1" stop-color="#c24f37"/></linearGradient><linearGradient id="f" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c24f37"/><stop offset="1" stop-color="#f08d71"/></linearGradient></defs><rect x="64" y="64" width="896" height="896" rx="208" fill="url(#t)"/><rect x="64" y="64" width="896" height="896" rx="208" fill="url(#s)"/><rect x="66" y="66" width="892" height="892" rx="206" fill="none" stroke="#fff" stroke-opacity=".1" stroke-width="4"/><rect x="292" y="232" width="136" height="560" rx="68" fill="url(#p)"/><rect x="292" y="656" width="440" height="136" rx="68" fill="#fff" fill-opacity=".16"/><rect x="292" y="656" width="300" height="136" rx="68" fill="url(#f)"/><rect x="640" y="616" width="22" height="216" rx="11" fill="#fff" fill-opacity=".92"/></svg>`;
+
+const art = new URLSearchParams(location.search).get("a") ?? "box";
+const [width, height] = art === "poster" ? [720, 1080] : [1080, 1080];
+Object.assign(document.documentElement.style, { width: `${width}px`, height: `${height}px` });
+Object.assign(document.body.style, { width: `${width}px`, height: `${height}px` });
+
+const markup =
+  art === "poster"
+    ? `<div class="art" style="justify-content:flex-start;padding-top:250px">${LOGO(300)}<div class="name" style="font-size:104px;margin-top:64px">Limvo</div><p class="tag" style="margin:22px 60px 0">Your AI plan limits,<br><em>right next to the clock.</em></p></div>`
+    : `<div class="art">${LOGO(500)}</div>`;
+document.body.append(document.createRange().createContextualFragment(markup));
+await document.fonts.ready;
+document.title = "ready";
+</script>
+</body>
+</html>
