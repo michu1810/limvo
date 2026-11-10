@@ -114,7 +114,7 @@ The Store package is signed by Microsoft, so there is no SmartScreen warning,
 and the Store keeps it up to date. From a terminal:
 
 ```powershell
-winget install --id 9MZ7HN8V6GX5 --source msstore
+winget install Limvo
 ```
 
 ### Installer from GitHub
