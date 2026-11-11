@@ -6,14 +6,16 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-11
+
 ### Added
 
 - A card on the Windows 11 Widgets board (Store version): the main limit of
   every signed-in service with its pace and reset, in small, medium and
   large. A click opens the flyout; the larger sizes can refresh.
-- GitHub Copilot, the fifth service, with its official mark: premium requests on paid plans, or
-  chat and completions on Copilot Free, for the month to the reset, with the
-  plan badge and a colour of its own. Limvo reads the GitHub CLI's sign-in,
+- GitHub Copilot, the fifth service, with its official mark: premium
+  requests on paid plans, or chat and completions on Copilot Free, for the
+  month to the reset, with the plan badge and a colour of its own. Limvo reads the GitHub CLI's sign-in,
   so `gh auth login` once is all it takes.
 - A budget to the reset: when a limit is _Tight_ or _Running hot_, the
   flyout says how much a day you can use to make it to the reset, next to
@@ -34,6 +36,11 @@ All notable changes to Limvo are listed here. The format follows
 - With extra accounts, a hot or spent account points to another account of
   the same service that lasts to its reset, for example "More room on
   Claude · Work, 46% until Sun". A click opens its tab.
+
+### Fixed
+
+- With several limits in the taskbar, the reading no longer stays as wide as
+  the first service that reported and cuts the others off.
 
 ## [0.4.1] - 2026-11-10
 
