@@ -49,7 +49,8 @@ work, and nudges you with a Windows notification before you run out.
   _On track_, _Tight_, _Running hot_ or _Limit reached_, charts the period
   against an even pace and says when the limit runs out at today's rate.
   When the period is tight, it also says how much a day you can use to make
-  it to the reset, next to your rate so far.
+  it to the reset, next to your rate so far. Below, the peaks of the last
+  eight periods show whether the plan fits.
 
   <img src="docs/images/flyout-forecast.png" width="380" alt="Claude running hot at 78%, with the chart above the even pace, the warning that the limit runs out on Monday, the split by product and 12.40 dollars of extra usage" />
 

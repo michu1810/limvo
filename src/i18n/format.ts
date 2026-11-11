@@ -17,6 +17,8 @@ export interface Formatters {
   weekdayTime(instant: Date): string;
   /** Short weekday only, for example "Tue". */
   weekday(instant: Date): string;
+  /** Day and short month, for example "Nov 4". */
+  dayMonth(instant: Date): string;
 }
 
 export function createFormatters(locale: string): Formatters {
@@ -33,6 +35,7 @@ export function createFormatters(locale: string): Formatters {
     minute: "2-digit",
   });
   const weekday = new Intl.DateTimeFormat(locale, { weekday: "short" });
+  const dayMonth = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" });
   const unit = (name: "day" | "hour" | "minute") =>
     new Intl.NumberFormat(locale, {
       style: "unit",
@@ -72,5 +75,6 @@ export function createFormatters(locale: string): Formatters {
 
     weekdayTime: (instant) => weekdayTime.format(instant),
     weekday: (instant) => weekday.format(instant),
+    dayMonth: (instant) => dayMonth.format(instant),
   };
 }

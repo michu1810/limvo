@@ -522,6 +522,88 @@ html:has(.flyout:not(.card)) {
   color: var(--text-tertiary);
 }
 
+/* Past periods ---------------------------------------------------------------- */
+
+.past__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.past__average {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.past__bars {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 6px;
+  height: 72px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Time runs left to right in every language, as in the week chart. */
+[dir="rtl"] .past__bars {
+  direction: ltr;
+}
+
+.past__bar {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px;
+  min-width: 0;
+}
+
+.past__fill {
+  align-self: end;
+  height: max(3px, calc(var(--value) * 100%));
+  border-radius: 3px 3px 1px 1px;
+  background: var(--accent);
+  opacity: 0.4;
+  transform-origin: bottom;
+  animation: past-grow var(--duration-slow) var(--ease-out) both;
+  animation-delay: calc(700ms + var(--index) * 40ms);
+}
+
+.past__bar[data-full] .past__fill {
+  background: var(--caution-text);
+}
+
+.past__bar[data-current] .past__fill {
+  opacity: 1;
+}
+
+.past__label {
+  overflow: hidden;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.past__bar[data-current] .past__label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+@keyframes past-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .past__fill {
+    animation: none;
+  }
+}
+
 /* Groups and rows ------------------------------------------------------------ */
 
 .group {

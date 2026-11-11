@@ -13,6 +13,7 @@ import { AccountHint } from "./AccountHint";
 import { Breakdown, OtherLimits } from "./Details";
 import { Headline } from "./Headline";
 import { LanguagePanel } from "./LanguagePanel";
+import { PastPeriods } from "./PastPeriods";
 import { ProviderTabs } from "./ProviderTabs";
 import { SettingsPanel } from "./SettingsPanel";
 import { StateNotice } from "./StateNotice";
@@ -168,6 +169,13 @@ export function Flyout({
               <OtherLimits
                 windows={snapshot.windows}
                 extraUsage={snapshot.extraUsage}
+                replay={shown}
+              />
+            )}
+            {snapshot?.headline && (
+              <PastPeriods
+                window={snapshot.headline}
+                history={histories[report.providerId]}
                 replay={shown}
               />
             )}

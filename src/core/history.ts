@@ -1,9 +1,11 @@
 /**
- * Readings of one window over its current period, for the weekly chart.
+ * Readings of one window over its current period, for the weekly chart, and
+ * the peak of each period before it, for the history of past periods.
  *
- * Only the running period is kept: when the reset time moves on, the history
- * starts over. Readings that repeat the previous value are folded together
- * unless enough time has passed, so a quiet day does not fill the store.
+ * Only the running period keeps its readings: when the reset time moves on,
+ * they are folded into one past entry and the history starts over. Readings
+ * that repeat the previous value are folded together unless enough time has
+ * passed, so a quiet day does not fill the store.
  */
 
 export interface Reading {
@@ -12,22 +14,40 @@ export interface Reading {
   percent: number;
 }
 
+/** A finished period: when it reset and the most it reached while Limvo watched. */
+export interface PastPeriod {
+  resetsAt: string;
+  peak: number;
+}
+
 export interface WindowHistory {
   resetsAt: string;
   readings: Reading[];
+  /** Finished periods, oldest first. Missing until one has finished. */
+  past?: PastPeriod[];
 }
 
 /** Repeat a flat value at most this often, so the chart still shows idle stretches. */
 const FLAT_SPACING_MS = 30 * 60_000;
 /** A week of five-minute readings fits with room to spare. */
 const MAX_READINGS = 600;
+/** Past periods kept: two months of weeks. */
+export const MAX_PAST = 8;
+/**
+ * A reset time that moves on by less than this is the service adjusting it,
+ * not a new period, and leaves no past entry behind.
+ */
+const NEW_PERIOD_MS = 3600_000;
 
 export function addReading(
   history: WindowHistory | undefined,
   resetsAt: string,
   reading: Reading,
 ): WindowHistory {
-  const current = history && history.resetsAt === resetsAt ? history : { resetsAt, readings: [] };
+  const current =
+    history && history.resetsAt === resetsAt
+      ? history
+      : { resetsAt, readings: [], ...pastAfter(history, resetsAt) };
   const last = current.readings.at(-1);
 
   if (last && reading.at <= last.at) return current;
@@ -35,7 +55,22 @@ export function addReading(
     return current;
   }
   const readings = [...current.readings, reading].slice(-MAX_READINGS);
-  return { resetsAt, readings };
+  return { ...current, resetsAt, readings };
+}
+
+/** The past periods once `history` gives way to the period ending at `resetsAt`. */
+function pastAfter(
+  history: WindowHistory | undefined,
+  resetsAt: string,
+): Pick<WindowHistory, "past"> {
+  if (!history) return {};
+  const past = history.past ?? [];
+  const moved = Date.parse(resetsAt) - Date.parse(history.resetsAt);
+  if (!(moved >= NEW_PERIOD_MS) || history.readings.length === 0) {
+    return past.length > 0 ? { past } : {};
+  }
+  const peak = Math.max(...history.readings.map((reading) => reading.percent));
+  return { past: [...past, { resetsAt: history.resetsAt, peak }].slice(-MAX_PAST) };
 }
 
 export interface ChartPoint {

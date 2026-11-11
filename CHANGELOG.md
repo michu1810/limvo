@@ -19,6 +19,9 @@ All notable changes to Limvo are listed here. The format follows
   _Settings > Pace warning_ turns it off.
 - _Settings > Notify at_ chooses when a main limit is announced: at 50, 75
   and 90%, at 80 and 95% as before, or only when it is reached.
+- Past weeks (past months for Cursor): the peak of each of the last eight
+  periods beside the running one, with their average, so a glance says
+  whether the plan fits. It fills in as periods finish while Limvo runs.
 - The tray icon's tooltip adds the daily budget to a limit that could run
   out, as long as every pinned limit still fits.
 - With extra accounts, a hot or spent account points to another account of

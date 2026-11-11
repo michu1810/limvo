@@ -100,6 +100,14 @@ export interface Messages {
   forecastLimitAt: string;
   /** Accessible description of the weekly chart. */
   weekChart: string;
+  pastWeeks: string;
+  pastMonths: string;
+  /** Average peak of the past periods. Placeholder `{percent}`. */
+  pastAverage: string;
+  /** One past period. Placeholders `{period}`, a day and month such as "Nov 4", and `{percent}`. */
+  pastBar: string;
+  /** Label of the running period's bar. */
+  pastNow: string;
   /** Opens the budget line. Placeholder `{day}`, a weekday, or a weekday and time on the last day. */
   budgetUntil: string;
   /** Placeholder `{rate}`, a percentage that may have one decimal, for example "13.9%". */
