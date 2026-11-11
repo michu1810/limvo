@@ -47,7 +47,7 @@ export function addReading(
   const current =
     history && history.resetsAt === resetsAt
       ? history
-      : { resetsAt, readings: [], ...pastAfter(history, resetsAt) };
+      : { resetsAt, readings: [], ...pastAfter(history, resetsAt, reading.at) };
   const last = current.readings.at(-1);
 
   if (last && reading.at <= last.at) return current;
@@ -58,15 +58,24 @@ export function addReading(
   return { ...current, resetsAt, readings };
 }
 
-/** The past periods once `history` gives way to the period ending at `resetsAt`. */
+/**
+ * The past periods once `history` gives way to the period ending at
+ * `resetsAt`. The old period counts only if it has ended by `now`: a service
+ * whose headline can switch to another quota mid-period (Antigravity leads
+ * with its fullest model) would otherwise leave a period behind that never
+ * finished.
+ */
 function pastAfter(
   history: WindowHistory | undefined,
   resetsAt: string,
+  now: number,
 ): Pick<WindowHistory, "past"> {
   if (!history) return {};
   const past = history.past ?? [];
-  const moved = Date.parse(resetsAt) - Date.parse(history.resetsAt);
-  if (!(moved >= NEW_PERIOD_MS) || history.readings.length === 0) {
+  const oldReset = Date.parse(history.resetsAt);
+  const moved = Date.parse(resetsAt) - oldReset;
+  const ended = now >= oldReset - NEW_PERIOD_MS;
+  if (!(moved >= NEW_PERIOD_MS) || !ended || history.readings.length === 0) {
     return past.length > 0 ? { past } : {};
   }
   const peak = Math.max(...history.readings.map((reading) => reading.percent));

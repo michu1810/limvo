@@ -25,7 +25,7 @@ works with: they are not in the product name, the logo or the search terms.
 
 > Limvo puts the plan limits of the AI coding tools you use next to the clock. It shows how much of each allowance is gone, whether you are on track to make it to the reset, and when a limit will run out at today's pace.
 >
-> Limvo works with Claude (desktop app and Claude Code), Codex with a ChatGPT plan, Cursor and Google Antigravity. A service appears as soon as you are signed in to it on this computer; there is nothing to configure and no account to create.
+> Limvo works with Claude (desktop app and Claude Code), Codex with a ChatGPT plan, Cursor, Google Antigravity and GitHub Copilot. A service appears as soon as you are signed in to it on this computer; there is nothing to configure and no account to create.
 >
 > • A reading in the taskbar: one limit as a sentence, or up to six limits side by side, on every monitor.
 > • A forecast: Limvo projects your usage to the reset and labels it On track, Tight, Running hot or Limit reached.
@@ -70,7 +70,7 @@ works with: they are not in the product name, the logo or the search terms.
 
 > Limvo pokazuje limity planów narzędzi AI do programowania obok zegara. Widać, ile z każdego limitu już zużyłeś, czy zmieścisz się do resetu i kiedy limit się skończy przy dzisiejszym tempie.
 >
-> Limvo działa z Claude (aplikacja desktopowa i Claude Code), Codex z planem ChatGPT, Cursorem i Google Antigravity. Usługa pojawia się, gdy tylko jesteś w niej zalogowany na tym komputerze: niczego nie trzeba konfigurować ani zakładać konta.
+> Limvo działa z Claude (aplikacja desktopowa i Claude Code), Codex z planem ChatGPT, Cursorem, Google Antigravity i GitHub Copilot. Usługa pojawia się, gdy tylko jesteś w niej zalogowany na tym komputerze: niczego nie trzeba konfigurować ani zakładać konta.
 >
 > • Odczyt na pasku zadań: jeden limit jako zdanie albo do sześciu limitów obok siebie, na każdym monitorze.
 > • Prognoza: Limvo przewiduje zużycie do resetu i oznacza je jako W normie, Na styk, Za szybko albo Limit osiągnięty.
@@ -90,7 +90,7 @@ works with: they are not in the product name, the logo or the search terms.
 
 **Notes for certification:**
 
-> Limvo shows the plan limits of AI coding tools the user is already signed in to on the same PC: the Claude desktop app or Claude Code, the Codex CLI or app, Cursor and Google Antigravity. It reads their existing local sign-in only to request that user's own usage from each service over HTTPS. Tokens are kept in memory for one request and are never stored, logged or sent anywhere else. There is no telemetry and no server of its own; see https://github.com/michu1810/limvo#privacy-and-security.
+> Limvo shows the plan limits of AI coding tools the user is already signed in to on the same PC: the Claude desktop app or Claude Code, the Codex CLI or app, Cursor, Google Antigravity and the GitHub CLI for Copilot. It reads their existing local sign-in only to request that user's own usage from each service over HTTPS. Tokens are kept in memory for one request and are never stored, logged or sent anywhere else. There is no telemetry and no server of its own; see https://github.com/michu1810/limvo#privacy-and-security.
 >
 > On a test machine without any of these tools signed in, Limvo starts in the notification area and its flyout explains which services it supports and how to sign in. To see readings, install and sign in to Claude Code or Cursor with any account; the free plans work.
 >

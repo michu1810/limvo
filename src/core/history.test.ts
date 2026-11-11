@@ -36,6 +36,14 @@ describe("addReading", () => {
     expect(history?.readings.at(-1)?.percent).toBe(90);
   });
 
+  it("leaves no past entry when the headline switches quota mid-period", () => {
+    const old = addReading(undefined, RESET, { at: start + hour, percent: 40 });
+    const otherQuota = new Date(Date.parse(RESET) + 3 * 24 * hour).toISOString();
+    const twoDaysBefore = Date.parse(RESET) - 2 * 24 * hour;
+    const next = addReading(old, otherQuota, { at: twoDaysBefore, percent: 12 });
+    expect(next.past).toBeUndefined();
+  });
+
   it("does not take a nudged reset time for a new period", () => {
     const old = addReading(undefined, RESET, { at: start + hour, percent: 40 });
     const nudged = new Date(Date.parse(RESET) + 60_000).toISOString();

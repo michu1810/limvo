@@ -19,7 +19,7 @@ All notable changes to Limvo are listed here. The format follows
 - An early warning: once per period, a notification says when the main limit
   runs out at the current pace and what daily budget would make it last. It
   waits for the first tenth of the period, so one busy hour after a reset
-  says nothing, and stays quiet once the 80% notification has been shown.
+  says nothing, and stays quiet once the first level has been announced.
   _Settings > Pace warning_ turns it off.
 - _Settings > Notify at_ chooses when a main limit is announced: at 50, 75
   and 90%, at 80 and 95% as before, or only when it is reached.

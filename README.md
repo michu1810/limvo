@@ -33,9 +33,9 @@ work, and nudges you with a Windows notification before you run out.
 
 ## Features
 
-- **Every service in one place.** Claude, Codex (ChatGPT plans), Cursor and
-  Google Antigravity each get a tab with their own logo, plan badge and
-  colour. A service appears as soon as you are signed in to it on this
+- **Every service in one place.** Claude, Codex (ChatGPT plans), Cursor,
+  Google Antigravity and GitHub Copilot each get a tab with their own logo,
+  plan badge and colour. A service appears as soon as you are signed in to it on this
   computer; there is nothing to configure.
 
   <img src="docs/images/services-dark.png" width="760" alt="Three flyouts side by side: Codex at 23% of its weekly limit with a five-hour session, Cursor at 34% of its monthly included usage running hot with a forecast, and Antigravity at 41% of the Gemini 3 Flash weekly quota with the other agent models" />
@@ -57,7 +57,8 @@ work, and nudges you with a Windows notification before you run out.
 - **The whole picture per service.** Claude's weekly limit, its split between
   Claude Code, chats and Cowork, model caps and extra usage; Codex's weekly
   and five-hour windows; Cursor's monthly included usage with Auto and API;
-  Antigravity's weekly quota for every agent model.
+  Antigravity's weekly quota for every agent model; Copilot's monthly
+  premium requests, or chat and completions on Copilot Free.
 - **A counter with some craft.** The percentage rolls in on drum wheels like an
   old odometer: each digit drops in from above, and a wheel only moves on when
   the one to its right passes nine.
@@ -283,6 +284,8 @@ are honoured. One service failing never delays or blanks another.
 - Tokens stay in memory for the duration of one request and are never logged,
   stored or shown. Logs record only which source was used and HTTP status
   codes.
+- Copilot is read with the GitHub CLI's token, sent only to `api.github.com`.
+  Like every other sign-in, Limvo only reads it.
 - Everything that touches credentials, the network and the system lives in the
   Rust core (`src-tauri/src`). The interface runs with a strict content
   security policy and can only call the commands listed in
@@ -362,7 +365,7 @@ npm run tauri build
 
 `npm run dev` serves the interface with built-in scenarios, which is the
 quickest way to work on design: `?scenario=reference|fresh|tight|hot|reached|offline|auth|signedOut|error`,
-`&more` for all four services, `&codex=off`, `&pins=claude:weekly_all,codex:session`,
+`&more` for Cursor and Antigravity, `&copilot` for Copilot, `&accounts` for a second Claude account, `&codex=off`, `&pins=claude:weekly_all,codex:session`,
 `&locale=he`, `&theme=dark`, and `&now=<ISO time>` for reproducible screenshots.
 Open `/strip.html` and `/card.html` for the other windows.
 
@@ -410,9 +413,9 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, and
 ## Disclaimer
 
 Limvo is an independent open-source project. It is not affiliated with,
-endorsed by or sponsored by Anthropic, OpenAI, Anysphere (Cursor) or Google.
-Claude, ChatGPT, Codex, Cursor and Antigravity are trademarks of their
-respective owners, used here only to describe what the app works with.
+endorsed by or sponsored by Anthropic, OpenAI, Anysphere (Cursor), Google,
+GitHub or Microsoft. Claude, ChatGPT, Codex, Cursor, Antigravity, GitHub and
+GitHub Copilot are trademarks of their respective owners, used here only to describe what the app works with.
 
 ## License
 
