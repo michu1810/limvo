@@ -8,6 +8,10 @@ All notable changes to Limvo are listed here. The format follows
 
 ### Added
 
+- GitHub Copilot, the fifth service: premium requests on paid plans, or
+  chat and completions on Copilot Free, for the month to the reset, with the
+  plan badge and a colour of its own. Limvo reads the GitHub CLI's sign-in,
+  so `gh auth login` once is all it takes.
 - A budget to the reset: when a limit is _Tight_ or _Running hot_, the
   flyout says how much a day you can use to make it to the reset, next to
   your rate so far, for example "To last until Tue ~13.9% a day · now

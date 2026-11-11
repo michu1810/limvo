@@ -12,7 +12,9 @@ use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use serde::Deserialize;
 use serde_json::json;
 
-use super::{FetchFuture, ProviderError, UsageProvider, clamp_percent, severity_of, status_error};
+use super::{
+    FetchFuture, ProviderError, UsageProvider, clamp_percent, credential, severity_of, status_error,
+};
 use crate::snapshot::{PlanBadge, UsageSnapshot, UsageWindow, WindowKind};
 
 pub const PROVIDER_ID: &str = "antigravity";
@@ -306,47 +308,6 @@ fn slug(text: &str) -> String {
         .chars()
         .map(|c| if c.is_ascii_alphanumeric() { c } else { '_' })
         .collect()
-}
-
-#[cfg(windows)]
-mod credential {
-    use windows::Win32::Security::Credentials::{
-        CRED_TYPE_GENERIC, CREDENTIALW, CredFree, CredReadW,
-    };
-    use windows::core::HSTRING;
-
-    /// The secret of a generic Windows credential, read for this user only.
-    pub fn read(target: &str) -> Option<Vec<u8>> {
-        let mut credential: *mut CREDENTIALW = std::ptr::null_mut();
-        // SAFETY: CredReadW fills `credential` with a buffer it owns; it is
-        // copied out and released with CredFree before returning.
-        unsafe {
-            CredReadW(
-                &HSTRING::from(target),
-                CRED_TYPE_GENERIC,
-                None,
-                &raw mut credential,
-            )
-            .ok()?;
-            let blob = (*credential).CredentialBlob;
-            let size = usize::try_from((*credential).CredentialBlobSize).ok();
-            let secret = match size {
-                Some(size) if !blob.is_null() && size > 0 => {
-                    Some(std::slice::from_raw_parts(blob, size).to_vec())
-                }
-                _ => None,
-            };
-            CredFree(credential.cast());
-            secret
-        }
-    }
-}
-
-#[cfg(not(windows))]
-mod credential {
-    pub fn read(_target: &str) -> Option<Vec<u8>> {
-        None
-    }
 }
 
 #[cfg(test)]

@@ -5,7 +5,8 @@ import type { MessageKey } from "../i18n/resolve";
 
 export function headlineLabel(window: UsageWindow, { t }: I18n): string {
   if (window.kind === "session") return t("headlineSession");
-  if (window.kind === "monthly") return t("headlineMonthly");
+  if (window.kind === "monthly")
+    return window.label ? t("windowMonthlyNamed", { name: window.label }) : t("headlineMonthly");
   if (window.kind === "scoped" && window.label) return t("windowScoped", { name: window.label });
   return t("headlineWeekly");
 }

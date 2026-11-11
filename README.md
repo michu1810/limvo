@@ -4,7 +4,7 @@
 
 # Limvo
 
-**Your AI plan limits in the Windows taskbar: Claude, Codex, Cursor and Antigravity, with the pace you are using them at.**
+**Your AI plan limits in the Windows taskbar: Claude, Codex, Cursor, Antigravity and GitHub Copilot, with the pace you are using them at.**
 
 <a href="https://apps.microsoft.com/detail/9MZ7HN8V6GX5?mode=direct"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="180" alt="Get it from Microsoft" /></a>
 
@@ -105,6 +105,7 @@ work, and nudges you with a Windows notification before you run out.
 | **Codex**       | ChatGPT Plus, Pro, Business and others       | Weekly limit, five-hour session                                            | Codex CLI or app signed in with ChatGPT       |
 | **Cursor**      | Free, Pro, Pro+, Ultra, Business             | Monthly included usage, Auto, API                                          | Cursor editor                                 |
 | **Antigravity** | Free, Google AI plans                        | Weekly quota of each agent model                                           | Google Antigravity app                        |
+| **Copilot**     | Free, Pro, Pro+, Business, Enterprise        | Premium requests, or chat and completions on Free                          | GitHub CLI (`gh auth login`)                  |
 
 Each service is a small module behind one interface. Adding another one is
 described in [CONTRIBUTING.md](CONTRIBUTING.md#add-a-service).
@@ -225,6 +226,7 @@ draw its usage screen, and shows the answer.
 | Codex       | `~/.codex/auth.json`, or `%CODEX_HOME%\auth.json`                                                                                                                                   | `chatgpt.com/backend-api/wham/usage`       |
 | Cursor      | The editor's settings database, `%APPDATA%\Cursor\User\globalStorage\state.vscdb`, opened read-only                                                                                 | `api2.cursor.sh` dashboard service         |
 | Antigravity | The Windows Credential Manager entry the app creates, `gemini:antigravity`                                                                                                          | `cloudcode-pa.googleapis.com` model quotas |
+| Copilot     | The GitHub CLI's sign-in: its Windows Credential Manager entry (`gh:github.com:`), or `oauth_token` in `%APPDATA%\GitHub CLI\hosts.yml`                                             | `api.github.com/copilot_internal/user`     |
 
 **Read only, always.** Limvo never refreshes, writes, moves or copies a
 credential. A token is held in memory for one request and dropped. An expired
@@ -255,6 +257,7 @@ are honoured. One service failing never delays or blanks another.
 | Codex CLI or app signed in with ChatGPT | A Codex tab appears. API-key sign-ins have no plan limits and are not shown.                                                  |
 | Cursor signed in                        | A Cursor tab appears with the billing cycle's included usage.                                                                 |
 | Antigravity signed in                   | An Antigravity tab appears. Its sign-in lasts an hour; open Antigravity now and then and Limvo picks up the renewed one.      |
+| GitHub CLI signed in, with Copilot      | A Copilot tab appears with this month's quotas. Copilot in an editor alone is not enough: run `gh auth login` once.           |
 | Only some services                      | Only those get a tab. With a single service, the tabs disappear and the flyout looks like a dedicated widget.                 |
 | Signed out everywhere                   | The flyout asks you to sign in. Limvo checks again every two minutes, no restart needed.                                      |
 | Custom tool folders                     | `CLAUDE_CONFIG_DIR` and `CODEX_HOME` are honoured the same way the CLIs honour them.                                          |
@@ -387,7 +390,7 @@ src/                 Interface (React 19, TypeScript)
   i18n/              Translations and Intl formatting
   ui/                Flyout, taskbar strip, desktop card, controls
 src-tauri/src/       Core (Rust, Tauri 2)
-  providers/         One module per service: claude, codex, cursor, antigravity
+  providers/         One module per service: claude, codex, cursor, antigravity, copilot
   poller.rs          One slot per service: schedule, back-off, adaptive refresh
   taskbar.rs         A reading on every taskbar, next to the notification area
   flyout.rs card.rs  Window placement and behaviour

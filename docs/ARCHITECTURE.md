@@ -6,7 +6,7 @@ the system, and a React interface that only draws what the core reports.
 ```
           ┌──────────────── Rust core (src-tauri/src) ────────────────┐
           │                                                            │
- sign-in ─┤ providers/ claude codex cursor antigravity (one per service)│
+ sign-in ─┤ providers/ claude codex cursor antigravity copilot (one per service)│
  files    │        │                  │                                │
           │        ▼                  ▼                                │
  ~/.claude│ activity.rs ──nudge──▶ poller.rs ── Vec<ProviderReport> ─┐ │
@@ -60,6 +60,7 @@ restart.
 | Codex       | `~/.codex/auth.json` (ChatGPT sign-in)                         | `chatgpt.com/backend-api/wham/usage` | `~/.codex/sessions`                   |
 | Cursor      | `state.vscdb` of the editor, SQLite opened read-only           | `api2.cursor.sh` dashboard service   | Cursor `workspaceStorage`             |
 | Antigravity | Credential Manager entry `gemini:antigravity`                  | `cloudcode-pa.googleapis.com` quotas | `~/.gemini/antigravity/conversations` |
+| Copilot     | GitHub CLI: Credential Manager `gh:github.com:`, `hosts.yml`   | `api.github.com` Copilot quotas      | none                                  |
 
 A service whose sign-in lives in a folder (Claude Code, Codex) can have
 extra accounts (`accounts.rs`): each is the same provider bound to another

@@ -10,5 +10,8 @@ pages (the OpenAI mark filled in plain black and in plain white), and are used o
 to. They are not covered by the MIT license of Limvo and do not imply any
 affiliation or endorsement.
 
+No GitHub Copilot mark is bundled, so Copilot shows the Limvo mark; put
+`copilot.svg` here on your own machine to see it.
+
 Remove a file to see the Limvo mark in its place. Forks that redistribute
 Limvo should check each owner's brand terms first.

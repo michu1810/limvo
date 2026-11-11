@@ -20,7 +20,8 @@ export function createBrowserBridge(): Bridge {
   const now = () => (fixedNow ? new Date(fixedNow) : new Date());
   const withMore = params.has("more");
   const withAccount = params.has("accounts");
-  const build = () => scenarioReports(name, now(), withCodex, withMore, withAccount);
+  const withCopilot = params.has("copilot");
+  const build = () => scenarioReports(name, now(), withCodex, withMore, withAccount, withCopilot);
 
   let reports: ProviderReport[] = build();
   let settings: Settings = {
