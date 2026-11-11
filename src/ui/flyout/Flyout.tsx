@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { bridge, PRIMARY_PROVIDER, type Settings } from "../../bridge";
+import { budgetWorthShowing } from "../../core/pace";
 import { pinnedLimits, visibleReports } from "../../core/pins";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -211,11 +212,12 @@ function LanguageButton({ onOpen }: { onOpen: () => void }) {
 /**
  * The tray icon and its menu are drawn by the host, which has no translations.
  * The flyout window lives for the whole session, so it keeps them current.
- * The tooltip lists the pinned limits, one service per line.
+ * The tooltip lists the pinned limits, one service per line. A limit that
+ * could run out also gets its budget, as long as every line still fits.
  */
 function useTrayTexts(reports: ProviderReport[], settings: Settings | null, now: Date) {
   const { t, format, locale } = useI18n();
-  const lines = pinnedLimits(reports, settings?.pinned ?? null).map(({ report, window }) => {
+  const limits = pinnedLimits(reports, settings?.pinned ?? null).map(({ report, window }) => {
     const reading =
       window.resetsAt && new Date(window.resetsAt) > now
         ? t("stripUntil", {
@@ -223,9 +225,24 @@ function useTrayTexts(reports: ProviderReport[], settings: Settings | null, now:
             day: format.weekday(new Date(window.resetsAt)),
           })
         : format.percent(window.percent);
-    return `${report.providerName}: ${reading}`;
+    const budget = budgetWorthShowing(window, now);
+    const line = `${report.providerName}: ${reading}`;
+    return {
+      line,
+      withBudget: budget
+        ? `${line} · ${t(budget.unit === "day" ? "budgetPerDay" : "budgetPerHour", {
+            rate: format.percentTenths(budget.allowed),
+          })}`
+        : line,
+    };
   });
-  const tooltip = fitTooltip([`Limvo ${__APP_VERSION__}`, ...lines]);
+  const title = `Limvo ${__APP_VERSION__}`;
+  const withBudgets = [title, ...limits.map((limit) => limit.withBudget)].join("\n");
+  // Every limit matters more than any budget: drop the budgets before dropping a line.
+  const tooltip =
+    withBudgets.length <= TOOLTIP_LIMIT
+      ? withBudgets
+      : fitTooltip([title, ...limits.map((limit) => limit.line)]);
   const refresh = t("refresh");
   const quit = t("quit");
 
@@ -235,8 +252,11 @@ function useTrayTexts(reports: ProviderReport[], settings: Settings | null, now:
   }, [tooltip, refresh, quit, locale]);
 }
 
-/** Windows cuts tray tooltips at 127 characters; drop whole lines instead of ending mid-word. */
-function fitTooltip(lines: readonly string[], limit = 127): string {
+/** Windows cuts tray tooltips at this many characters. */
+const TOOLTIP_LIMIT = 127;
+
+/** Drops whole lines instead of ending mid-word. */
+function fitTooltip(lines: readonly string[], limit = TOOLTIP_LIMIT): string {
   let text = "";
   for (const line of lines) {
     const next = text ? `${text}\n${line}` : line;

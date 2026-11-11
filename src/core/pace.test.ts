@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computePace, limitReachedAt, usageBudget } from "./pace";
+import { budgetWorthShowing, computePace, limitReachedAt, usageBudget } from "./pace";
 
 const WEEK = 7 * 24 * 3600;
 const SESSION = 5 * 3600;
@@ -150,5 +150,17 @@ describe("usageBudget", () => {
     expect(usageBudget({ ...weekly(10, 40), resetsAt: null }, now)).toBeNull();
     expect(usageBudget({ ...weekly(10, 40), periodSeconds: null }, now)).toBeNull();
     expect(usageBudget({ ...weekly(10, 40), resetsAt: "soon" }, now)).toBeNull();
+  });
+});
+
+describe("budgetWorthShowing", () => {
+  const weekly = (percent: number, hoursLeft: number) =>
+    ({ kind: "weekly", percent, resetsAt: hoursFromNow(hoursLeft), periodSeconds: WEEK }) as const;
+
+  it("shows the budget only while the window could run out", () => {
+    expect(budgetWorthShowing(weekly(51, 40), now)).toBeNull(); // on track
+    expect(budgetWorthShowing(weekly(45, 84), now)?.unit).toBe("day"); // tight
+    expect(budgetWorthShowing(weekly(60, 84), now)?.unit).toBe("day"); // running hot
+    expect(budgetWorthShowing(weekly(100, 40), now)).toBeNull(); // reached
   });
 });

@@ -1,5 +1,5 @@
 import type { WindowHistory } from "../../core/history";
-import { computePace, limitReachedAt, type PaceStatus, usageBudget } from "../../core/pace";
+import { budgetWorthShowing, computePace, limitReachedAt } from "../../core/pace";
 import type { PlanBadge, UsageWindow } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import type { MessageKey } from "../../i18n/resolve";
@@ -14,18 +14,6 @@ const PACE_DETAIL: Record<UsageWindow["kind"], MessageKey> = {
   weekly: "paceDetailWeekly",
   monthly: "paceDetailMonthly",
   scoped: "paceDetailWeekly",
-};
-
-/**
- * The budget line shows only when the week could run out: while the pace is
- * calm it would be noise, and once the limit is reached there is nothing left
- * to budget.
- */
-const SHOWS_BUDGET: Record<PaceStatus, boolean> = {
-  on_track: false,
-  tight: true,
-  running_hot: true,
-  limit_reached: false,
 };
 
 export function Headline({
@@ -51,7 +39,7 @@ export function Headline({
   const { t, format } = i18n;
   const pace = computePace(window, now);
   const runsOutAt = limitReachedAt(window, now);
-  const budget = pace && SHOWS_BUDGET[pace.status] ? usageBudget(window, now) : null;
+  const budget = budgetWorthShowing(window, now);
   const resetsAt = window.resetsAt ? new Date(window.resetsAt) : null;
   const remaining = resetsAt ? resetsAt.getTime() - now.getTime() : null;
   const label = headlineLabel(window, i18n);

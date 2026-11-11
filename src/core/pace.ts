@@ -133,6 +133,19 @@ export function usageBudget(
   };
 }
 
+/**
+ * The budget, when it is worth showing: only while the window could run out.
+ * While the pace is calm it would be noise, and once the limit is reached
+ * there is nothing left to budget. The flyout and the tray tooltip share it.
+ */
+export function budgetWorthShowing(
+  window: Pick<UsageWindow, "kind" | "percent" | "resetsAt" | "periodSeconds">,
+  now: Date,
+): Budget | null {
+  const status = computePace(window, now)?.status;
+  return status === "tight" || status === "running_hot" ? usageBudget(window, now) : null;
+}
+
 function classify(percent: number, projected: number, thresholds: PaceThresholds): PaceStatus {
   if (percent >= 100) return "limit_reached";
   if (projected >= thresholds.hot) return "running_hot";

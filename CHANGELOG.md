@@ -16,6 +16,8 @@ All notable changes to Limvo are listed here. The format follows
   runs out at the current pace and what daily budget would make it last. It
   waits for the first tenth of the period, so one busy hour after a reset
   says nothing, and stays quiet once the 80% notification has been shown.
+- The tray icon's tooltip adds the daily budget to a limit that could run
+  out, as long as every pinned limit still fits.
 
 ## [0.4.1] - 2026-11-10
 
