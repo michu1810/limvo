@@ -7,6 +7,8 @@ export interface Formatters {
   percent(value: number): string;
   /** A percentage to one decimal, for rates: 13.94 becomes "13.9%", 14.02 "14%". */
   percentTenths(value: number): string;
+  /** A whole number in the locale's digits and grouping. */
+  number(value: number): string;
   /** "3 min ago", relative to `now`. */
   relativeTime(instant: Date, now: Date): string;
   /** A positive span as its two largest units, for example "1 day 16 hr". */
@@ -19,6 +21,7 @@ export interface Formatters {
 
 export function createFormatters(locale: string): Formatters {
   const percent = new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 0 });
+  const whole = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 });
   const percentTenths = new Intl.NumberFormat(locale, {
     style: "percent",
     maximumFractionDigits: 1,
@@ -43,6 +46,7 @@ export function createFormatters(locale: string): Formatters {
   return {
     percent: (value) => percent.format(value / 100),
     percentTenths: (value) => percentTenths.format(value / 100),
+    number: (value) => whole.format(value),
 
     relativeTime(instant, now) {
       const elapsed = now.getTime() - instant.getTime();

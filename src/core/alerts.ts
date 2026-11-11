@@ -38,6 +38,25 @@ export const HEADLINE_POLICY: AlertPolicy = {
   resetWorthAnnouncing: 80,
   forecastAbove: 105,
 };
+
+/** The levels each notification choice announces a main limit at. */
+const HEADLINE_LEVELS = {
+  standard: [80, 95, 100],
+  early: [50, 75, 90, 100],
+  reached: [100],
+} as const satisfies Record<string, readonly number[]>;
+
+/** The main limit's policy for the user's notification choices. */
+export function headlinePolicy(
+  levels: keyof typeof HEADLINE_LEVELS,
+  forecast: boolean,
+): AlertPolicy {
+  return {
+    ...HEADLINE_POLICY,
+    levels: HEADLINE_LEVELS[levels],
+    forecastAbove: forecast ? HEADLINE_POLICY.forecastAbove : null,
+  };
+}
 export const SECONDARY_POLICY: AlertPolicy = {
   levels: [100],
   resetWorthAnnouncing: null,

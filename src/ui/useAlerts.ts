@@ -4,7 +4,7 @@ import {
   type Alert,
   type AlertMemory,
   evaluate,
-  HEADLINE_POLICY,
+  headlinePolicy,
   SECONDARY_POLICY,
 } from "../core/alerts";
 import { usageBudget } from "../core/pace";
@@ -28,6 +28,7 @@ export function useAlerts(reports: readonly ProviderReport[], settings: Settings
     const memory = load();
     const named = visibleReports(reports).length > 1;
     const now = new Date();
+    const headline = headlinePolicy(settings.notifyLevels, settings.notifyForecast);
 
     for (const report of reports) {
       const snapshot = report.snapshot;
@@ -38,7 +39,7 @@ export function useAlerts(reports: readonly ProviderReport[], settings: Settings
           ? [
               {
                 window: snapshot.headline,
-                policy: HEADLINE_POLICY,
+                policy: headline,
                 label: headlineLabel(snapshot.headline, i18n),
               },
             ]

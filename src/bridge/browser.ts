@@ -28,6 +28,8 @@ export function createBrowserBridge(): Bridge {
     showStrip: true,
     stripAllMonitors: true,
     notifications: true,
+    notifyLevels: "standard",
+    notifyForecast: true,
     refresh: "adaptive",
     desktopCard: false,
     shortcut: true,

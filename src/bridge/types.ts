@@ -2,6 +2,9 @@ import type { ProviderReport } from "../core/snapshot";
 
 export type RefreshMode = "adaptive" | "2m" | "5m" | "15m";
 
+/** Levels a main limit is announced at: 80/95%, 50/75/90%, or only when reached. */
+export type NotifyLevels = "standard" | "early" | "reached";
+
 /** A service that can have extra accounts, each signed in from its own folder. */
 export type AccountService = "claude" | "codex";
 
@@ -26,6 +29,10 @@ export interface Settings {
   /** A reading on the taskbar of every monitor. */
   stripAllMonitors: boolean;
   notifications: boolean;
+  /** When the main limit is announced on its way up. */
+  notifyLevels: NotifyLevels;
+  /** The early warning when the pace would empty the main limit before its reset. */
+  notifyForecast: boolean;
   refresh: RefreshMode;
   desktopCard: boolean;
   /** The system-wide shortcut that opens the flyout. */

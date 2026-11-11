@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { bridge, type RefreshMode, type Settings } from "../../bridge";
+import { bridge, type NotifyLevels, type RefreshMode, type Settings } from "../../bridge";
 import type { ProviderReport } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import { Segmented, SwitchRow } from "../controls";
@@ -20,7 +20,7 @@ export function SettingsPanel({
   onBack: () => void;
   onLanguage: () => void;
 }) {
-  const { t, locale } = useI18n();
+  const { t, locale, format } = useI18n();
   const [launchAtLogin, setLaunchAtLogin] = useState<boolean | null>(null);
   const [shortcutKeys, setShortcutKeys] = useState<string | null>(null);
   // The Store delivers its own updates, so the Store build has no update switch.
@@ -53,6 +53,18 @@ export function SettingsPanel({
     })),
   ];
   const refresh = settings?.refresh ?? "adaptive";
+  // "80 · 95%": the numbers alone, with the locale's percent sign on the last.
+  const levels = (values: readonly number[]) =>
+    values
+      .map((value, index) =>
+        index === values.length - 1 ? format.percent(value) : format.number(value),
+      )
+      .join(" · ");
+  const levelOptions: { value: NotifyLevels; label: string }[] = [
+    { value: "early", label: levels([50, 75, 90]) },
+    { value: "standard", label: levels([80, 95]) },
+    { value: "reached", label: t("notifyLevelsReached") },
+  ];
 
   return (
     <>
@@ -110,6 +122,27 @@ export function SettingsPanel({
           checked={settings?.notifications ?? true}
           onChange={(notifications) => update({ notifications })}
         />
+        {(settings?.notifications ?? true) && (
+          <>
+            <div className="setting setting--stacked">
+              <span className="setting__text">
+                <span className="setting__label">{t("notifyLevels")}</span>
+              </span>
+              <Segmented
+                label={t("notifyLevels")}
+                value={settings?.notifyLevels ?? "standard"}
+                options={levelOptions}
+                onChange={(notifyLevels) => update({ notifyLevels })}
+              />
+            </div>
+            <SwitchRow
+              label={t("notifyForecast")}
+              hint={t("notifyForecastHint")}
+              checked={settings?.notifyForecast ?? true}
+              onChange={(notifyForecast) => update({ notifyForecast })}
+            />
+          </>
+        )}
         <SwitchRow
           label={t("shortcut")}
           hint={

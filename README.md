@@ -186,6 +186,8 @@ afterwards.
 | Limits in taskbar  | Main     | Each service's main limit, or up to six you pick, in the order you turn them on.                 |
 | Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                              |
 | Notifications      | On       | Early warning, 80%, 95%, limit reached, and the reset after a busy period. Each once per period. |
+| Notify at          | 80 · 95% | 50 · 75 · 90%, 80 · 95%, or only when the limit is reached. Applies to each main limit.          |
+| Pace warning       | On       | The early warning when the pace would use up the main limit before the reset.                    |
 | Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.         |
 | Plan colours       | On       | Tints each service with the colour of its plan.                                                  |
 | Update frequency   | Adaptive | Adaptive follows activity in the services' own tools. 2, 5 or 15 minutes are fixed schedules.    |

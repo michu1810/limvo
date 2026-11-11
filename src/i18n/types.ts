@@ -65,6 +65,12 @@ export interface Messages {
   desktopCard: string;
   notifications: string;
   notificationsHint: string;
+  /** Label of the choice of levels; the options are percentages, and this one word. */
+  notifyLevels: string;
+  /** The option that announces only a reached limit. */
+  notifyLevelsReached: string;
+  notifyForecast: string;
+  notifyForecastHint: string;
   refreshFrequency: string;
   refreshAdaptive: string;
   refreshAdaptiveHint: string;

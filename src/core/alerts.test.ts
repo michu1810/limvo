@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { type AlertMemory, evaluate, HEADLINE_POLICY, SECONDARY_POLICY } from "./alerts";
+import {
+  type AlertMemory,
+  evaluate,
+  HEADLINE_POLICY,
+  headlinePolicy,
+  SECONDARY_POLICY,
+} from "./alerts";
 
 const WEEK_A = "2026-11-10T07:00:00Z";
 const WEEK_B = "2026-11-17T07:00:00Z";
@@ -163,5 +169,39 @@ describe("evaluate, forecast", () => {
 
   it("never warns about a secondary limit", () => {
     expect(week([[30, 30]], SECONDARY_POLICY)).toEqual([null]);
+  });
+});
+
+describe("headlinePolicy", () => {
+  it("announces the levels the user chose", () => {
+    const early = headlinePolicy("early", true);
+    expect(
+      run(
+        [
+          [55, WEEK_A],
+          [76, WEEK_A],
+          [91, WEEK_A],
+        ],
+        early,
+      ),
+    ).toEqual([
+      { kind: "threshold", level: 50 },
+      { kind: "threshold", level: 75 },
+      { kind: "threshold", level: 90 },
+    ]);
+    expect(
+      run(
+        [
+          [85, WEEK_A],
+          [100, WEEK_A],
+        ],
+        headlinePolicy("reached", true),
+      ),
+    ).toEqual([null, { kind: "reached" }]);
+  });
+
+  it("drops the forecast when it is turned off", () => {
+    expect(headlinePolicy("standard", true).forecastAbove).toBe(105);
+    expect(headlinePolicy("standard", false).forecastAbove).toBeNull();
   });
 });
