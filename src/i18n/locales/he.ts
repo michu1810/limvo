@@ -80,6 +80,7 @@ export const he: LocaleDefinition = {
     budgetPerHour: "~{rate} לשעה",
     budgetNow: "כעת ~{rate}",
     roomierAccount: "יותר מקום ב־{name}",
+    widgetEmpty: "התחברו לאחד מכלי ה־AI שלכם כדי לראות כאן את המגבלות שלו.",
     shortcut: "קיצור מקשים",
     shortcutHint: "{keys} פותח מכל מקום",
     shortcutTaken: "שני הקיצורים תפוסים על ידי אפליקציות אחרות",

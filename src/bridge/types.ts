@@ -61,6 +61,15 @@ export interface HostInfo {
   store: boolean;
 }
 
+/** Mirrors `CardData` in `src-tauri/src/widgets/mod.rs`: the Widgets board card, already worded. */
+export interface WidgetCard {
+  items: { name: string; value: string; detail: string; hot: boolean }[];
+  /** Shown when no service is signed in. */
+  empty: string;
+  /** Label of the card's refresh button. */
+  refresh: string;
+}
+
 export interface TrayTexts {
   tooltip: string;
   refresh: string;
@@ -104,6 +113,8 @@ export interface Bridge {
   onTaskbarTheme(listener: (theme: Theme) => void): Promise<Unsubscribe>;
   /** Hands translated texts to the tray icon and its menu, which the host draws. */
   localizeTray(texts: TrayTexts): Promise<void>;
+  /** Hands the Widgets board card its content; only the Store build shows it. */
+  updateWidget(card: WidgetCard): Promise<void>;
   /** Shows a Windows notification. */
   notify(toast: Toast): Promise<void>;
   /** Fires each time the flyout is brought on screen, so it can play its entrance. */

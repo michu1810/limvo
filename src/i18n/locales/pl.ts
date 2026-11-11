@@ -82,6 +82,7 @@ export const pl: LocaleDefinition = {
     budgetPerHour: "~{rate} na godzinę",
     budgetNow: "teraz ~{rate}",
     roomierAccount: "Więcej zapasu na koncie {name}",
+    widgetEmpty: "Zaloguj się w jednym z narzędzi AI, żeby zobaczyć tu jego limity.",
     shortcut: "Skrót klawiszowy",
     shortcutHint: "{keys} otwiera okienko z dowolnego miejsca",
     shortcutTaken: "Oba skróty są zajęte przez inne aplikacje",

@@ -118,6 +118,8 @@ export interface Messages {
   budgetNow: string;
   /** Another account of the same service that lasts. Placeholder `{name}`, for example "Claude · Work". */
   roomierAccount: string;
+  /** The Widgets board card with no service signed in. */
+  widgetEmpty: string;
 
   shortcut: string;
   /** Placeholder `{keys}`, for example "Win+Shift+H". */

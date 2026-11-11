@@ -82,6 +82,7 @@ export const ja: LocaleDefinition = {
     budgetPerHour: "1時間 ~{rate}",
     budgetNow: "現在 ~{rate}",
     roomierAccount: "{name} に余裕があります",
+    widgetEmpty: "AI ツールにサインインすると、ここに上限が表示されます。",
     shortcut: "キーボードショートカット",
     shortcutHint: "{keys} でどこからでも開く",
     shortcutTaken: "両方のショートカットが他のアプリで使用中です",

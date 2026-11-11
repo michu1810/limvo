@@ -81,6 +81,7 @@ export const uk: LocaleDefinition = {
     budgetPerHour: "~{rate} на годину",
     budgetNow: "зараз ~{rate}",
     roomierAccount: "Більше запасу в {name}",
+    widgetEmpty: "Увійдіть в один зі своїх інструментів ШІ, щоб бачити тут його ліміти.",
     shortcut: "Сполучення клавіш",
     shortcutHint: "{keys} відкриває з будь-якого місця",
     shortcutTaken: "Обидва сполучення зайняті іншими застосунками",

@@ -81,6 +81,7 @@ export const ptBR: LocaleDefinition = {
     budgetPerHour: "~{rate} por hora",
     budgetNow: "agora ~{rate}",
     roomierAccount: "Mais folga em {name}",
+    widgetEmpty: "Entre em uma das suas ferramentas de IA para ver os limites aqui.",
     shortcut: "Atalho de teclado",
     shortcutHint: "{keys} abre de qualquer lugar",
     shortcutTaken: "Os dois atalhos já estão em uso por outros apps",

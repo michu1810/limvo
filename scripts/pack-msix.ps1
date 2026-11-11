@@ -46,6 +46,13 @@ Copy-Item $exe $layout
 foreach ($logo in "StoreLogo.png", "Square44x44Logo.png", "Square150x150Logo.png") {
   Copy-Item (Join-Path $tauri "icons/$logo") (Join-Path $layout "Assets/$logo")
 }
+# The Widgets board card: the picker's screenshots, and the public folder the
+# manifest's app extension names (the board reads nothing from it, but it
+# must exist).
+New-Item -ItemType Directory -Force (Join-Path $layout "Assets/Widgets") | Out-Null
+Copy-Item (Join-Path $tauri "msix/widgets/*.png") (Join-Path $layout "Assets/Widgets")
+New-Item -ItemType Directory -Force (Join-Path $layout "Public") | Out-Null
+Copy-Item (Join-Path $tauri "icons/Square44x44Logo.png") (Join-Path $layout "Public/Limvo.png")
 
 # XML-escape the values, since a publisher name may contain & or quotes.
 function Escape([string]$text) { [Security.SecurityElement]::Escape($text) }

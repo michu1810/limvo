@@ -73,6 +73,9 @@ work, and nudges you with a Windows notification before you run out.
   busy period resets, each naming its service. Before any of those, one
   early warning when the pace would empty the main limit before the reset,
   with the daily budget that would make it last.
+- **A card on the Widgets board.** The Store version adds _AI plan limits_
+  to the Windows 11 Widgets board (Win+W), small, medium or large, with the
+  limits you pinned to the taskbar. See [docs/WIDGETS.md](docs/WIDGETS.md).
 - **Plan colours.** Limvo recognises the plan (Claude Free, Pro, Max 5×,
   Max 20×, Team and Enterprise; ChatGPT, Cursor and Google AI plans) and tints
   each service in its own colour. Status colours keep their meaning.
@@ -408,7 +411,6 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, and
 
 - macOS menu bar version
 - Code-signed GitHub installers through SignPath Foundation
-- A Windows 11 Widgets board card (needs a widget provider in the MSIX package)
 
 ## Disclaimer
 

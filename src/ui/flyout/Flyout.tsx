@@ -9,6 +9,7 @@ import { SettingsIcon } from "../icons";
 import { ProviderMark } from "../ProviderMark";
 import { useAlerts } from "../useAlerts";
 import { useWeekHistory } from "../useWeekHistory";
+import { useWidgetCard } from "../useWidgetCard";
 import { AccountHint } from "./AccountHint";
 import { Breakdown, OtherLimits } from "./Details";
 import { Headline } from "./Headline";
@@ -50,6 +51,7 @@ export function Flyout({
     reports[0];
 
   useTrayTexts(reports, settings, now);
+  useWidgetCard(reports, settings, now);
   useAlerts(reports, settings);
   const histories = useWeekHistory(reports);
 

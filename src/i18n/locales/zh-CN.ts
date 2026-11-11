@@ -80,6 +80,7 @@ export const zhCN: LocaleDefinition = {
     budgetPerHour: "每小时 ~{rate}",
     budgetNow: "当前 ~{rate}",
     roomierAccount: "{name} 余量更多",
+    widgetEmpty: "登录任一 AI 工具即可在此查看其限额。",
     shortcut: "键盘快捷键",
     shortcutHint: "{keys} 可随时打开",
     shortcutTaken: "两个快捷键都已被其他应用占用",

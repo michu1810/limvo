@@ -1,0 +1,140 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "selectAction": {
+    "type": "Action.Execute",
+    "verb": "open"
+  },
+  "body": [
+    {
+      "type": "Container",
+      "$when": "${$host.widgetSize == \"small\" && hasItems}",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "${small.name}",
+          "size": "small",
+          "isSubtle": true,
+          "wrap": false
+        },
+        {
+          "type": "TextBlock",
+          "text": "${small.value}",
+          "size": "extraLarge",
+          "weight": "bolder",
+          "spacing": "none",
+          "color": "${if(small.hot, 'warning', 'default')}"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${small.detail}",
+          "size": "small",
+          "isSubtle": true,
+          "wrap": true,
+          "maxLines": 2,
+          "spacing": "none"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "$when": "${$host.widgetSize == \"medium\" && hasItems}",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "$data": "${medium}",
+          "spacing": "medium",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                { "type": "TextBlock", "text": "${name}", "weight": "bolder", "wrap": false },
+                {
+                  "type": "TextBlock",
+                  "text": "${detail}",
+                  "size": "small",
+                  "isSubtle": true,
+                  "spacing": "none",
+                  "wrap": false
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "verticalContentAlignment": "center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${value}",
+                  "size": "large",
+                  "weight": "bolder",
+                  "color": "${if(hot, 'warning', 'default')}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "$when": "${$host.widgetSize == \"large\" && hasItems}",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "$data": "${large}",
+          "spacing": "medium",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                { "type": "TextBlock", "text": "${name}", "weight": "bolder", "wrap": false },
+                {
+                  "type": "TextBlock",
+                  "text": "${detail}",
+                  "size": "small",
+                  "isSubtle": true,
+                  "spacing": "none",
+                  "wrap": false
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "verticalContentAlignment": "center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${value}",
+                  "size": "large",
+                  "weight": "bolder",
+                  "color": "${if(hot, 'warning', 'default')}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "$when": "${!hasItems}",
+      "text": "${empty}",
+      "wrap": true,
+      "isSubtle": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Execute",
+      "$when": "${$host.widgetSize != \"small\"}",
+      "title": "${refresh}",
+      "verb": "refresh"
+    }
+  ]
+}
