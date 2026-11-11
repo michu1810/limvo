@@ -30,7 +30,7 @@ works with: they are not in the product name, the logo or the search terms.
 > • A reading in the taskbar: one limit as a sentence, or up to six limits side by side, on every monitor.
 > • A forecast: Limvo projects your usage to the reset and labels it On track, Tight, Running hot or Limit reached.
 > • The whole picture per service: weekly and five-hour windows, model caps, monthly included usage and extra usage.
-> • Windows notifications at 80% and 95%, when a limit is reached and when a busy period resets.
+> • Windows notifications: an early warning when your pace would run out before the reset, then 80% and 95%, when a limit is reached and when a busy period resets.
 > • Light and dark themes, Mica, high DPI, and eleven languages including right-to-left Hebrew.
 >
 > Private by design: no telemetry, no analytics, no server of its own. Limvo only sends the usage requests to the services you are signed in to, over HTTPS. Sign-ins stay where the services keep them. Limvo is open source under the MIT license.

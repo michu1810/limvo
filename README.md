@@ -68,7 +68,9 @@ work, and nudges you with a Windows notification before you run out.
   idle they slow down to every five minutes. Fixed intervals are one click
   away.
 - **Windows notifications** at 80% and 95%, when a limit is reached and when a
-  busy period resets, each naming its service.
+  busy period resets, each naming its service. Before any of those, one
+  early warning when the pace would empty the main limit before the reset,
+  with the daily budget that would make it last.
 - **Plan colours.** Limvo recognises the plan (Claude Free, Pro, Max 5×,
   Max 20×, Team and Enterprise; ChatGPT, Cursor and Google AI plans) and tints
   each service in its own colour. Status colours keep their meaning.
@@ -183,7 +185,7 @@ afterwards.
 | On every monitor   | On       | A reading on the taskbar of every display, not only the main one.                                |
 | Limits in taskbar  | Main     | Each service's main limit, or up to six you pick, in the order you turn them on.                 |
 | Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                              |
-| Notifications      | On       | 80%, 95%, limit reached, and the reset after a busy period. Each one is shown once per period.   |
+| Notifications      | On       | Early warning, 80%, 95%, limit reached, and the reset after a busy period. Each once per period. |
 | Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.         |
 | Plan colours       | On       | Tints each service with the colour of its plan.                                                  |
 | Update frequency   | Adaptive | Adaptive follows activity in the services' own tools. 2, 5 or 15 minutes are fixed schedules.    |

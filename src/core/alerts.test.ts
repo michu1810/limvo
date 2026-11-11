@@ -3,11 +3,13 @@ import { type AlertMemory, evaluate, HEADLINE_POLICY, SECONDARY_POLICY } from ".
 
 const WEEK_A = "2026-11-10T07:00:00Z";
 const WEEK_B = "2026-11-17T07:00:00Z";
+const NOW = new Date("2026-11-05T07:00:00Z");
 
 function run(readings: [number, string][], policy = HEADLINE_POLICY) {
   let memory: AlertMemory | undefined;
   return readings.map(([percent, resetsAt]) => {
-    const result = evaluate({ percent, resetsAt }, memory, policy);
+    // No period: these readings test the levels, never the forecast.
+    const result = evaluate({ percent, resetsAt, periodSeconds: null }, memory, policy, NOW);
     memory = result.memory;
     return result.alert;
   });
@@ -84,5 +86,82 @@ describe("evaluate", () => {
         SECONDARY_POLICY,
       ),
     ).toEqual([null, { kind: "reached" }]);
+  });
+});
+
+describe("evaluate, forecast", () => {
+  const WEEK = 7 * 24 * 3600;
+  const start = new Date("2026-11-03T07:00:00Z");
+  const resetsAt = "2026-11-10T07:00:00Z";
+  const at = (hours: number) => new Date(start.getTime() + hours * 3600_000);
+
+  /** Readings of one week, each `[percent, hours since the reset]`. */
+  function week(readings: [number, number][], policy = HEADLINE_POLICY) {
+    let memory: AlertMemory | undefined;
+    return readings.map(([percent, hours]) => {
+      const result = evaluate(
+        { percent, resetsAt, periodSeconds: WEEK },
+        memory,
+        policy,
+        at(hours),
+      );
+      memory = result.memory;
+      return result.alert;
+    });
+  }
+
+  it("warns once when the week would run out before the reset", () => {
+    // 16% after 23 hours projects to ~117% and runs out after ~144 hours.
+    const alerts = week([
+      [10, 20],
+      [16, 23],
+      [20, 30],
+    ]);
+    expect(alerts[0]).toBeNull();
+    expect(alerts[1]).toEqual({
+      kind: "forecast",
+      runsOutAt: at((23 / 16) * 100).toISOString(),
+    });
+    expect(alerts[2]).toBeNull();
+  });
+
+  it("stays quiet in the first tenth of the week, however busy", () => {
+    // 15% in the first 10 hours: 16.8 hours make the first tenth.
+    expect(week([[15, 10]])).toEqual([null]);
+  });
+
+  it("stays quiet when the week only just runs out", () => {
+    // Projected ~104%: under the mark of 105%.
+    expect(week([[52, 84]])).toEqual([null]);
+  });
+
+  it("leaves the news to the levels once one is announced", () => {
+    expect(
+      week([
+        [82, 60],
+        [90, 70],
+      ]),
+    ).toEqual([{ kind: "threshold", level: 80 }, null]);
+  });
+
+  it("warns again in the next week", () => {
+    let memory: AlertMemory | undefined;
+    const read = (percent: number, reset: string, now: Date) => {
+      const result = evaluate(
+        { percent, resetsAt: reset, periodSeconds: WEEK },
+        memory,
+        HEADLINE_POLICY,
+        now,
+      );
+      memory = result.memory;
+      return result.alert?.kind ?? null;
+    };
+    expect(read(30, resetsAt, at(30))).toBe("forecast");
+    expect(read(1, "2026-11-17T07:00:00Z", at(170))).toBe(null);
+    expect(read(30, "2026-11-17T07:00:00Z", at(198))).toBe("forecast");
+  });
+
+  it("never warns about a secondary limit", () => {
+    expect(week([[30, 30]], SECONDARY_POLICY)).toEqual([null]);
   });
 });

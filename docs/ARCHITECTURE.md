@@ -149,3 +149,8 @@ The flyout window evaluates each new report with `core/alerts.ts`. What has
 been announced for each window is remembered in `localStorage`, keyed by
 `<provider>:<window>` and reset time, so a restart never repeats a notification and turning
 notifications back on never replays old news.
+
+Only the main limit gets the forecast warning: once per period, when the
+projection reaches 105% after the first tenth of the period has passed, and
+only until a level such as 80% has been announced, which then carries the
+news. Its body is the same budget the flyout shows.

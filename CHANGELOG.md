@@ -12,6 +12,10 @@ All notable changes to Limvo are listed here. The format follows
   flyout says how much a day you can use to make it to the reset, next to
   your rate so far, for example "To last until Tue ~13.9% a day · now
   ~16.7%". On the last day, and for a five-hour session, it counts per hour.
+- An early warning: once per period, a notification says when the main limit
+  runs out at the current pace and what daily budget would make it last. It
+  waits for the first tenth of the period, so one busy hour after a reset
+  says nothing, and stays quiet once the 80% notification has been shown.
 
 ## [0.4.1] - 2026-11-10
 

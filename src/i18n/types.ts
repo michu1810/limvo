@@ -80,6 +80,12 @@ export interface Messages {
   /** Placeholder `{window}`. */
   notifyResetTitle: string;
   notifyResetBody: string;
+  /** The pace would empty the window before its reset. Placeholders `{window}` and `{when}`, a weekday and time. */
+  notifyForecastTitle: string;
+  /** Placeholders `{day}`, as in `budgetUntil`, and `{rate}`, a percentage. */
+  notifyForecastBodyDay: string;
+  /** Placeholders `{day}` and `{rate}`. */
+  notifyForecastBodyHour: string;
 
   extraUsage: string;
   /** Placeholders `{used}` and `{limit}` are formatted amounts of money. */
