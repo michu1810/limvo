@@ -273,5 +273,7 @@ jobs:
           if ($package.Count -ne 1) { throw "expected one package, found $($package.Count)" }
           # Starts a new submission from the live one, so the listing stays as
           # it is, swaps in this package and commits it for certification.
-          msstore publish $package[0].DirectoryName --inputFile $package[0].FullName --appId $env:PRODUCT_ID
+          # Given a .msix file as its path, the CLI publishes that package as
+          # it is instead of looking for a project to build.
+          msstore publish $package[0].FullName --appId $env:PRODUCT_ID
           if ($LASTEXITCODE -ne 0) { throw "submitting to the Store failed" }
