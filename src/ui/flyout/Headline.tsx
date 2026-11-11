@@ -1,5 +1,5 @@
 import type { WindowHistory } from "../../core/history";
-import { computePace, limitReachedAt } from "../../core/pace";
+import { budgetWorthShowing, computePace, limitReachedAt } from "../../core/pace";
 import type { PlanBadge, UsageWindow } from "../../core/snapshot";
 import { useI18n } from "../../i18n/I18nProvider";
 import type { MessageKey } from "../../i18n/resolve";
@@ -39,6 +39,7 @@ export function Headline({
   const { t, format } = i18n;
   const pace = computePace(window, now);
   const runsOutAt = limitReachedAt(window, now);
+  const budget = budgetWorthShowing(window, now);
   const resetsAt = window.resetsAt ? new Date(window.resetsAt) : null;
   const remaining = resetsAt ? resetsAt.getTime() - now.getTime() : null;
   const label = headlineLabel(window, i18n);
@@ -106,6 +107,26 @@ export function Headline({
       {!compact && runsOutAt && (
         <p className="forecast" role="status">
           {t("forecastLimitAt", { when: format.weekdayTime(runsOutAt) })}
+        </p>
+      )}
+      {!compact && budget && resetsAt && (
+        <p className="budget" data-hot={pace?.status === "running_hot" || undefined}>
+          <span className="budget__label">
+            {t("budgetUntil", {
+              // On the last day the weekday alone would not say how much time is left.
+              day: budget.unit === "day" ? format.weekday(resetsAt) : format.weekdayTime(resetsAt),
+            })}
+          </span>
+          <span className="budget__rates">
+            <strong className="budget__allowed">
+              {t(budget.unit === "day" ? "budgetPerDay" : "budgetPerHour", {
+                rate: format.percentTenths(budget.allowed),
+              })}
+            </strong>
+            <span className="budget__now">
+              {t("budgetNow", { rate: format.percentTenths(budget.current) })}
+            </span>
+          </span>
         </p>
       )}
     </section>

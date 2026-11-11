@@ -17,7 +17,7 @@ use crate::settings::{Settings, SettingsPatch};
 use crate::snapshot::ProviderReport;
 use crate::system::{self, HostInfo};
 use crate::updater::{self, AvailableUpdate};
-use crate::{AppState, card, events, tray};
+use crate::{AppState, card, events, tray, widgets};
 
 /// One report per provider, in the order the interface lists them.
 #[tauri::command]
@@ -187,6 +187,12 @@ pub fn localize_tray(
     quit: String,
 ) {
     tray::localize(&app, &state.tray, &tooltip, &refresh, &quit);
+}
+
+/// New content for the card on the Widgets board, worded by the flyout.
+#[tauri::command]
+pub fn update_widget(card: widgets::CardData) {
+    widgets::publish(card);
 }
 
 /// Adds an account of `service` signed in from a folder the user picks in

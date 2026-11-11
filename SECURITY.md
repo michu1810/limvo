@@ -41,5 +41,6 @@ reproduce. You can expect a first answer within a week.
   environment of this repository, which serves `v*` tag runs after the
   maintainer approves them.
 - Other apps' stores are opened read-only: Cursor's settings database with
-  SQLite's read-only flags, Antigravity's Credential Manager entry with
-  `CredReadW`. Nothing is written back.
+  SQLite's read-only flags, the Credential Manager entries of Antigravity and
+  the GitHub CLI with `CredReadW`, and the CLI's `hosts.yml` as plain text.
+  Nothing is written back.

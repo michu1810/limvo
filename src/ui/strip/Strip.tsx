@@ -180,15 +180,32 @@ function shortTag(window: Limit["window"]): string {
   return (window.label ?? "").slice(0, 6);
 }
 
-/** Reports the natural width of the strip so the host sizes its window to fit the text. */
+/**
+ * Reports the natural width of the strip so the host sizes its window to fit
+ * the text. Measured after every render as well as on resize: services report
+ * one after another, and a reading that joins while the window is still the
+ * width of the first one must widen it. A resize observer alone missed that
+ * in the docked window, which then cut the later readings off.
+ */
 function useFitWidth() {
   const element = useRef<HTMLButtonElement>(null);
+  const reported = useRef(0);
+  const report = () => {
+    const button = element.current;
+    if (!button) return;
+    const width = Math.ceil(button.scrollWidth);
+    if (width === reported.current) return;
+    reported.current = width;
+    bridge.fitStrip(width);
+  };
+
+  // No dependency list: it measures after every render.
+  useLayoutEffect(report);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: one observer for the strip's lifetime.
   useLayoutEffect(() => {
     const button = element.current;
     if (!button) return;
-    const observer = new ResizeObserver(() => {
-      bridge.fitStrip(Math.ceil(button.scrollWidth));
-    });
+    const observer = new ResizeObserver(report);
     observer.observe(button);
     return () => observer.disconnect();
   }, []);

@@ -20,7 +20,8 @@ export function createBrowserBridge(): Bridge {
   const now = () => (fixedNow ? new Date(fixedNow) : new Date());
   const withMore = params.has("more");
   const withAccount = params.has("accounts");
-  const build = () => scenarioReports(name, now(), withCodex, withMore, withAccount);
+  const withCopilot = params.has("copilot");
+  const build = () => scenarioReports(name, now(), withCodex, withMore, withAccount, withCopilot);
 
   let reports: ProviderReport[] = build();
   let settings: Settings = {
@@ -28,6 +29,8 @@ export function createBrowserBridge(): Bridge {
     showStrip: true,
     stripAllMonitors: true,
     notifications: true,
+    notifyLevels: "standard",
+    notifyForecast: true,
     refresh: "adaptive",
     desktopCard: false,
     shortcut: true,
@@ -98,6 +101,7 @@ export function createBrowserBridge(): Bridge {
       }),
     onTaskbarTheme: () => Promise.resolve(() => {}),
     localizeTray: () => Promise.resolve(),
+    updateWidget: () => Promise.resolve(),
     async notify(toast) {
       console.info("[notification]", toast.title, toast.body);
     },

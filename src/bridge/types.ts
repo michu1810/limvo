@@ -2,6 +2,9 @@ import type { ProviderReport } from "../core/snapshot";
 
 export type RefreshMode = "adaptive" | "2m" | "5m" | "15m";
 
+/** Levels a main limit is announced at: 80/95%, 50/75/90%, or only when reached. */
+export type NotifyLevels = "standard" | "early" | "reached";
+
 /** A service that can have extra accounts, each signed in from its own folder. */
 export type AccountService = "claude" | "codex";
 
@@ -26,6 +29,10 @@ export interface Settings {
   /** A reading on the taskbar of every monitor. */
   stripAllMonitors: boolean;
   notifications: boolean;
+  /** When the main limit is announced on its way up. */
+  notifyLevels: NotifyLevels;
+  /** The early warning when the pace would empty the main limit before its reset. */
+  notifyForecast: boolean;
   refresh: RefreshMode;
   desktopCard: boolean;
   /** The system-wide shortcut that opens the flyout. */
@@ -52,6 +59,15 @@ export interface HostInfo {
   taskbarTheme: Theme;
   /** Installed from the Microsoft Store, which delivers the updates itself. */
   store: boolean;
+}
+
+/** Mirrors `CardData` in `src-tauri/src/widgets/mod.rs`: the Widgets board card, already worded. */
+export interface WidgetCard {
+  items: { name: string; value: string; detail: string; hot: boolean }[];
+  /** Shown when no service is signed in. */
+  empty: string;
+  /** Label of the card's refresh button. */
+  refresh: string;
 }
 
 export interface TrayTexts {
@@ -97,6 +113,8 @@ export interface Bridge {
   onTaskbarTheme(listener: (theme: Theme) => void): Promise<Unsubscribe>;
   /** Hands translated texts to the tray icon and its menu, which the host draws. */
   localizeTray(texts: TrayTexts): Promise<void>;
+  /** Hands the Widgets board card its content; only the Store build shows it. */
+  updateWidget(card: WidgetCard): Promise<void>;
   /** Shows a Windows notification. */
   notify(toast: Toast): Promise<void>;
   /** Fires each time the flyout is brought on screen, so it can play its entrance. */

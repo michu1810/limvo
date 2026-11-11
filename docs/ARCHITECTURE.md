@@ -6,7 +6,7 @@ the system, and a React interface that only draws what the core reports.
 ```
           ┌──────────────── Rust core (src-tauri/src) ────────────────┐
           │                                                            │
- sign-in ─┤ providers/ claude codex cursor antigravity (one per service)│
+ sign-in ─┤ providers/ claude codex cursor antigravity copilot (one per service)│
  files    │        │                  │                                │
           │        ▼                  ▼                                │
  ~/.claude│ activity.rs ──nudge──▶ poller.rs ── Vec<ProviderReport> ─┐ │
@@ -60,6 +60,7 @@ restart.
 | Codex       | `~/.codex/auth.json` (ChatGPT sign-in)                         | `chatgpt.com/backend-api/wham/usage` | `~/.codex/sessions`                   |
 | Cursor      | `state.vscdb` of the editor, SQLite opened read-only           | `api2.cursor.sh` dashboard service   | Cursor `workspaceStorage`             |
 | Antigravity | Credential Manager entry `gemini:antigravity`                  | `cloudcode-pa.googleapis.com` quotas | `~/.gemini/antigravity/conversations` |
+| Copilot     | GitHub CLI: Credential Manager `gh:github.com:`, `hosts.yml`   | `api.github.com` Copilot quotas      | none                                  |
 
 A service whose sign-in lives in a folder (Claude Code, Codex) can have
 extra accounts (`accounts.rs`): each is the same provider bound to another
@@ -118,8 +119,12 @@ started by a `flyout-shown` event from the core rather than by React mounting.
 
 ## Interface
 
-- `src/core` is pure TypeScript with no React: pace projection, alert rules,
-  the week history and taskbar pins, unit tested.
+- `src/core` is pure TypeScript with no React: pace projection, the budget
+  to the reset, alert rules, the week history and taskbar pins, unit tested.
+  The budget uses the projection's elapsed floor, so after the first tenth of
+  the window its rate so far is over the budget exactly when the projection
+  is over 100%. The budget line takes its warning colour from the pace label,
+  so the two always agree.
 - The flyout shows one tab per visible service (`ui/flyout/ProviderTabs.tsx`)
   and remembers the chosen tab. Plan colours are set per element with
   `data-plan`, so every tab, pin and taskbar reading wears its own service's
@@ -145,3 +150,8 @@ The flyout window evaluates each new report with `core/alerts.ts`. What has
 been announced for each window is remembered in `localStorage`, keyed by
 `<provider>:<window>` and reset time, so a restart never repeats a notification and turning
 notifications back on never replays old news.
+
+Only the main limit gets the forecast warning: once per period, when the
+projection reaches 105% after the first tenth of the period has passed, and
+only until a level such as 80% has been announced, which then carries the
+news. Its body is the same budget the flyout shows.

@@ -26,6 +26,21 @@ pub enum RefreshMode {
     Every15Minutes,
 }
 
+/// The levels a main limit is announced at on its way up.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum NotifyLevels {
+    /// 80% and 95%, then the limit.
+    #[default]
+    #[serde(rename = "standard")]
+    Standard,
+    /// 50%, 75% and 90%, then the limit.
+    #[serde(rename = "early")]
+    Early,
+    /// Only when the limit is reached.
+    #[serde(rename = "reached")]
+    Reached,
+}
+
 /// Top-left corner of the desktop card, in physical screen pixels.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CardPosition {
@@ -46,6 +61,10 @@ pub struct Settings {
     pub strip_all_monitors: bool,
     /// Windows notifications when a limit gets close, is reached or resets.
     pub notifications: bool,
+    /// When the main limit is announced on its way up.
+    pub notify_levels: NotifyLevels,
+    /// The early warning when the pace would empty the main limit before its reset.
+    pub notify_forecast: bool,
     pub refresh: RefreshMode,
     /// The card pinned to the desktop.
     pub desktop_card: bool,
@@ -72,6 +91,8 @@ impl Default for Settings {
             show_strip: true,
             strip_all_monitors: true,
             notifications: true,
+            notify_levels: NotifyLevels::Standard,
+            notify_forecast: true,
             refresh: RefreshMode::Adaptive,
             desktop_card: false,
             card_position: None,
@@ -96,6 +117,8 @@ pub struct SettingsPatch {
     pub show_strip: Option<bool>,
     pub strip_all_monitors: Option<bool>,
     pub notifications: Option<bool>,
+    pub notify_levels: Option<NotifyLevels>,
+    pub notify_forecast: Option<bool>,
     pub refresh: Option<RefreshMode>,
     pub desktop_card: Option<bool>,
     #[serde(default, deserialize_with = "present")]
@@ -130,6 +153,12 @@ impl Settings {
         }
         if let Some(notifications) = patch.notifications {
             self.notifications = notifications;
+        }
+        if let Some(levels) = patch.notify_levels {
+            self.notify_levels = levels;
+        }
+        if let Some(forecast) = patch.notify_forecast {
+            self.notify_forecast = forecast;
         }
         if let Some(refresh) = patch.refresh {
             self.refresh = refresh;
@@ -214,8 +243,9 @@ mod tests {
     #[test]
     fn fills_new_fields_with_defaults_for_older_files() {
         let settings: Settings = serde_json::from_str(r#"{"locale": "pl"}"#).unwrap();
-        assert!(settings.show_strip && settings.notifications);
+        assert!(settings.show_strip && settings.notifications && settings.notify_forecast);
         assert_eq!(settings.refresh, RefreshMode::Adaptive);
+        assert_eq!(settings.notify_levels, NotifyLevels::Standard);
     }
 
     #[test]
@@ -260,6 +290,19 @@ mod tests {
         assert_eq!(settings.pinned.as_ref().map(Vec::len), Some(6));
         settings.apply(serde_json::from_str(r#"{"pinned": null}"#).unwrap());
         assert_eq!(settings.pinned, None);
+    }
+
+    #[test]
+    fn notification_choices_round_trip_by_name() {
+        let mut settings = Settings::default();
+        settings.apply(
+            serde_json::from_str(r#"{"notifyLevels": "early", "notifyForecast": false}"#).unwrap(),
+        );
+        assert_eq!(settings.notify_levels, NotifyLevels::Early);
+        assert!(!settings.notify_forecast);
+        let saved = serde_json::to_value(&settings).unwrap();
+        assert_eq!(saved["notifyLevels"], "early");
+        assert!(serde_json::from_str::<SettingsPatch>(r#"{"notifyLevels": "often"}"#).is_err());
     }
 
     #[test]

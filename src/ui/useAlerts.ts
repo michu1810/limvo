@@ -4,9 +4,10 @@ import {
   type Alert,
   type AlertMemory,
   evaluate,
-  HEADLINE_POLICY,
+  headlinePolicy,
   SECONDARY_POLICY,
 } from "../core/alerts";
+import { usageBudget } from "../core/pace";
 import { limitKey, visibleReports } from "../core/pins";
 import type { ProviderReport, UsageWindow } from "../core/snapshot";
 import { type I18n, useI18n } from "../i18n/I18nProvider";
@@ -26,6 +27,8 @@ export function useAlerts(reports: readonly ProviderReport[], settings: Settings
     if (!settings) return;
     const memory = load();
     const named = visibleReports(reports).length > 1;
+    const now = new Date();
+    const headline = headlinePolicy(settings.notifyLevels, settings.notifyForecast);
 
     for (const report of reports) {
       const snapshot = report.snapshot;
@@ -36,7 +39,7 @@ export function useAlerts(reports: readonly ProviderReport[], settings: Settings
           ? [
               {
                 window: snapshot.headline,
-                policy: HEADLINE_POLICY,
+                policy: headline,
                 label: headlineLabel(snapshot.headline, i18n),
               },
             ]
@@ -53,18 +56,18 @@ export function useAlerts(reports: readonly ProviderReport[], settings: Settings
         // Before several services, memory was keyed by window alone; that was Claude.
         const previous =
           memory[key] ?? (report.providerId === "claude" ? memory[window.id] : undefined);
-        const result = evaluate(window, previous, policy);
+        const result = evaluate(window, previous, policy, now);
         memory[key] = result.memory;
         // Memory is always updated, so turning notifications back on never replays old news.
         if (result.alert && settings.notifications)
-          bridge.notify(toast(result.alert, window, `${prefix}${label}`, i18n));
+          bridge.notify(toast(result.alert, window, `${prefix}${label}`, now, i18n));
       }
     }
     save(memory);
   }, [reports, settings, i18n]);
 }
 
-function toast(alert: Alert, window: UsageWindow, label: string, { t, format }: I18n) {
+function toast(alert: Alert, window: UsageWindow, label: string, now: Date, { t, format }: I18n) {
   const when = window.resetsAt ? format.weekdayTime(new Date(window.resetsAt)) : "";
   switch (alert.kind) {
     case "threshold":
@@ -79,6 +82,23 @@ function toast(alert: Alert, window: UsageWindow, label: string, { t, format }: 
       };
     case "reset":
       return { title: t("notifyResetTitle", { window: label }), body: t("notifyResetBody") };
+    case "forecast": {
+      const title = t("notifyForecastTitle", {
+        window: label,
+        when: format.weekdayTime(new Date(alert.runsOutAt)),
+      });
+      // The same budget the flyout shows, so the toast says what to do about it.
+      const budget = usageBudget(window, now);
+      if (!budget || !window.resetsAt) return { title, body: "" };
+      const resetsAt = new Date(window.resetsAt);
+      return {
+        title,
+        body: t(budget.unit === "day" ? "notifyForecastBodyDay" : "notifyForecastBodyHour", {
+          day: budget.unit === "day" ? format.weekday(resetsAt) : format.weekdayTime(resetsAt),
+          rate: format.percentTenths(budget.allowed),
+        }),
+      };
+    }
   }
 }
 

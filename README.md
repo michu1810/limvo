@@ -4,7 +4,7 @@
 
 # Limvo
 
-**Your AI plan limits in the Windows taskbar: Claude, Codex, Cursor and Antigravity, with the pace you are using them at.**
+**Your AI plan limits in the Windows taskbar: Claude, Codex, Cursor, Antigravity and GitHub Copilot, with the pace you are using them at.**
 
 <a href="https://apps.microsoft.com/detail/9MZ7HN8V6GX5?mode=direct"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="180" alt="Get it from Microsoft" /></a>
 
@@ -33,9 +33,9 @@ work, and nudges you with a Windows notification before you run out.
 
 ## Features
 
-- **Every service in one place.** Claude, Codex (ChatGPT plans), Cursor and
-  Google Antigravity each get a tab with their own logo, plan badge and
-  colour. A service appears as soon as you are signed in to it on this
+- **Every service in one place.** Claude, Codex (ChatGPT plans), Cursor,
+  Google Antigravity and GitHub Copilot each get a tab with their own logo,
+  plan badge and colour. A service appears as soon as you are signed in to it on this
   computer; there is nothing to configure.
 
   <img src="docs/images/services-dark.png" width="760" alt="Three flyouts side by side: Codex at 23% of its weekly limit with a five-hour session, Cursor at 34% of its monthly included usage running hot with a forecast, and Antigravity at 41% of the Gemini 3 Flash weekly quota with the other agent models" />
@@ -48,13 +48,17 @@ work, and nudges you with a Windows notification before you run out.
   the period has passed. Limvo projects your usage to the reset, labels it
   _On track_, _Tight_, _Running hot_ or _Limit reached_, charts the period
   against an even pace and says when the limit runs out at today's rate.
+  When the period is tight, it also says how much a day you can use to make
+  it to the reset, next to your rate so far. Below, the peaks of the last
+  eight periods show whether the plan fits.
 
   <img src="docs/images/flyout-forecast.png" width="380" alt="Claude running hot at 78%, with the chart above the even pace, the warning that the limit runs out on Monday, the split by product and 12.40 dollars of extra usage" />
 
 - **The whole picture per service.** Claude's weekly limit, its split between
   Claude Code, chats and Cowork, model caps and extra usage; Codex's weekly
   and five-hour windows; Cursor's monthly included usage with Auto and API;
-  Antigravity's weekly quota for every agent model.
+  Antigravity's weekly quota for every agent model; Copilot's monthly
+  premium requests, or chat and completions on Copilot Free.
 - **A counter with some craft.** The percentage rolls in on drum wheels like an
   old odometer: each digit drops in from above, and a wheel only moves on when
   the one to its right passes nine.
@@ -66,7 +70,12 @@ work, and nudges you with a Windows notification before you run out.
   idle they slow down to every five minutes. Fixed intervals are one click
   away.
 - **Windows notifications** at 80% and 95%, when a limit is reached and when a
-  busy period resets, each naming its service.
+  busy period resets, each naming its service. Before any of those, one
+  early warning when the pace would empty the main limit before the reset,
+  with the daily budget that would make it last.
+- **A card on the Widgets board.** The Store version adds _AI plan limits_
+  to the Windows 11 Widgets board (Win+W), small, medium or large, with the
+  main limit of every service you are signed in to. See [docs/WIDGETS.md](docs/WIDGETS.md).
 - **Plan colours.** Limvo recognises the plan (Claude Free, Pro, Max 5×,
   Max 20×, Team and Enterprise; ChatGPT, Cursor and Google AI plans) and tints
   each service in its own colour. Status colours keep their meaning.
@@ -94,12 +103,13 @@ work, and nudges you with a Windows notification before you run out.
 
 ## Supported services
 
-| Service         | Plans                                        | Limits shown                                                               | Sign-in Limvo reads                           |
-| --------------- | -------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
-| **Claude**      | Free, Pro, Max 5×, Max 20×, Team, Enterprise | Weekly limit, split by product, model caps, five-hour session, extra usage | Claude desktop app, or Claude Code (`claude`) |
-| **Codex**       | ChatGPT Plus, Pro, Business and others       | Weekly limit, five-hour session                                            | Codex CLI or app signed in with ChatGPT       |
-| **Cursor**      | Free, Pro, Pro+, Ultra, Business             | Monthly included usage, Auto, API                                          | Cursor editor                                 |
-| **Antigravity** | Free, Google AI plans                        | Weekly quota of each agent model                                           | Google Antigravity app                        |
+| Service            | Plans                                        | Limits shown                                                               | Sign-in Limvo reads                           |
+| ------------------ | -------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
+| **Claude**         | Free, Pro, Max 5×, Max 20×, Team, Enterprise | Weekly limit, split by product, model caps, five-hour session, extra usage | Claude desktop app, or Claude Code (`claude`) |
+| **Codex**          | ChatGPT Plus, Pro, Business and others       | Weekly limit, five-hour session                                            | Codex CLI or app signed in with ChatGPT       |
+| **Cursor**         | Free, Pro, Pro+, Ultra, Business             | Monthly included usage, Auto, API                                          | Cursor editor                                 |
+| **Antigravity**    | Free, Google AI plans                        | Weekly quota of each agent model                                           | Google Antigravity app                        |
+| **GitHub Copilot** | Free, Pro, Pro+, Business, Enterprise        | Premium requests, or chat and completions on Free                          | GitHub CLI (`gh auth login`)                  |
 
 Each service is a small module behind one interface. Adding another one is
 described in [CONTRIBUTING.md](CONTRIBUTING.md#add-a-service).
@@ -181,7 +191,9 @@ afterwards.
 | On every monitor   | On       | A reading on the taskbar of every display, not only the main one.                                |
 | Limits in taskbar  | Main     | Each service's main limit, or up to six you pick, in the order you turn them on.                 |
 | Pin to desktop     | Off      | Shows the desktop card. Its position is remembered.                                              |
-| Notifications      | On       | 80%, 95%, limit reached, and the reset after a busy period. Each one is shown once per period.   |
+| Notifications      | On       | Early warning, 80%, 95%, limit reached, and the reset after a busy period. Each once per period. |
+| Notify at          | 80 · 95% | 50 · 75 · 90%, 80 · 95%, or only when the limit is reached. Applies to each main limit.          |
+| Pace warning       | On       | The early warning when the pace would use up the main limit before the reset.                    |
 | Keyboard shortcut  | On       | Win+Shift+H, or Ctrl+Alt+H when the first is taken. The panel shows which one is active.         |
 | Plan colours       | On       | Tints each service with the colour of its plan.                                                  |
 | Update frequency   | Adaptive | Adaptive follows activity in the services' own tools. 2, 5 or 15 minutes are fixed schedules.    |
@@ -195,7 +207,9 @@ with that folder set (`CLAUDE_CONFIG_DIR` for Claude Code, `CODEX_HOME` for
 Codex), then add it in _Settings > Extra accounts_. Pick the service, give it
 a name such as _Work_, and choose the folder in the dialog. It gets its own
 tab, its own limits in _Limits in the taskbar_, and a small letter beside the
-service's mark wherever only the mark fits.
+service's mark wherever only the mark fits. When one account runs hot or
+runs out and another of the same service would last to its reset, the flyout
+points to it; a click opens its tab.
 
 - An extra Claude account reads only the Claude Code sign-in in its folder,
   never the Claude desktop app, which stays with the main account.
@@ -216,6 +230,7 @@ draw its usage screen, and shows the answer.
 | Codex       | `~/.codex/auth.json`, or `%CODEX_HOME%\auth.json`                                                                                                                                   | `chatgpt.com/backend-api/wham/usage`       |
 | Cursor      | The editor's settings database, `%APPDATA%\Cursor\User\globalStorage\state.vscdb`, opened read-only                                                                                 | `api2.cursor.sh` dashboard service         |
 | Antigravity | The Windows Credential Manager entry the app creates, `gemini:antigravity`                                                                                                          | `cloudcode-pa.googleapis.com` model quotas |
+| Copilot     | The GitHub CLI's sign-in: its Windows Credential Manager entry (`gh:github.com:`), or `oauth_token` in `%APPDATA%\GitHub CLI\hosts.yml`                                             | `api.github.com/copilot_internal/user`     |
 
 **Read only, always.** Limvo never refreshes, writes, moves or copies a
 credential. A token is held in memory for one request and dropped. An expired
@@ -246,6 +261,7 @@ are honoured. One service failing never delays or blanks another.
 | Codex CLI or app signed in with ChatGPT | A Codex tab appears. API-key sign-ins have no plan limits and are not shown.                                                  |
 | Cursor signed in                        | A Cursor tab appears with the billing cycle's included usage.                                                                 |
 | Antigravity signed in                   | An Antigravity tab appears. Its sign-in lasts an hour; open Antigravity now and then and Limvo picks up the renewed one.      |
+| GitHub CLI signed in, with Copilot      | A Copilot tab appears with this month's quotas. Copilot in an editor alone is not enough: run `gh auth login` once.           |
 | Only some services                      | Only those get a tab. With a single service, the tabs disappear and the flyout looks like a dedicated widget.                 |
 | Signed out everywhere                   | The flyout asks you to sign in. Limvo checks again every two minutes, no restart needed.                                      |
 | Custom tool folders                     | `CLAUDE_CONFIG_DIR` and `CODEX_HOME` are honoured the same way the CLIs honour them.                                          |
@@ -271,6 +287,8 @@ are honoured. One service failing never delays or blanks another.
 - Tokens stay in memory for the duration of one request and are never logged,
   stored or shown. Logs record only which source was used and HTTP status
   codes.
+- Copilot is read with the GitHub CLI's token, sent only to `api.github.com`.
+  Like every other sign-in, Limvo only reads it.
 - Everything that touches credentials, the network and the system lives in the
   Rust core (`src-tauri/src`). The interface runs with a strict content
   security policy and can only call the commands listed in
@@ -350,7 +368,7 @@ npm run tauri build
 
 `npm run dev` serves the interface with built-in scenarios, which is the
 quickest way to work on design: `?scenario=reference|fresh|tight|hot|reached|offline|auth|signedOut|error`,
-`&more` for all four services, `&codex=off`, `&pins=claude:weekly_all,codex:session`,
+`&more` for Cursor and Antigravity, `&copilot` for Copilot, `&accounts` for a second Claude account, `&codex=off`, `&pins=claude:weekly_all,codex:session`,
 `&locale=he`, `&theme=dark`, and `&now=<ISO time>` for reproducible screenshots.
 Open `/strip.html` and `/card.html` for the other windows.
 
@@ -363,12 +381,13 @@ service a reading belongs to, and are not covered by the MIT license (see
 `<id>-dark.svg` is used on dark surfaces. Delete a file to see the Limvo mark
 in its place.
 
-| File                            | Logo        | Official source                                                |
-| ------------------------------- | ----------- | -------------------------------------------------------------- |
-| `claude.svg`                    | Claude      | [anthropic.com/press-kit](https://www.anthropic.com/press-kit) |
-| `codex.svg`, `codex-dark.svg`   | OpenAI      | [openai.com/brand](https://openai.com/brand/)                  |
-| `cursor.svg`, `cursor-dark.svg` | Cursor cube | [cursor.com/brand](https://cursor.com/brand)                   |
-| `antigravity.svg`               | Antigravity | [antigravity.google/press](https://antigravity.google/press)   |
+| File                              | Logo           | Official source                                                   |
+| --------------------------------- | -------------- | ----------------------------------------------------------------- |
+| `claude.svg`                      | Claude         | [anthropic.com/press-kit](https://www.anthropic.com/press-kit)    |
+| `codex.svg`, `codex-dark.svg`     | OpenAI         | [openai.com/brand](https://openai.com/brand/)                     |
+| `cursor.svg`, `cursor-dark.svg`   | Cursor cube    | [cursor.com/brand](https://cursor.com/brand)                      |
+| `antigravity.svg`                 | Antigravity    | [antigravity.google/press](https://antigravity.google/press)      |
+| `copilot.svg`, `copilot-dark.svg` | GitHub Copilot | [primer/octicons](https://github.com/primer/octicons) (`copilot`) |
 
 ## Project layout
 
@@ -378,7 +397,7 @@ src/                 Interface (React 19, TypeScript)
   i18n/              Translations and Intl formatting
   ui/                Flyout, taskbar strip, desktop card, controls
 src-tauri/src/       Core (Rust, Tauri 2)
-  providers/         One module per service: claude, codex, cursor, antigravity
+  providers/         One module per service: claude, codex, cursor, antigravity, copilot
   poller.rs          One slot per service: schedule, back-off, adaptive refresh
   taskbar.rs         A reading on every taskbar, next to the notification area
   flyout.rs card.rs  Window placement and behaviour
@@ -393,14 +412,13 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, and
 
 - macOS menu bar version
 - Code-signed GitHub installers through SignPath Foundation
-- A Windows 11 Widgets board card (needs a widget provider in the MSIX package)
 
 ## Disclaimer
 
 Limvo is an independent open-source project. It is not affiliated with,
-endorsed by or sponsored by Anthropic, OpenAI, Anysphere (Cursor) or Google.
-Claude, ChatGPT, Codex, Cursor and Antigravity are trademarks of their
-respective owners, used here only to describe what the app works with.
+endorsed by or sponsored by Anthropic, OpenAI, Anysphere (Cursor), Google,
+GitHub or Microsoft. Claude, ChatGPT, Codex, Cursor, Antigravity, GitHub and
+GitHub Copilot are trademarks of their respective owners, used here only to describe what the app works with.
 
 ## License
 

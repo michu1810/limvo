@@ -431,6 +431,179 @@ html:has(.flyout:not(.card)) {
   animation: rise var(--duration-medium) var(--ease-out) 900ms both;
 }
 
+/* What the rest of the window allows, beside the rate so far. Arrives just
+   after the forecast it answers. */
+.budget {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 12px;
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  animation: rise var(--duration-medium) var(--ease-out) 980ms both;
+}
+
+.budget__rates {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.budget__allowed {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.budget__now {
+  color: var(--text-tertiary);
+}
+
+.budget__now::before {
+  content: "·";
+  margin-inline-end: 8px;
+  color: var(--text-tertiary);
+}
+
+/* Running hot: the rate so far takes the forecast's colour. It follows the
+   pace label rather than comparing the two rates, which can disagree in the
+   first tenth of the window, where the projection is floored. */
+.budget[data-hot] .budget__now {
+  color: var(--caution-text);
+}
+
+/* Another account with room to spare. A quiet card, so it reads as a way out
+   rather than one more warning; it arrives after the budget it answers. */
+.account-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 14px 0 0;
+  padding: 9px 10px 9px 12px;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-control);
+  background: var(--fill-subtle-pressed);
+  color: var(--text);
+  text-align: start;
+  font-size: 13px;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+  animation: rise var(--duration-medium) var(--ease-out) 1060ms both;
+}
+
+.account-hint:hover {
+  background: var(--fill-subtle-hover);
+}
+
+.account-hint__text {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+  min-width: 0;
+}
+
+.account-hint__title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-hint__detail {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.account-hint .icon--chevron {
+  flex: none;
+  color: var(--text-tertiary);
+}
+
+/* Past periods ---------------------------------------------------------------- */
+
+.past__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.past__average {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.past__bars {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 6px;
+  height: 72px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Time runs left to right in every language, as in the week chart. */
+[dir="rtl"] .past__bars {
+  direction: ltr;
+}
+
+.past__bar {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px;
+  min-width: 0;
+}
+
+.past__fill {
+  align-self: end;
+  height: max(3px, calc(var(--value) * 100%));
+  border-radius: 3px 3px 1px 1px;
+  background: var(--accent);
+  opacity: 0.4;
+  transform-origin: bottom;
+  animation: past-grow var(--duration-slow) var(--ease-out) both;
+  animation-delay: calc(700ms + var(--index) * 40ms);
+}
+
+.past__bar[data-full] .past__fill {
+  background: var(--caution-text);
+}
+
+.past__bar[data-current] .past__fill {
+  opacity: 1;
+}
+
+.past__label {
+  overflow: hidden;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.past__bar[data-current] .past__label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+@keyframes past-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .past__fill {
+    animation: none;
+  }
+}
+
 /* Groups and rows ------------------------------------------------------------ */
 
 .group {

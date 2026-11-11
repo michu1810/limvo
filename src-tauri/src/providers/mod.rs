@@ -8,6 +8,8 @@
 pub mod antigravity;
 pub mod claude;
 pub mod codex;
+pub mod copilot;
+mod credential;
 pub mod cursor;
 
 use std::future::Future;
@@ -84,6 +86,7 @@ pub fn all(accounts: &[Account]) -> Vec<Box<dyn UsageProvider>> {
     );
     providers.push(Box::new(cursor::CursorProvider::new()));
     providers.push(Box::new(antigravity::AntigravityProvider::new()));
+    providers.push(Box::new(copilot::CopilotProvider::new()));
     providers
 }
 

@@ -41,6 +41,8 @@ export function scenarioReports(
   withMore = false,
   /** Adds a second Claude account, signed in from another folder. */
   withAccount = false,
+  /** Adds GitHub Copilot on its free plan. */
+  withCopilot = false,
 ): ProviderReport[] {
   const reports: ProviderReport[] = [
     { providerId: "claude", serviceId: "claude", providerName: "Claude", ...SCENARIOS[name](now) },
@@ -87,6 +89,14 @@ export function scenarioReports(
             detail: null,
           },
     );
+  reports.push({
+    providerId: "copilot",
+    serviceId: "copilot",
+    providerName: "GitHub Copilot",
+    ...(withCopilot
+      ? { state: "ok" as const, snapshot: copilot(now), detail: null }
+      : { state: "no_credentials" as const, snapshot: null, detail: null }),
+  });
   return reports;
 }
 
@@ -177,6 +187,29 @@ function cursor(now: Date): UsageSnapshot {
     breakdown: [],
     extraUsage: null,
     usagePageUrl: "https://cursor.com/dashboard?tab=usage",
+  };
+}
+
+function copilot(now: Date): UsageSnapshot {
+  const month = (id: string, label: string, percent: number) => ({
+    id,
+    kind: "monthly" as const,
+    label,
+    percent,
+    resetsAt: at(now, 19 * 24),
+    periodSeconds: 30 * 24 * 3600,
+    severity: percent >= 80 ? ("warning" as const) : ("normal" as const),
+  });
+  return {
+    providerId: "copilot",
+    providerName: "GitHub Copilot",
+    plan: { id: "copilot_free", label: "Free" },
+    fetchedAt: at(now, -1 / 60),
+    headline: month("monthly_chat", "Chat", 62),
+    windows: [month("monthly_completions", "Completions", 18)],
+    breakdown: [],
+    extraUsage: null,
+    usagePageUrl: "https://github.com/settings/copilot/features",
   };
 }
 

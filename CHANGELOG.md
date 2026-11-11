@@ -6,6 +6,42 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-11
+
+### Added
+
+- A card on the Windows 11 Widgets board (Store version): the main limit of
+  every signed-in service with its pace and reset, in small, medium and
+  large. A click opens the flyout; the larger sizes can refresh.
+- GitHub Copilot, the fifth service, with its official mark: premium
+  requests on paid plans, or chat and completions on Copilot Free, for the
+  month to the reset, with the plan badge and a colour of its own. Limvo reads the GitHub CLI's sign-in,
+  so `gh auth login` once is all it takes.
+- A budget to the reset: when a limit is _Tight_ or _Running hot_, the
+  flyout says how much a day you can use to make it to the reset, next to
+  your rate so far, for example "To last until Tue ~13.9% a day · now
+  ~16.7%". On the last day, and for a five-hour session, it counts per hour.
+- An early warning: once per period, a notification says when the main limit
+  runs out at the current pace and what daily budget would make it last. It
+  waits for the first tenth of the period, so one busy hour after a reset
+  says nothing, and stays quiet once the first level has been announced.
+  _Settings > Pace warning_ turns it off.
+- _Settings > Notify at_ chooses when a main limit is announced: at 50, 75
+  and 90%, at 80 and 95% as before, or only when it is reached.
+- Past weeks (past months for Cursor): the peak of each of the last eight
+  periods beside the running one, with their average, so a glance says
+  whether the plan fits. It fills in as periods finish while Limvo runs.
+- The tray icon's tooltip adds the daily budget to a limit that could run
+  out, as long as every pinned limit still fits.
+- With extra accounts, a hot or spent account points to another account of
+  the same service that lasts to its reset, for example "More room on
+  Claude · Work, 46% until Sun". A click opens its tab.
+
+### Fixed
+
+- With several limits in the taskbar, the reading no longer stays as wide as
+  the first service that reported and cuts the others off.
+
 ## [0.4.1] - 2026-11-10
 
 ### Fixed

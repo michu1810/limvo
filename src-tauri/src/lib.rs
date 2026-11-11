@@ -23,6 +23,7 @@ mod system;
 mod taskbar;
 mod tray;
 mod updater;
+mod widgets;
 
 use std::sync::Mutex;
 
@@ -101,6 +102,7 @@ pub fn run() {
             commands::shortcut_label,
             commands::hide_flyout,
             commands::localize_tray,
+            commands::update_widget,
             commands::add_account,
             commands::remove_account,
             commands::rename_account,
@@ -142,6 +144,7 @@ pub fn run() {
             card::set_visible(app.handle(), desktop_card, card_position);
             hotkey::apply(app.handle(), shortcut);
             updater::start(app.handle().clone());
+            widgets::start(app.handle());
             Ok(())
         })
         .on_window_event(|window, event| {

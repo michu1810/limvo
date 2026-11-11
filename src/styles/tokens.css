@@ -150,6 +150,11 @@
   --accent-soft: #3c87ec;
 }
 
+[data-plan^="copilot"] {
+  --accent: #8250df;
+  --accent-soft: #956ce4;
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) [data-plan="free"] {
     --accent: #a3a8b0;
@@ -194,6 +199,11 @@
   :root:not([data-theme="light"]) [data-plan^="antigravity"] {
     --accent: #8ab4f8;
     --accent-soft: #a5c5fa;
+  }
+
+  :root:not([data-theme="light"]) [data-plan^="copilot"] {
+    --accent: #a371f7;
+    --accent-soft: #b58cf9;
   }
 }
 
@@ -240,4 +250,9 @@
 :root[data-theme="dark"] [data-plan^="antigravity"] {
   --accent: #8ab4f8;
   --accent-soft: #a5c5fa;
+}
+
+:root[data-theme="dark"] [data-plan^="copilot"] {
+  --accent: #a371f7;
+  --accent-soft: #b58cf9;
 }

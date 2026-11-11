@@ -20,7 +20,35 @@ describe("addReading", () => {
     expect(fresh).toEqual({
       resetsAt: NEXT,
       readings: [{ at: Date.parse(RESET) + hour, percent: 1 }],
+      past: [{ resetsAt: RESET, peak: 80 }],
     });
+  });
+
+  it("keeps the peak of each finished period, the last eight", () => {
+    let history: ReturnType<typeof addReading> | undefined;
+    for (let week = 0; week < 10; week++) {
+      const reset = new Date(Date.parse(RESET) + week * WEEK * 1000).toISOString();
+      const begin = Date.parse(reset) - WEEK * 1000;
+      history = addReading(history, reset, { at: begin + hour, percent: week });
+      history = addReading(history, reset, { at: begin + 2 * hour, percent: week * 10 });
+    }
+    expect(history?.past?.map((period) => period.peak)).toEqual([10, 20, 30, 40, 50, 60, 70, 80]);
+    expect(history?.readings.at(-1)?.percent).toBe(90);
+  });
+
+  it("leaves no past entry when the headline switches quota mid-period", () => {
+    const old = addReading(undefined, RESET, { at: start + hour, percent: 40 });
+    const otherQuota = new Date(Date.parse(RESET) + 3 * 24 * hour).toISOString();
+    const twoDaysBefore = Date.parse(RESET) - 2 * 24 * hour;
+    const next = addReading(old, otherQuota, { at: twoDaysBefore, percent: 12 });
+    expect(next.past).toBeUndefined();
+  });
+
+  it("does not take a nudged reset time for a new period", () => {
+    const old = addReading(undefined, RESET, { at: start + hour, percent: 40 });
+    const nudged = new Date(Date.parse(RESET) + 60_000).toISOString();
+    const next = addReading(old, nudged, { at: start + 2 * hour, percent: 41 });
+    expect(next.past).toBeUndefined();
   });
 
   it("folds repeated values that come close together", () => {

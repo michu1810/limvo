@@ -65,6 +65,12 @@ export interface Messages {
   desktopCard: string;
   notifications: string;
   notificationsHint: string;
+  /** Label of the choice of levels; the options are percentages, and this one word. */
+  notifyLevels: string;
+  /** The option that announces only a reached limit. */
+  notifyLevelsReached: string;
+  notifyForecast: string;
+  notifyForecastHint: string;
   refreshFrequency: string;
   refreshAdaptive: string;
   refreshAdaptiveHint: string;
@@ -80,6 +86,12 @@ export interface Messages {
   /** Placeholder `{window}`. */
   notifyResetTitle: string;
   notifyResetBody: string;
+  /** The pace would empty the window before its reset. Placeholders `{window}` and `{when}`, a weekday and time. */
+  notifyForecastTitle: string;
+  /** Placeholders `{day}`, as in `budgetUntil`, and `{rate}`, a percentage. */
+  notifyForecastBodyDay: string;
+  /** Placeholders `{day}` and `{rate}`. */
+  notifyForecastBodyHour: string;
 
   extraUsage: string;
   /** Placeholders `{used}` and `{limit}` are formatted amounts of money. */
@@ -88,6 +100,26 @@ export interface Messages {
   forecastLimitAt: string;
   /** Accessible description of the weekly chart. */
   weekChart: string;
+  pastWeeks: string;
+  pastMonths: string;
+  /** Average peak of the past periods. Placeholder `{percent}`. */
+  pastAverage: string;
+  /** One past period. Placeholders `{period}`, a day and month such as "Nov 4", and `{percent}`. */
+  pastBar: string;
+  /** Label of the running period's bar. */
+  pastNow: string;
+  /** Opens the budget line. Placeholder `{day}`, a weekday, or a weekday and time on the last day. */
+  budgetUntil: string;
+  /** Placeholder `{rate}`, a percentage that may have one decimal, for example "13.9%". */
+  budgetPerDay: string;
+  /** Placeholder `{rate}`. */
+  budgetPerHour: string;
+  /** The rate so far, beside the budget. Placeholder `{rate}`. */
+  budgetNow: string;
+  /** Another account of the same service that lasts. Placeholder `{name}`, for example "Claude · Work". */
+  roomierAccount: string;
+  /** The Widgets board card with no service signed in. */
+  widgetEmpty: string;
 
   shortcut: string;
   /** Placeholder `{keys}`, for example "Win+Shift+H". */
