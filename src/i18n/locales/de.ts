@@ -83,6 +83,8 @@ export const de: LocaleDefinition = {
     budgetNow: "aktuell ~{rate}",
     roomierAccount: "Mehr Spielraum bei {name}",
     widgetEmpty: "Melde dich bei einem deiner KI-Tools an, um hier seine Limits zu sehen.",
+    windowTitleStrip: "Limvo · Anzeige in der Taskleiste",
+    windowTitleCard: "Limvo · Desktop-Karte",
     shortcut: "Tastenkürzel",
     shortcutHint: "{keys} öffnet es von überall",
     shortcutTaken: "Beide Kürzel sind von anderen Apps belegt",

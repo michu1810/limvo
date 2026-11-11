@@ -7,7 +7,11 @@ import { mount } from "./mount";
 
 function CardWindow() {
   const reports = useReports();
-  return <Root>{(settings) => <Card reports={reports} settings={settings} />}</Root>;
+  return (
+    <Root title="windowTitleCard">
+      {(settings) => <Card reports={reports} settings={settings} />}
+    </Root>
+  );
 }
 
 mount(<CardWindow />);

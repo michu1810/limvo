@@ -6,6 +6,12 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Task Manager names Limvo's windows by what they are, in the app's
+  language: "Limvo · taskbar reading" and "Limvo · desktop card" instead
+  of "Limvo strip" and "Limvo card", also on their WebView2 processes.
+
 ## [0.5.1] - 2026-11-11
 
 ### Fixed

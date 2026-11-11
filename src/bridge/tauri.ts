@@ -35,6 +35,10 @@ export const tauriBridge: Bridge = {
     listen<Theme>(TASKBAR_THEME_EVENT, (event) => listener(event.payload)),
   localizeTray: (texts) => invoke("localize_tray", { ...texts }),
   updateWidget: (card) => invoke("update_widget", { card }),
+  async nameWindow(title) {
+    document.title = title;
+    await getCurrentWindow().setTitle(title);
+  },
   async notify(toast) {
     const granted = (await isPermissionGranted()) || (await requestPermission()) === "granted";
     if (granted) sendNotification(toast);

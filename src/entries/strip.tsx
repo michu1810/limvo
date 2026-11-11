@@ -6,7 +6,11 @@ import { mount } from "./mount";
 
 function StripWindow() {
   const reports = useReports();
-  return <Root>{(settings) => <Strip reports={reports} settings={settings} />}</Root>;
+  return (
+    <Root title="windowTitleStrip">
+      {(settings) => <Strip reports={reports} settings={settings} />}
+    </Root>
+  );
 }
 
 mount(<StripWindow />, { followTaskbarTheme: true });

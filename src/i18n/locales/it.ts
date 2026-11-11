@@ -81,6 +81,8 @@ export const it: LocaleDefinition = {
     budgetNow: "ora ~{rate}",
     roomierAccount: "Più margine su {name}",
     widgetEmpty: "Accedi a uno dei tuoi strumenti di IA per vederne qui i limiti.",
+    windowTitleStrip: "Limvo · lettura nella barra delle applicazioni",
+    windowTitleCard: "Limvo · scheda sul desktop",
     shortcut: "Scorciatoia da tastiera",
     shortcutHint: "{keys} lo apre da qualsiasi punto",
     shortcutTaken: "Entrambe le scorciatoie sono già usate da altre app",

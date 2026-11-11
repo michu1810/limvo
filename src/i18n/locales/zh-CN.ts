@@ -81,6 +81,8 @@ export const zhCN: LocaleDefinition = {
     budgetNow: "当前 ~{rate}",
     roomierAccount: "{name} 余量更多",
     widgetEmpty: "登录任一 AI 工具即可在此查看其限额。",
+    windowTitleStrip: "Limvo · 任务栏读数",
+    windowTitleCard: "Limvo · 桌面卡片",
     shortcut: "键盘快捷键",
     shortcutHint: "{keys} 可随时打开",
     shortcutTaken: "两个快捷键都已被其他应用占用",
