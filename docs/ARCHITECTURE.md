@@ -118,8 +118,12 @@ started by a `flyout-shown` event from the core rather than by React mounting.
 
 ## Interface
 
-- `src/core` is pure TypeScript with no React: pace projection, alert rules,
-  the week history and taskbar pins, unit tested.
+- `src/core` is pure TypeScript with no React: pace projection, the budget
+  to the reset, alert rules, the week history and taskbar pins, unit tested.
+  The budget uses the projection's elapsed floor, so after the first tenth of
+  the window its rate so far is over the budget exactly when the projection
+  is over 100%. The budget line takes its warning colour from the pace label,
+  so the two always agree.
 - The flyout shows one tab per visible service (`ui/flyout/ProviderTabs.tsx`)
   and remembers the chosen tab. Plan colours are set per element with
   `data-plan`, so every tab, pin and taskbar reading wears its own service's

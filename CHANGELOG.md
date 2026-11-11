@@ -6,6 +6,13 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- A budget to the reset: when a limit is _Tight_ or _Running hot_, the
+  flyout says how much a day you can use to make it to the reset, next to
+  your rate so far, for example "To last until Tue ~13.9% a day · now
+  ~16.7%". On the last day, and for a five-hour session, it counts per hour.
+
 ## [0.4.1] - 2026-11-10
 
 ### Fixed

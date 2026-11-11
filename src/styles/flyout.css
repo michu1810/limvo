@@ -431,6 +431,50 @@ html:has(.flyout:not(.card)) {
   animation: rise var(--duration-medium) var(--ease-out) 900ms both;
 }
 
+/* What the rest of the window allows, beside the rate so far. Arrives just
+   after the forecast it answers. */
+.budget {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 12px;
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  animation: rise var(--duration-medium) var(--ease-out) 980ms both;
+}
+
+.budget__rates {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.budget__allowed {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.budget__now {
+  color: var(--text-tertiary);
+}
+
+.budget__now::before {
+  content: "·";
+  margin-inline-end: 8px;
+  color: var(--text-tertiary);
+}
+
+/* Running hot: the rate so far takes the forecast's colour. It follows the
+   pace label rather than comparing the two rates, which can disagree in the
+   first tenth of the window, where the projection is floored. */
+.budget[data-hot] .budget__now {
+  color: var(--caution-text);
+}
+
 /* Groups and rows ------------------------------------------------------------ */
 
 .group {

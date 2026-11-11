@@ -56,6 +56,12 @@ describe("createFormatters", () => {
     expect(createFormatters("de").percent(51)).toMatch(/^51\s%$/u);
   });
 
+  it("formats rates to one decimal, in the locale's own way", () => {
+    expect(en.percentTenths(13.94)).toBe("13.9%");
+    expect(en.percentTenths(14.02)).toBe("14%");
+    expect(createFormatters("pl").percentTenths(13.94)).toBe("13,9%");
+  });
+
   it("formats relative times in the past", () => {
     const now = new Date("2026-11-08T12:00:00Z");
     expect(en.relativeTime(new Date("2026-11-08T11:57:00Z"), now)).toBe("3 min. ago");

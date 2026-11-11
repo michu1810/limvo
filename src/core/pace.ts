@@ -80,6 +80,59 @@ export function limitReachedAt(
   return at < resetsAt ? new Date(at) : null;
 }
 
+export type BudgetUnit = "day" | "hour";
+
+export interface Budget {
+  /** What one step of the budget is. */
+  unit: BudgetUnit;
+  /** Share of the limit that can be used per unit from now on and still last until the reset, in percent. */
+  allowed: number;
+  /** Average share used per unit so far in this window, in percent. */
+  current: number;
+}
+
+const HOUR_MS = 3600_000;
+const DAY_MS = 24 * HOUR_MS;
+
+/**
+ * How fast the rest of the window can be used and still last until the
+ * reset, next to how fast it has been used so far.
+ *
+ * Counted per hour for a session, and for any window with less than a day
+ * left, where a daily figure would promise more than remains. Uses the same
+ * elapsed floor as the projection, so once the first tenth of the window has
+ * passed, `current` exceeds `allowed` exactly when the projection is over
+ * 100%. Before that the floor calms `current` only. Returns `null` without a clock, for a
+ * spent window, and in the last hour, when the reset is close enough to
+ * make a budget pointless.
+ */
+export function usageBudget(
+  window: Pick<UsageWindow, "kind" | "percent" | "resetsAt" | "periodSeconds">,
+  now: Date,
+  thresholds: PaceThresholds = DEFAULT_THRESHOLDS,
+): Budget | null {
+  if (window.resetsAt === null || window.periodSeconds === null || window.periodSeconds <= 0) {
+    return null;
+  }
+  const resetsAt = Date.parse(window.resetsAt);
+  if (Number.isNaN(resetsAt) || window.percent >= 100) return null;
+
+  const periodMs = window.periodSeconds * 1000;
+  const remainingMs = Math.min(resetsAt - now.getTime(), periodMs);
+  if (remainingMs < HOUR_MS) return null;
+
+  const unit: BudgetUnit = window.kind === "session" || remainingMs < DAY_MS ? "hour" : "day";
+  const unitMs = unit === "day" ? DAY_MS : HOUR_MS;
+  const elapsedMs = Math.max(periodMs - remainingMs, thresholds.elapsedFloor * periodMs);
+  const percent = Math.max(0, window.percent);
+
+  return {
+    unit,
+    allowed: ((100 - percent) / remainingMs) * unitMs,
+    current: (percent / elapsedMs) * unitMs,
+  };
+}
+
 function classify(percent: number, projected: number, thresholds: PaceThresholds): PaceStatus {
   if (percent >= 100) return "limit_reached";
   if (projected >= thresholds.hot) return "running_hot";

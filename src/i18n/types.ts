@@ -88,6 +88,14 @@ export interface Messages {
   forecastLimitAt: string;
   /** Accessible description of the weekly chart. */
   weekChart: string;
+  /** Opens the budget line. Placeholder `{day}`, a weekday, or a weekday and time on the last day. */
+  budgetUntil: string;
+  /** Placeholder `{rate}`, a percentage that may have one decimal, for example "13.9%". */
+  budgetPerDay: string;
+  /** Placeholder `{rate}`. */
+  budgetPerHour: string;
+  /** The rate so far, beside the budget. Placeholder `{rate}`. */
+  budgetNow: string;
 
   shortcut: string;
   /** Placeholder `{keys}`, for example "Win+Shift+H". */

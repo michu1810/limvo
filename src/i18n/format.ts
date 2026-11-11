@@ -5,6 +5,8 @@ const DAY = 24 * HOUR;
 export interface Formatters {
   /** 51 becomes "51%" in English and "51 %" in German. */
   percent(value: number): string;
+  /** A percentage to one decimal, for rates: 13.94 becomes "13.9%", 14.02 "14%". */
+  percentTenths(value: number): string;
   /** "3 min ago", relative to `now`. */
   relativeTime(instant: Date, now: Date): string;
   /** A positive span as its two largest units, for example "1 day 16 hr". */
@@ -17,6 +19,10 @@ export interface Formatters {
 
 export function createFormatters(locale: string): Formatters {
   const percent = new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 0 });
+  const percentTenths = new Intl.NumberFormat(locale, {
+    style: "percent",
+    maximumFractionDigits: 1,
+  });
   const relative = new Intl.RelativeTimeFormat(locale, { numeric: "auto", style: "short" });
   const weekdayTime = new Intl.DateTimeFormat(locale, {
     weekday: "short",
@@ -36,6 +42,7 @@ export function createFormatters(locale: string): Formatters {
 
   return {
     percent: (value) => percent.format(value / 100),
+    percentTenths: (value) => percentTenths.format(value / 100),
 
     relativeTime(instant, now) {
       const elapsed = now.getTime() - instant.getTime();
