@@ -381,12 +381,13 @@ service a reading belongs to, and are not covered by the MIT license (see
 `<id>-dark.svg` is used on dark surfaces. Delete a file to see the Limvo mark
 in its place.
 
-| File                            | Logo        | Official source                                                |
-| ------------------------------- | ----------- | -------------------------------------------------------------- |
-| `claude.svg`                    | Claude      | [anthropic.com/press-kit](https://www.anthropic.com/press-kit) |
-| `codex.svg`, `codex-dark.svg`   | OpenAI      | [openai.com/brand](https://openai.com/brand/)                  |
-| `cursor.svg`, `cursor-dark.svg` | Cursor cube | [cursor.com/brand](https://cursor.com/brand)                   |
-| `antigravity.svg`               | Antigravity | [antigravity.google/press](https://antigravity.google/press)   |
+| File                              | Logo           | Official source                                                   |
+| --------------------------------- | -------------- | ----------------------------------------------------------------- |
+| `claude.svg`                      | Claude         | [anthropic.com/press-kit](https://www.anthropic.com/press-kit)    |
+| `codex.svg`, `codex-dark.svg`     | OpenAI         | [openai.com/brand](https://openai.com/brand/)                     |
+| `cursor.svg`, `cursor-dark.svg`   | Cursor cube    | [cursor.com/brand](https://cursor.com/brand)                      |
+| `antigravity.svg`                 | Antigravity    | [antigravity.google/press](https://antigravity.google/press)      |
+| `copilot.svg`, `copilot-dark.svg` | GitHub Copilot | [primer/octicons](https://github.com/primer/octicons) (`copilot`) |
 
 ## Project layout
 
