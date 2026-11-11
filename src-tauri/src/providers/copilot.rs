@@ -47,7 +47,7 @@ impl UsageProvider for CopilotProvider {
     }
 
     fn name(&self) -> &'static str {
-        "Copilot"
+        "GitHub Copilot"
     }
 
     fn fetch<'a>(&'a self, http: &'a reqwest::Client) -> FetchFuture<'a> {
@@ -226,7 +226,7 @@ fn to_snapshot(user: &UserResponse, fetched_at: String) -> UsageSnapshot {
 
     UsageSnapshot {
         provider_id: PROVIDER_ID.to_owned(),
-        provider_name: "Copilot".to_owned(),
+        provider_name: "GitHub Copilot".to_owned(),
         plan: plan_badge(user),
         fetched_at,
         headline,

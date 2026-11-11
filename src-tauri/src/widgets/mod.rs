@@ -48,7 +48,7 @@ pub struct CardItem {
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct CardData {
-    /// Up to six limits, the pinned ones in their order.
+    /// Up to six limits: the main limit of each signed-in service.
     pub items: Vec<CardItem>,
     /// Shown instead of the limits when there are none: "Sign in to a service".
     pub empty: String,

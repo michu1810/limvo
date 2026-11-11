@@ -51,7 +51,7 @@ export function Flyout({
     reports[0];
 
   useTrayTexts(reports, settings, now);
-  useWidgetCard(reports, settings, now);
+  useWidgetCard(reports, now);
   useAlerts(reports, settings);
   const histories = useWeekHistory(reports);
 

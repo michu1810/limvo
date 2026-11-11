@@ -75,7 +75,7 @@ work, and nudges you with a Windows notification before you run out.
   with the daily budget that would make it last.
 - **A card on the Widgets board.** The Store version adds _AI plan limits_
   to the Windows 11 Widgets board (Win+W), small, medium or large, with the
-  limits you pinned to the taskbar. See [docs/WIDGETS.md](docs/WIDGETS.md).
+  main limit of every service you are signed in to. See [docs/WIDGETS.md](docs/WIDGETS.md).
 - **Plan colours.** Limvo recognises the plan (Claude Free, Pro, Max 5×,
   Max 20×, Team and Enterprise; ChatGPT, Cursor and Google AI plans) and tints
   each service in its own colour. Status colours keep their meaning.
@@ -103,13 +103,13 @@ work, and nudges you with a Windows notification before you run out.
 
 ## Supported services
 
-| Service         | Plans                                        | Limits shown                                                               | Sign-in Limvo reads                           |
-| --------------- | -------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
-| **Claude**      | Free, Pro, Max 5×, Max 20×, Team, Enterprise | Weekly limit, split by product, model caps, five-hour session, extra usage | Claude desktop app, or Claude Code (`claude`) |
-| **Codex**       | ChatGPT Plus, Pro, Business and others       | Weekly limit, five-hour session                                            | Codex CLI or app signed in with ChatGPT       |
-| **Cursor**      | Free, Pro, Pro+, Ultra, Business             | Monthly included usage, Auto, API                                          | Cursor editor                                 |
-| **Antigravity** | Free, Google AI plans                        | Weekly quota of each agent model                                           | Google Antigravity app                        |
-| **Copilot**     | Free, Pro, Pro+, Business, Enterprise        | Premium requests, or chat and completions on Free                          | GitHub CLI (`gh auth login`)                  |
+| Service            | Plans                                        | Limits shown                                                               | Sign-in Limvo reads                           |
+| ------------------ | -------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
+| **Claude**         | Free, Pro, Max 5×, Max 20×, Team, Enterprise | Weekly limit, split by product, model caps, five-hour session, extra usage | Claude desktop app, or Claude Code (`claude`) |
+| **Codex**          | ChatGPT Plus, Pro, Business and others       | Weekly limit, five-hour session                                            | Codex CLI or app signed in with ChatGPT       |
+| **Cursor**         | Free, Pro, Pro+, Ultra, Business             | Monthly included usage, Auto, API                                          | Cursor editor                                 |
+| **Antigravity**    | Free, Google AI plans                        | Weekly quota of each agent model                                           | Google Antigravity app                        |
+| **GitHub Copilot** | Free, Pro, Pro+, Business, Enterprise        | Premium requests, or chat and completions on Free                          | GitHub CLI (`gh auth login`)                  |
 
 Each service is a small module behind one interface. Adding another one is
 described in [CONTRIBUTING.md](CONTRIBUTING.md#add-a-service).

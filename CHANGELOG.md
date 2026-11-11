@@ -8,10 +8,10 @@ All notable changes to Limvo are listed here. The format follows
 
 ### Added
 
-- A card on the Windows 11 Widgets board (Store version): the limits pinned
-  to the taskbar with their pace and reset, in small, medium and large. A
-  click opens the flyout; the larger sizes can refresh.
-- GitHub Copilot, the fifth service: premium requests on paid plans, or
+- A card on the Windows 11 Widgets board (Store version): the main limit of
+  every signed-in service with its pace and reset, in small, medium and
+  large. A click opens the flyout; the larger sizes can refresh.
+- GitHub Copilot, the fifth service, with its official mark: premium requests on paid plans, or
   chat and completions on Copilot Free, for the month to the reset, with the
   plan badge and a colour of its own. Limvo reads the GitHub CLI's sign-in,
   so `gh auth login` once is all it takes.

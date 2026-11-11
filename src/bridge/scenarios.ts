@@ -92,7 +92,7 @@ export function scenarioReports(
   reports.push({
     providerId: "copilot",
     serviceId: "copilot",
-    providerName: "Copilot",
+    providerName: "GitHub Copilot",
     ...(withCopilot
       ? { state: "ok" as const, snapshot: copilot(now), detail: null }
       : { state: "no_credentials" as const, snapshot: null, detail: null }),
@@ -202,7 +202,7 @@ function copilot(now: Date): UsageSnapshot {
   });
   return {
     providerId: "copilot",
-    providerName: "Copilot",
+    providerName: "GitHub Copilot",
     plan: { id: "copilot_free", label: "Free" },
     fetchedAt: at(now, -1 / 60),
     headline: month("monthly_chat", "Chat", 62),

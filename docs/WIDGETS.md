@@ -1,8 +1,9 @@
 # The Widgets board card
 
 The Microsoft Store build of Limvo puts a card on the Windows 11 Widgets
-board (Win+W): the limits pinned to the taskbar, each with its pace and
-reset, in three sizes. The installer build has no card, because the board
+board (Win+W): the main limit of every signed-in service, each with its
+pace and reset, in three sizes. The taskbar has room for a few chosen
+limits; the card is the overview, so it does not follow the taskbar pins. The installer build has no card, because the board
 only shows widgets of packaged apps.
 
 ## How it fits together
@@ -20,8 +21,8 @@ only shows widgets of packaged apps.
   session. When the board needs the provider while Limvo is not running,
   Windows starts `limvo.exe` from the manifest's `com:ExeServer`, which then
   starts as usual and registers itself.
-- **The interface words the card.** Translations, pins and the pace live in
-  the interface, so the flyout window sends the card's content whenever it
+- **The interface words the card.** Translations and the pace live in the
+  interface, so the flyout window sends the card's content whenever it
   changes (`useWidgetCard`), as it does for the tray tooltip. The provider
   keeps the latest content, bounds it, and hands it to every pinned widget
   with the template in `src-tauri/src/widgets/template.json`.
