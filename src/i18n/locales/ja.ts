@@ -72,6 +72,7 @@ export const ja: LocaleDefinition = {
     budgetPerDay: "1日 ~{rate}",
     budgetPerHour: "1時間 ~{rate}",
     budgetNow: "現在 ~{rate}",
+    roomierAccount: "{name} に余裕があります",
     shortcut: "キーボードショートカット",
     shortcutHint: "{keys} でどこからでも開く",
     shortcutTaken: "両方のショートカットが他のアプリで使用中です",

@@ -199,7 +199,9 @@ with that folder set (`CLAUDE_CONFIG_DIR` for Claude Code, `CODEX_HOME` for
 Codex), then add it in _Settings > Extra accounts_. Pick the service, give it
 a name such as _Work_, and choose the folder in the dialog. It gets its own
 tab, its own limits in _Limits in the taskbar_, and a small letter beside the
-service's mark wherever only the mark fits.
+service's mark wherever only the mark fits. When one account runs hot or
+runs out and another of the same service would last to its reset, the flyout
+points to it; a click opens its tab.
 
 - An extra Claude account reads only the Claude Code sign-in in its folder,
   never the Claude desktop app, which stays with the main account.

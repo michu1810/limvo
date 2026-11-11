@@ -72,6 +72,7 @@ export const de: LocaleDefinition = {
     budgetPerDay: "~{rate} pro Tag",
     budgetPerHour: "~{rate} pro Stunde",
     budgetNow: "aktuell ~{rate}",
+    roomierAccount: "Mehr Spielraum bei {name}",
     shortcut: "Tastenkürzel",
     shortcutHint: "{keys} öffnet es von überall",
     shortcutTaken: "Beide Kürzel sind von anderen Apps belegt",

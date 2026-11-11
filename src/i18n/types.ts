@@ -102,6 +102,8 @@ export interface Messages {
   budgetPerHour: string;
   /** The rate so far, beside the budget. Placeholder `{rate}`. */
   budgetNow: string;
+  /** Another account of the same service that lasts. Placeholder `{name}`, for example "Claude · Work". */
+  roomierAccount: string;
 
   shortcut: string;
   /** Placeholder `{keys}`, for example "Win+Shift+H". */

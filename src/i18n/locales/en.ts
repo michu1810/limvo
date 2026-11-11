@@ -70,6 +70,7 @@ export const en: LocaleDefinition = {
     budgetPerDay: "~{rate} a day",
     budgetPerHour: "~{rate} an hour",
     budgetNow: "now ~{rate}",
+    roomierAccount: "More room on {name}",
     shortcut: "Keyboard shortcut",
     shortcutHint: "{keys} opens it from anywhere",
     shortcutTaken: "Both shortcuts are taken by other apps",

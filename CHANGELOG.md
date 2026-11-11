@@ -18,6 +18,9 @@ All notable changes to Limvo are listed here. The format follows
   says nothing, and stays quiet once the 80% notification has been shown.
 - The tray icon's tooltip adds the daily budget to a limit that could run
   out, as long as every pinned limit still fits.
+- With extra accounts, a hot or spent account points to another account of
+  the same service that lasts to its reset, for example "More room on
+  Claude · Work, 46% until Sun". A click opens its tab.
 
 ## [0.4.1] - 2026-11-10
 

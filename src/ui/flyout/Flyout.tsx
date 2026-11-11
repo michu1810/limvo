@@ -9,6 +9,7 @@ import { SettingsIcon } from "../icons";
 import { ProviderMark } from "../ProviderMark";
 import { useAlerts } from "../useAlerts";
 import { useWeekHistory } from "../useWeekHistory";
+import { AccountHint } from "./AccountHint";
 import { Breakdown, OtherLimits } from "./Details";
 import { Headline } from "./Headline";
 import { LanguagePanel } from "./LanguagePanel";
@@ -161,6 +162,7 @@ export function Flyout({
                 history={histories[report.providerId]}
               />
             )}
+            <AccountHint report={report} reports={visible} now={now} onSelect={selectTab} />
             {snapshot && <Breakdown rows={snapshot.breakdown} replay={shown} />}
             {snapshot && (
               <OtherLimits

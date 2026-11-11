@@ -475,6 +475,53 @@ html:has(.flyout:not(.card)) {
   color: var(--caution-text);
 }
 
+/* Another account with room to spare. A quiet card, so it reads as a way out
+   rather than one more warning; it arrives after the budget it answers. */
+.account-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 14px 0 0;
+  padding: 9px 10px 9px 12px;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-control);
+  background: var(--fill-subtle-pressed);
+  color: var(--text);
+  text-align: start;
+  font-size: 13px;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+  animation: rise var(--duration-medium) var(--ease-out) 1060ms both;
+}
+
+.account-hint:hover {
+  background: var(--fill-subtle-hover);
+}
+
+.account-hint__text {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+  min-width: 0;
+}
+
+.account-hint__title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-hint__detail {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.account-hint .icon--chevron {
+  flex: none;
+  color: var(--text-tertiary);
+}
+
 /* Groups and rows ------------------------------------------------------------ */
 
 .group {
