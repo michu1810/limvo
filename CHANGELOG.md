@@ -6,6 +6,14 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-11
+
+### Fixed
+
+- The Microsoft Store version gets this release, and with it everything
+  that is new in 0.5.0: the Widgets board card, GitHub Copilot, the budget
+  to the reset and the pace warning. 0.5.0 reached only the installer.
+
 ## [0.5.0] - 2026-11-11
 
 ### Added
