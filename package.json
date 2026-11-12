@@ -1,7 +1,7 @@
 {
   "name": "limvo",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "See how much of your AI plan is left, right in the Windows taskbar.",
   "license": "MIT",
   "type": "module",
