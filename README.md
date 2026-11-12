@@ -186,7 +186,7 @@ afterwards.
 | Setting            | Default  | Notes                                                                                            |
 | ------------------ | -------- | ------------------------------------------------------------------------------------------------ |
 | Language           | System   | Any of the eleven languages, or follow Windows.                                                  |
-| Start with Windows | Off      | Adds Limvo to your user's startup apps.                                                          |
+| Start with Windows | Depends  | On for the Store version, managed in Windows Startup apps. Off for the installer version.        |
 | Show in taskbar    | On       | Turn off to keep only the tray icon.                                                             |
 | On every monitor   | On       | A reading on the taskbar of every display, not only the main one.                                |
 | Limits in taskbar  | Main     | Each service's main limit, or up to six you pick, in the order you turn them on.                 |

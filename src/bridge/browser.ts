@@ -102,6 +102,9 @@ export function createBrowserBridge(): Bridge {
     onTaskbarTheme: () => Promise.resolve(() => {}),
     localizeTray: () => Promise.resolve(),
     updateWidget: () => Promise.resolve(),
+    async nameWindow(title) {
+      document.title = title;
+    },
     async notify(toast) {
       console.info("[notification]", toast.title, toast.body);
     },

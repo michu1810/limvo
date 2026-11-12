@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { bridge, type Settings } from "../../bridge";
 import { availableLimits, pinnedLimits } from "../../core/pins";
 import type { ProviderReport } from "../../core/snapshot";
@@ -23,13 +24,20 @@ export function TaskbarPins({
   settings: Settings | null;
 }) {
   const i18n = useI18n();
+  // Pins sent but not yet saved: a second click before the first is saved
+  // counts from it, instead of from the settings the panel last drew.
+  const sending = useRef<string[] | null>(null);
   const limits = availableLimits(reports);
   if (limits.length < 2) return null;
 
   const current = pinnedLimits(reports, settings?.pinned ?? null).map((limit) => limit.key);
   const toggle = (key: string, on: boolean) => {
-    const pinned = on ? [...current, key] : current.filter((pin) => pin !== key);
-    bridge.updateSettings({ pinned });
+    const base = sending.current ?? current;
+    const pinned = on ? [...base, key] : base.filter((pin) => pin !== key);
+    sending.current = pinned;
+    bridge.updateSettings({ pinned }).finally(() => {
+      if (sending.current === pinned) sending.current = null;
+    });
   };
 
   const providers = [...new Set(limits.map((limit) => limit.report.providerId))];

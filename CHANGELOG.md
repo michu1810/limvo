@@ -6,6 +6,24 @@ All notable changes to Limvo are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-11-12
+
+### Changed
+
+- The Microsoft Store version starts with Windows by default and lists itself
+  in Windows' Startup apps, where it can be turned off. Its settings no
+  longer show _Launch at login_. An install that had it off is turned on
+  once with this update.
+- Task Manager names Limvo's windows by what they are, in the app's
+  language: "Limvo · taskbar reading" and "Limvo · desktop card" instead
+  of "Limvo strip" and "Limvo card", also on their WebView2 processes.
+
+### Fixed
+
+- A switch in the settings, such as a limit in the taskbar, shows its new
+  state as soon as it is saved, instead of waiting for the change to come
+  back from the app and sometimes staying as it was.
+
 ## [0.5.1] - 2026-11-11
 
 ### Fixed

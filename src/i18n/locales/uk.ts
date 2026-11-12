@@ -82,6 +82,8 @@ export const uk: LocaleDefinition = {
     budgetNow: "зараз ~{rate}",
     roomierAccount: "Більше запасу в {name}",
     widgetEmpty: "Увійдіть в один зі своїх інструментів ШІ, щоб бачити тут його ліміти.",
+    windowTitleStrip: "Limvo · показник на панелі завдань",
+    windowTitleCard: "Limvo · картка на робочому столі",
     shortcut: "Сполучення клавіш",
     shortcutHint: "{keys} відкриває з будь-якого місця",
     shortcutTaken: "Обидва сполучення зайняті іншими застосунками",

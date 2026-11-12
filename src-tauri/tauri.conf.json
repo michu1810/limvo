@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Limvo",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "identifier": "io.github.michu1810.limvo",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -34,7 +34,7 @@
       {
         "label": "strip",
         "url": "strip.html",
-        "title": "Limvo strip",
+        "title": "Limvo",
         "width": 150,
         "height": 48,
         "resizable": false,
@@ -51,7 +51,7 @@
       {
         "label": "card",
         "url": "card.html",
-        "title": "Limvo card",
+        "title": "Limvo",
         "width": 300,
         "height": 176,
         "resizable": false,

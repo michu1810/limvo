@@ -23,8 +23,10 @@ export function SettingsPanel({
   const { t, locale, format } = useI18n();
   const [launchAtLogin, setLaunchAtLogin] = useState<boolean | null>(null);
   const [shortcutKeys, setShortcutKeys] = useState<string | null>(null);
-  // The Store delivers its own updates, so the Store build has no update switch.
-  const [store, setStore] = useState(false);
+  // The Store build has neither an update switch (the Store delivers updates)
+  // nor a launch-at-login switch (it starts with Windows by default, and the
+  // user turns that off in Windows' Startup apps). Unknown until the host says.
+  const [store, setStore] = useState<boolean | null>(null);
 
   useEffect(() => {
     bridge.getLaunchAtLogin().then(setLaunchAtLogin);
@@ -90,12 +92,14 @@ export function SettingsPanel({
           <ChevronIcon />
         </button>
 
-        <SwitchRow
-          label={t("launchAtLogin")}
-          checked={launchAtLogin ?? false}
-          disabled={launchAtLogin === null}
-          onChange={async (enabled) => setLaunchAtLogin(await bridge.setLaunchAtLogin(enabled))}
-        />
+        {store === false && (
+          <SwitchRow
+            label={t("launchAtLogin")}
+            checked={launchAtLogin ?? false}
+            disabled={launchAtLogin === null}
+            onChange={async (enabled) => setLaunchAtLogin(await bridge.setLaunchAtLogin(enabled))}
+          />
+        )}
         <SwitchRow
           label={t("showStrip")}
           checked={settings?.showStrip ?? true}
@@ -161,7 +165,7 @@ export function SettingsPanel({
           checked={settings?.planColors ?? true}
           onChange={(planColors) => update({ planColors })}
         />
-        {!store && (
+        {store === false && (
           <SwitchRow
             label={t("checkUpdates")}
             hint={t("checkUpdatesHint")}

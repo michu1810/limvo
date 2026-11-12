@@ -58,9 +58,12 @@
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png" />
       <Extensions>
-        <!-- Start at sign-in. Off until the user turns on Launch at login. -->
+        <!--
+          Start at sign-in, on from the first launch. The user turns it off in
+          Windows' Startup apps; the Store build has no switch of its own.
+        -->
         <desktop:Extension Category="windows.startupTask" Executable="limvo.exe" EntryPoint="Windows.FullTrustApplication">
-          <desktop:StartupTask TaskId="LimvoStartup" Enabled="false" DisplayName="Limvo" />
+          <desktop:StartupTask TaskId="LimvoStartup" Enabled="true" DisplayName="Limvo" />
         </desktop:Extension>
         <!--
           The card on the Widgets board. limvo.exe is its own widget provider:

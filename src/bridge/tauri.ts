@@ -16,6 +16,13 @@ const TASKBAR_THEME_EVENT = "taskbar-theme";
 const FLYOUT_SHOWN_EVENT = "flyout-shown";
 const UPDATE_EVENT = "update-available";
 
+/**
+ * Windows of this page that follow the settings. The host broadcasts every
+ * change, but the window that made one also hands on the saved settings the
+ * host answers with, so its own switches never wait on the broadcast.
+ */
+const settingsListeners = new Set<(settings: Settings) => void>();
+
 export const tauriBridge: Bridge = {
   getReports: () => invoke<ProviderReport[]>("get_reports"),
   onReports: (listener) =>
@@ -23,8 +30,19 @@ export const tauriBridge: Bridge = {
   refresh: () => invoke("refresh"),
 
   getSettings: () => invoke<Settings>("get_settings"),
-  onSettings: (listener) => listen<Settings>(SETTINGS_EVENT, (event) => listener(event.payload)),
-  updateSettings: (patch) => invoke<Settings>("update_settings", { patch }),
+  async onSettings(listener) {
+    const stop = await listen<Settings>(SETTINGS_EVENT, (event) => listener(event.payload));
+    settingsListeners.add(listener);
+    return () => {
+      settingsListeners.delete(listener);
+      stop();
+    };
+  },
+  async updateSettings(patch) {
+    const saved = await invoke<Settings>("update_settings", { patch });
+    for (const listener of settingsListeners) listener(saved);
+    return saved;
+  },
   getLaunchAtLogin: () => invoke<boolean>("get_launch_at_login"),
   setLaunchAtLogin: (enabled) => invoke<boolean>("set_launch_at_login", { enabled }),
   shortcutLabel: () => invoke<string | null>("shortcut_label"),
@@ -35,6 +53,10 @@ export const tauriBridge: Bridge = {
     listen<Theme>(TASKBAR_THEME_EVENT, (event) => listener(event.payload)),
   localizeTray: (texts) => invoke("localize_tray", { ...texts }),
   updateWidget: (card) => invoke("update_widget", { card }),
+  async nameWindow(title) {
+    document.title = title;
+    await getCurrentWindow().setTitle(title);
+  },
   async notify(toast) {
     const granted = (await isPermissionGranted()) || (await requestPermission()) === "granted";
     if (granted) sendNotification(toast);

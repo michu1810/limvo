@@ -83,6 +83,8 @@ export const pl: LocaleDefinition = {
     budgetNow: "teraz ~{rate}",
     roomierAccount: "Więcej zapasu na koncie {name}",
     widgetEmpty: "Zaloguj się w jednym z narzędzi AI, żeby zobaczyć tu jego limity.",
+    windowTitleStrip: "Limvo · odczyt na pasku zadań",
+    windowTitleCard: "Limvo · karta na pulpicie",
     shortcut: "Skrót klawiszowy",
     shortcutHint: "{keys} otwiera okienko z dowolnego miejsca",
     shortcutTaken: "Oba skróty są zajęte przez inne aplikacje",

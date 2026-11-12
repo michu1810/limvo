@@ -120,6 +120,9 @@ export interface Messages {
   roomierAccount: string;
   /** The Widgets board card with no service signed in. */
   widgetEmpty: string;
+  /** Names of the windows in Task Manager. Product name first, then what the window is. */
+  windowTitleStrip: string;
+  windowTitleCard: string;
 
   shortcut: string;
   /** Placeholder `{keys}`, for example "Win+Shift+H". */

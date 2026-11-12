@@ -113,6 +113,11 @@ export interface Bridge {
   onTaskbarTheme(listener: (theme: Theme) => void): Promise<Unsubscribe>;
   /** Hands translated texts to the tray icon and its menu, which the host draws. */
   localizeTray(texts: TrayTexts): Promise<void>;
+  /**
+   * Names the current window, for Task Manager and the window list: the
+   * window's title and its page's title, which also names its WebView2 process.
+   */
+  nameWindow(title: string): Promise<void>;
   /** Hands the Widgets board card its content; only the Store build shows it. */
   updateWidget(card: WidgetCard): Promise<void>;
   /** Shows a Windows notification. */

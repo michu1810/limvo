@@ -145,6 +145,8 @@ pub fn run() {
             hotkey::apply(app.handle(), shortcut);
             updater::start(app.handle().clone());
             widgets::start(app.handle());
+            #[cfg(windows)]
+            package::start_at_login_by_default(app.path().app_config_dir()?);
             Ok(())
         })
         .on_window_event(|window, event| {

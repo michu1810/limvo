@@ -82,6 +82,8 @@ export const ptBR: LocaleDefinition = {
     budgetNow: "agora ~{rate}",
     roomierAccount: "Mais folga em {name}",
     widgetEmpty: "Entre em uma das suas ferramentas de IA para ver os limites aqui.",
+    windowTitleStrip: "Limvo · leitura na barra de tarefas",
+    windowTitleCard: "Limvo · cartão na área de trabalho",
     shortcut: "Atalho de teclado",
     shortcutHint: "{keys} abre de qualquer lugar",
     shortcutTaken: "Os dois atalhos já estão em uso por outros apps",
